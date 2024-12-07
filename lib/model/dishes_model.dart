@@ -27,7 +27,7 @@ class Dishes {
               name: "Chancho Mongoliano",
               description: "Chancho Mongoliano",
               unitPrice: 12990,
-              previousPrice: 13990,
+              discountPrice: 1000,
               categoryId: 2,
               imageUrl:
                   "https://delivera.autolistbeta.com/storage/products/66f88e03b77ad.jpg"),
@@ -36,7 +36,7 @@ class Dishes {
               name: "Chancho Salsa Ajo",
               description: "Chancho Salsa Ajo",
               unitPrice: 12990,
-              previousPrice: 14990,
+              discountPrice: 2000,
               categoryId: 2,
               imageUrl:
                   "https://delivera.autolistbeta.com/storage/products/66f88e03b77ad.jpg"),
@@ -70,7 +70,7 @@ class Dishes {
               name: "Pato Mongoliano",
               description: "Pato Mongoliano",
               unitPrice: 9990,
-              previousPrice: 12000,
+              discountPrice: 2010,
               categoryId: 4,
               imageUrl:
                   "https://delivera.autolistbeta.com/storage/products/66f88e08e04a7.png"),
