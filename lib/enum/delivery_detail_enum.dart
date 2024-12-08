@@ -1,0 +1,1 @@
+enum DeliveryDetailEnum { pickup, homeDelivery }

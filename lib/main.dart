@@ -1,7 +1,9 @@
 import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
+import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/dish_categories_provider.dart';
 import 'package:chifa_el_meson/provider/dishes_provider.dart';
+import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/scroll_controller_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
@@ -23,7 +25,13 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => DishesProvider()),
           ChangeNotifierProvider(create: (_) => DishCategoriesProvider()),
           ChangeNotifierProvider(create: (_) => ScrollControllerProvider()),
-          ChangeNotifierProvider(create: (_) => ShoppingCartProvider())
+          ChangeNotifierProvider(create: (_) => ShoppingCartProvider()),
+          ChangeNotifierProvider(create: (_) => DeliveryDetailsProvider()),
+          ChangeNotifierProvider(
+              create: (context) => OrderSummaryProvider(
+                    context.read<RestaurantInfoProvider>(),
+                    context.read<ShoppingCartProvider>(),
+                  ))
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
