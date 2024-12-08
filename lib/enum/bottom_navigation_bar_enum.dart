@@ -1,0 +1,1 @@
+enum BottomNavigationBarEnum { home, shoppingCar }

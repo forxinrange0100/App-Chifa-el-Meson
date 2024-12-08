@@ -3,7 +3,7 @@ import 'package:chifa_el_meson/model/dish_model.dart';
 class Dishes {
   final List<Dish> dishes;
   Dishes({required this.dishes});
-  Dishes.eample()
+  Dishes.example()
       : dishes = [
           Dish(
               id: 1,
@@ -39,7 +39,7 @@ class Dishes {
               discountPrice: 2000,
               categoryId: 2,
               imageUrl:
-                  "https://delivera.autolistbeta.com/storage/products/66f88e03b77ad.jpg"),
+                  "https://delivera.autolistbeta.com/storage/products/66f88e2cd3b67.jpg"),
           Dish(
               id: 5,
               name: "Carne salsa ajo",
