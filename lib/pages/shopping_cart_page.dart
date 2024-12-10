@@ -92,9 +92,10 @@ class ShoppingCartPage extends StatelessWidget {
                                                               .decrementQuantity(
                                                                   cartItem);
                                                         },
-                                                        child: const Text(
-                                                          "-",
-                                                          style: TextStyle(),
+                                                        child: const Icon(
+                                                          FontAwesomeIcons
+                                                              .minus,
+                                                          size: 15,
                                                         )),
                                                     Text(
                                                       cartItem.quantity
@@ -119,7 +120,10 @@ class ShoppingCartPage extends StatelessWidget {
                                                               .incrementQuantity(
                                                                   cartItem);
                                                         },
-                                                        child: const Text("+")),
+                                                        child: const Icon(
+                                                          FontAwesomeIcons.plus,
+                                                          size: 15,
+                                                        )),
                                                   ],
                                                 ),
                                               ],
@@ -260,12 +264,13 @@ class ShoppingCartPage extends StatelessWidget {
                             children: [
                               const Text(
                                 "Subtotal",
-                                style: TextStyle(fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 20),
                               ),
                               Text(
                                 "\$${shoppingCartProvider.subTotal.toStringAsFixed(0)}",
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                               )
                             ],
                           ),

@@ -6,7 +6,6 @@ import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -32,6 +31,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+          backgroundColor: Colors.white,
           centerTitle: true,
           titleTextStyle: const TextStyle(
               color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
@@ -304,11 +304,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   border: Border.all(color: Colors.black, width: 1),
                 ),
                 padding: const EdgeInsets.all(8.0),
-                child: SvgPicture.network(
-                  "https://meson.simsis.cl/img/Logo_WebCheckout_Getnet.svg",
+                child: Image.asset(
+                  "assets/getnet.jpg",
                   height: 50,
-                  colorFilter:
-                      const ColorFilter.mode(Colors.red, BlendMode.srcIn),
                 ),
               ),
             ),

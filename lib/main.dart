@@ -9,6 +9,7 @@ import 'package:chifa_el_meson/provider/scroll_controller_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,28 +34,31 @@ class MyApp extends StatelessWidget {
                     context.read<ShoppingCartProvider>(),
                   ))
         ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-            textButtonTheme: const TextButtonThemeData(
-                style: ButtonStyle(
-                    foregroundColor:
-                        WidgetStatePropertyAll<Color>(Colors.black))),
-            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                selectedItemColor: Colors.black),
-            elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            )),
-            useMaterial3: true,
+        child: ToastificationWrapper(
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+              textButtonTheme: const TextButtonThemeData(
+                  style: ButtonStyle(
+                      foregroundColor:
+                          WidgetStatePropertyAll<Color>(Colors.black))),
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                  selectedItemColor: Colors.black),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              )),
+              useMaterial3: true,
+            ),
+            home: const HomePage(),
           ),
-          home: const HomePage(),
         ));
   }
 }

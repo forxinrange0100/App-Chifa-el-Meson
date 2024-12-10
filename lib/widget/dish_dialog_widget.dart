@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chifa_el_meson/model/dish_model.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
+import 'package:chifa_el_meson/toast/toast.dart';
 import 'package:chifa_el_meson/widget/expandable_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,35 +52,41 @@ class _DishDialogState extends State<DishDialog> {
                           ),
                         )
                       : const SizedBox(),
-                  Text(
-                    widget.dish.name,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      widget.dish.name,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   ExpandableText(text: widget.dish.description),
-                  widget.dish.discountPrice != null
-                      ? Row(
-                          children: [
-                            Text(
-                              "\$${widget.dish.unitPrice.toStringAsFixed(0)}",
-                              style: const TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "\$${(widget.dish.unitPrice + (widget.dish.discountPrice ?? 0)).toStringAsFixed(0)}",
-                              style: const TextStyle(
-                                  decoration: TextDecoration.lineThrough),
-                            ),
-                          ],
-                        )
-                      : Text(
-                          "\$${widget.dish.unitPrice.toStringAsFixed(0)}",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 25),
-                        ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: widget.dish.discountPrice != null
+                        ? Row(
+                            children: [
+                              Text(
+                                "\$${widget.dish.unitPrice.toStringAsFixed(0)}",
+                                style: const TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                "\$${(widget.dish.unitPrice + (widget.dish.discountPrice ?? 0)).toStringAsFixed(0)}",
+                                style: const TextStyle(
+                                    decoration: TextDecoration.lineThrough),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            "\$${widget.dish.unitPrice.toStringAsFixed(0)}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 25),
+                          ),
+                  ),
                   const Divider(),
                   const Text("Cantidad",
                       style:
@@ -100,7 +107,10 @@ class _DishDialogState extends State<DishDialog> {
                                 });
                               },
                               child: const Text("-")),
-                          Text(_counter.toString()),
+                          Text(
+                            _counter.toString(),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           TextButton(
                               onPressed: () {
                                 setState(() {
@@ -142,6 +152,7 @@ class _DishDialogState extends State<DishDialog> {
               context
                   .read<ShoppingCartProvider>()
                   .addCardItem(widget.dish, _counter, _notesController.text);
+              addingCartItemToast();
               Navigator.of(context).pop();
             },
             child: Row(
@@ -149,11 +160,12 @@ class _DishDialogState extends State<DishDialog> {
               children: [
                 Text(
                   "\$${(_counter * widget.dish.unitPrice).toStringAsFixed(0)}",
-                  style: const TextStyle(fontSize: 20),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const Text(
                   "AGREGAR",
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
