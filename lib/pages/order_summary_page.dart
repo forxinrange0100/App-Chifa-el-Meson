@@ -4,6 +4,7 @@ import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
+import 'package:chifa_el_meson/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,8 @@ class OrderSummaryPage extends StatefulWidget {
 }
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
+  final _formUserData = GlobalKey<FormState>();
+  final _formAddress = GlobalKey<FormState>();
   final TextEditingController _textEditingControllerAddress =
       TextEditingController();
   final TextEditingController _textEditingControllerFullName =
@@ -259,32 +262,47 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                 is HomeDelivery)
                             ? Padding(
                                 padding: const EdgeInsets.only(top: 12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "Dirección de envío:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    TextField(
-                                      controller: _textEditingControllerAddress,
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Colors.grey.shade200,
-                                        hintText: 'Ingrese su dirección...',
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10.0,
-                                                horizontal: 15.0),
+                                child: Form(
+                                  key: _formAddress,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Dirección de envío:",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
                                       ),
-                                    ),
-                                  ],
+                                      TextFormField(
+                                        controller:
+                                            _textEditingControllerAddress,
+                                        decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: Colors.grey.shade200,
+                                          hintText: 'Ingrese su dirección...',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 10.0,
+                                                  horizontal: 15.0),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return 'La dirección es requerida';
+                                          }
+                                          if (value.length < 5) {
+                                            return 'La dirección debe tener al menos 5 caracteres';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               )
                             : const SizedBox()
@@ -311,64 +329,96 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               ),
             ),
             const Divider(),
-            const Text(
-              "Mis datos",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Text("Nombre y Apellido (*):"),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextField(
-                controller: _textEditingControllerFullName,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su nombre',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 15.0),
-                ),
-              ),
-            ),
-            const Text("Email (*):"),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextField(
-                controller: _textEditingControllerEmail,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su correo',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 15.0),
-                ),
-              ),
-            ),
-            const Text("Celular (*):"),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextField(
-                controller: _textEditingControllerPhoneNumber,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su celular',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 15.0),
-                ),
-              ),
-            ),
+            Form(
+                key: _formUserData,
+                child: Column(
+                  children: [
+                    const Text(
+                      "Mis datos",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const Text("Nombre y Apellido (*):"),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                          controller: _textEditingControllerFullName,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey.shade200,
+                            hintText: 'Ingrese su nombre',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 15.0),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'El nombre es requerido';
+                            }
+                            if (value.length < 5) {
+                              return 'El nombre debe tener al menos 5 caracteres';
+                            }
+                            return null;
+                          }),
+                    ),
+                    const Text("Email (*):"),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                          controller: _textEditingControllerEmail,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey.shade200,
+                            hintText: 'Ingrese su correo',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 15.0),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'El correo es requerido';
+                            }
+                            final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                            if (!emailRegex.hasMatch(value)) {
+                              return 'El correo no es válido';
+                            }
+                            return null;
+                          }),
+                    ),
+                    const Text("Celular (*):"),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TextFormField(
+                          controller: _textEditingControllerPhoneNumber,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey.shade200,
+                            hintText: 'Ingrese su celular ej. +56912345678',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 15.0),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'El número de celular es requerido';
+                            }
+                            final phoneRegex = RegExp(r'^\+569\d{8}$');
+                            if (!phoneRegex.hasMatch(value)) {
+                              return 'El número de celular no es válido';
+                            }
+                            return null;
+                          }),
+                    ),
+                  ],
+                )),
             const Divider(),
             const Text(
               "Resumen de compra",
@@ -417,6 +467,17 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton(
                   onPressed: () async {
+                    if (context.read<OrderSummaryProvider>().details
+                            is HomeDelivery &&
+                        _formAddress.currentState?.validate() == false) {
+                      errorOrderSummary("La dirección es inválida");
+                      return;
+                    }
+                    if (_formUserData.currentState?.validate() == false) {
+                      errorOrderSummary(
+                          "Algunos datos de usuario son inválidos");
+                      return;
+                    }
                     context.read<OrderSummaryProvider>().setOrderSummary(
                         _textEditingControllerFullName.text,
                         _textEditingControllerEmail.text,
