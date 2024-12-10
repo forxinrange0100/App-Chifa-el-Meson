@@ -2,6 +2,7 @@ import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:chifa_el_meson/model/user_details_model.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
+import 'package:chifa_el_meson/utils/fetch_order.dart';
 import 'package:flutter/material.dart';
 
 class OrderSummaryProvider extends ChangeNotifier {
@@ -17,14 +18,14 @@ class OrderSummaryProvider extends ChangeNotifier {
   String get urlPayment => _urlPayment;
   bool get isOrderSummary => _orderSummary != null;
 
-  void setOrderSummary(String fullName, String email, String phoneNumber) {
+  Future<void> setOrderSummary(
+      String fullName, String email, String phoneNumber) async {
     _orderSummary = OrderSummary(
         details: details,
         userDetails: UserDetails(
             fullName: fullName, email: email, phoneNumber: phoneNumber),
         shoppingCart: _shoppingCartProvider.shoppingCart);
-    _urlPayment =
-        "https://checkout.test.getnet.cl/spa/session/74330/940f7ead26ed31371d6db544bd98e60d";
+    _urlPayment = await fetchOrder(_orderSummary as OrderSummary);
     notifyListeners();
   }
 

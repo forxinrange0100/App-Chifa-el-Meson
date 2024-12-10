@@ -1,4 +1,5 @@
 class RestaurantInfo {
+  final int id;
   final String name;
   final String description;
   final String address;
@@ -8,6 +9,7 @@ class RestaurantInfo {
   final String backgroundUrl;
 
   RestaurantInfo({
+    required this.id,
     required this.name,
     required this.description,
     required this.address,
@@ -18,7 +20,8 @@ class RestaurantInfo {
   });
 
   RestaurantInfo.example()
-      : name = "CHIFA EL MESÓN",
+      : id = 1,
+        name = "CHIFA EL MESÓN",
         description =
             "Te ofrecemos una experiencia culinaria que mezcla lo mejor de la cocina china. Cada plato que servimos, desde el clásico arroz chaufa hasta los deliciosos tallarines saltados, está preparado con ingredientes frescos y lleno de sabor. Queremos que te sientas como en casa cuando nos visites, disfrutando de porciones generosas en un ambiente cálido y familiar. Nos enorgullece combinar tradición y modernidad en cada bocado, para que siempre quieras volver a probar algo nuevo o disfrutar de tus favoritos. ¡Te esperamos con los brazos abiertos!",
         address = "Av. Sta. María 1364",

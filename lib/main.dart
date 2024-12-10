@@ -1,5 +1,6 @@
 import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
+import 'package:chifa_el_meson/provider/data_provider.dart';
 import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/dish_categories_provider.dart';
 import 'package:chifa_el_meson/provider/dishes_provider.dart';
@@ -32,6 +33,13 @@ class MyApp extends StatelessWidget {
               create: (context) => OrderSummaryProvider(
                     context.read<RestaurantInfoProvider>(),
                     context.read<ShoppingCartProvider>(),
+                  )),
+          ChangeNotifierProvider(
+              create: (context) => DataProvider(
+                    context.read<RestaurantInfoProvider>(),
+                    context.read<DishesProvider>(),
+                    context.read<DishCategoriesProvider>(),
+                    context.read<DeliveryDetailsProvider>(),
                   ))
         ],
         child: ToastificationWrapper(

@@ -3,9 +3,14 @@ import 'package:chifa_el_meson/model/dishes_model.dart';
 import 'package:flutter/material.dart';
 
 class DishesProvider extends ChangeNotifier {
-  final Dishes _dishes = Dishes.example();
+  Dishes _dishes = Dishes.example();
   DishesProvider();
   Dishes get dishes => _dishes;
+
+  void init(Dishes dishes) {
+    _dishes = dishes;
+    notifyListeners();
+  }
 
   List<Dish> getDishesByCategory(int categoryId) {
     return _dishes.dishes
