@@ -38,4 +38,14 @@ class OrderSummaryProvider extends ChangeNotifier {
     _details = homeDelivery;
     notifyListeners();
   }
+
+  void setDeliveryAddress(String address) {
+    if (_details is HomeDelivery) {
+      (_details as HomeDelivery).address = address;
+    }
+  }
+
+  void clearUrlPayment() {
+    _urlPayment = "";
+  }
 }

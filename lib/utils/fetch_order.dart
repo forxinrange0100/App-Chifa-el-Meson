@@ -6,15 +6,16 @@ import 'package:http/http.dart' as http;
 
 Future<String> fetchOrder(OrderSummary orderSummary) async {
   try {
-    final body = {
-      "delivery_type": "dispatch",
+    final body = jsonEncode({
+      "delivery_type":
+          (orderSummary.details is HomeDelivery) ? "dispatch" : "pickup",
       "payment_type": "card",
       "dispatch_zone_id": (orderSummary.details is HomeDelivery)
           ? (orderSummary.details as HomeDelivery).zone.id
           : null,
       "order_products": orderSummary.shoppingCart.cartItems.map((cartItem) {
         return {
-          "product_id": cartItem.id,
+          "product_id": cartItem.dish.id,
           "quantity": cartItem.quantity,
           "product_note": cartItem.preferenceNote,
         };
@@ -23,11 +24,11 @@ Future<String> fetchOrder(OrderSummary orderSummary) async {
         "name": orderSummary.userDetails.fullName,
         "email": orderSummary.userDetails.email,
         "phone": orderSummary.userDetails.phoneNumber,
-        "address": (orderSummary.details is PickUp)
-            ? (orderSummary.details as PickUp).address
+        "address": (orderSummary.details is HomeDelivery)
+            ? (orderSummary.details as HomeDelivery).address
             : null,
       },
-    };
+    });
     final response = await http.post(
         Uri.parse(
           "${Urls.apiUrl}/api/orders/${Urls.companyId}",

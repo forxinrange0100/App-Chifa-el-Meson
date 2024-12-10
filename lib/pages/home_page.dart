@@ -83,6 +83,10 @@ class HomePage extends StatelessWidget {
               );
             },
           );
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         } else if (snapshot.hasError) {
           return Scaffold(
             body: Center(

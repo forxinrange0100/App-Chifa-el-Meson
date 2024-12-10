@@ -30,7 +30,7 @@ class PickUp extends DeliveryDetails {
 }
 
 class HomeDelivery extends DeliveryDetails {
-  final String address;
+  String address;
   final DeliveryZone zone;
   HomeDelivery({required this.address, required this.zone});
 }

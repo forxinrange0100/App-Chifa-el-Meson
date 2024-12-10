@@ -478,10 +478,16 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           "Algunos datos de usuario son inválidos");
                       return;
                     }
-                    context.read<OrderSummaryProvider>().setOrderSummary(
+                    if (context.read<OrderSummaryProvider>().details
+                        is HomeDelivery) {
+                      context.read<OrderSummaryProvider>().setDeliveryAddress(
+                          _textEditingControllerAddress.text);
+                    }
+                    await context.read<OrderSummaryProvider>().setOrderSummary(
                         _textEditingControllerFullName.text,
                         _textEditingControllerEmail.text,
                         _textEditingControllerPhoneNumber.text);
+                    if (!context.mounted) return;
                     if (context
                         .read<OrderSummaryProvider>()
                         .urlPayment
@@ -489,7 +495,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       final url =
                           context.read<OrderSummaryProvider>().urlPayment;
                       final Uri uri = Uri.parse(url);
-
+                      context.read<OrderSummaryProvider>().clearUrlPayment();
                       if (await canLaunchUrl(uri)) {
                         await launchUrl(uri);
                       } else {}
