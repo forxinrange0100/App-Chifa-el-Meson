@@ -3,7 +3,6 @@ import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:chifa_el_meson/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -332,6 +331,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             Form(
                 key: _formUserData,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       "Mis datos",
@@ -429,7 +429,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               children: [
                 const Text("Subtotal"),
                 Text(
-                    "\$${context.watch<ShoppingCartProvider>().subTotal.toStringAsFixed(0)}")
+                    "\$${context.watch<OrderSummaryProvider>().orderSummary.subtotal}")
               ],
             ),
             Row(
@@ -437,7 +437,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               children: [
                 const Text("Descuentos"),
                 Text(
-                    "-\$${context.watch<ShoppingCartProvider>().shoppingCart.shoppingCartDiscount.toStringAsFixed(0)}")
+                    "-\$${context.watch<OrderSummaryProvider>().orderSummary.discount}")
               ],
             ),
             Row(
@@ -455,11 +455,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("TOTAL"),
-                (context.watch<OrderSummaryProvider>().details is HomeDelivery)
-                    ? Text(
-                        "\$${(context.watch<ShoppingCartProvider>().shoppingCart.shoppingCartPrice + (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price).toStringAsFixed(0)}")
-                    : Text(
-                        "\$${(context.watch<ShoppingCartProvider>().shoppingCart.shoppingCartPrice).toStringAsFixed(0)}")
+                Text(
+                    "\$${context.watch<OrderSummaryProvider>().orderSummary.total}")
               ],
             ),
             const Divider(),

@@ -5,7 +5,9 @@ class DishCategories {
 
   DishCategories({
     required this.categories,
-  });
+  }) {
+    categories.sort((a, b) => a.displayOrder - b.displayOrder);
+  }
 
   DishCategories.example() : categories = [];
 }

@@ -10,8 +10,10 @@ class OrderSummary {
       {required this.details,
       required this.userDetails,
       required this.shoppingCart});
-  int get subtotal => shoppingCart.shoppingCartPrice;
-  int get discount => shoppingCart.shoppingCartDiscount;
+  int get subtotal => shoppingCart.shoppingCartRegularPrice;
+  int get discount =>
+      shoppingCart.shoppingCartRegularPrice -
+      shoppingCart.shoppingCartDiscountedPrice;
 
   int get deliveryCost {
     if (details is HomeDelivery) {

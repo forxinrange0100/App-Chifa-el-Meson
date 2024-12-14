@@ -16,8 +16,8 @@ Future<DishCategories> fetchDishCategories() async {
       for (var category in categoriesResult) {
         categories.add(DishCategory(
           id: category['id'],
-          createdAt: category['created_at'],
-          updatedAt: category['updated_at'],
+          createdAt: DateTime.parse(category['created_at']),
+          updatedAt: DateTime.parse(category['updated_at']),
           name: category['name'],
           description: category['description'],
           displayOrder: category['display_order'],

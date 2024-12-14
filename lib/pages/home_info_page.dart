@@ -47,12 +47,12 @@ class HomeInfoPage extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: restaurantInfoProvider.restaurantInfo.heroImage,
                 width: double.infinity,
-                height: 200,
+                height: 250,
                 fit: BoxFit.cover,
               ),
               Container(
                 width: double.infinity,
-                height: 200,
+                height: 250,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -138,7 +138,7 @@ class HomeInfoPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    restaurantInfoProvider.restaurantInfo.name,
+                    restaurantInfoProvider.restaurantInfo.name.toUpperCase(),
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 30),
                   ),
@@ -199,71 +199,78 @@ class HomeInfoPage extends StatelessWidget {
           builder: (context, dishCategoriesProvider, child) {
             return Container(
               color: Colors.grey.shade200,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: dishCategoriesProvider.dishCategories.categories
-                    .map((category) => SizedBox(
-                        key: category.categoryKey,
-                        width: double.infinity,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Center(
-                                  child: Container(
-                                width: double.infinity,
-                                color: Colors.white,
-                                child: Text(
-                                  category.name,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              )),
-                            ),
-                            Consumer<DishesProvider>(
-                              builder: (context, dishProvider, child) {
-                                return Column(
-                                  children: dishProvider
-                                      .getDishesByCategory(category.id)
-                                      .map((dish) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8.0),
-                                      child: Container(
-                                        color: Colors.white,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return DishDialog(dish: dish);
-                                              },
-                                            );
-                                          },
-                                          child: SizedBox(
-                                              width: double.infinity,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Column(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Column(
+                  children: dishCategoriesProvider.dishCategories.categories
+                      .map((category) => SizedBox(
+                          key: category.categoryKey,
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 3.0),
+                                child: Center(
+                                    child: Container(
+                                  width: double.infinity,
+                                  color: Colors.white,
+                                  child: Text(
+                                    category.name,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )),
+                              ),
+                              Consumer<DishesProvider>(
+                                builder: (context, dishProvider, child) {
+                                  return Column(
+                                    children: dishProvider
+                                        .getDishesByCategory(category.id)
+                                        .map((dish) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Container(
+                                          color: Colors.white,
+                                          width: double.infinity,
+                                          child: ElevatedButton(
+                                            style: cardItemStyle(),
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return DishDialog(dish: dish);
+                                                },
+                                              );
+                                            },
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                SizedBox(
+                                                  height: 160,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .stretch,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 150,
+                                                        child: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .start,
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
                                                                   .spaceBetween,
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
                                                           children: [
                                                             Text(
                                                               dish.name,
@@ -273,104 +280,118 @@ class HomeInfoPage extends StatelessWidget {
                                                                       FontWeight
                                                                           .bold),
                                                             ),
-                                                            SizedBox(
-                                                              width: 200,
-                                                              child: Text(
-                                                                dish.description,
-                                                              ),
+                                                            ExpandableText(
+                                                              text: dish
+                                                                  .description,
+                                                              maxLines: 3,
+                                                              enabled: false,
+                                                              color:
+                                                                  Colors.grey,
                                                             ),
-                                                            dish.discountedPrice !=
-                                                                    0
-                                                                ? Row(
-                                                                    children: [
-                                                                      Text(
-                                                                        "\$${dish.discountedPrice}",
-                                                                        style: const TextStyle(
-                                                                            color: Colors
-                                                                                .green,
-                                                                            fontSize:
-                                                                                25,
-                                                                            fontWeight:
-                                                                                FontWeight.bold),
-                                                                      ),
-                                                                      const SizedBox(
-                                                                        width:
-                                                                            10,
-                                                                      ),
-                                                                      Text(
-                                                                        "\$${dish.regularPrice}",
-                                                                        style: const TextStyle(
-                                                                            decoration:
-                                                                                TextDecoration.lineThrough),
-                                                                      ),
-                                                                    ],
-                                                                  )
-                                                                : Text(
-                                                                    "\$${dish.regularPrice}",
-                                                                    style: const TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .bold,
-                                                                        fontSize:
-                                                                            25),
-                                                                  )
+                                                            Center(
+                                                                child:
+                                                                    dish.discountedPrice !=
+                                                                            0
+                                                                        ? Row(
+                                                                            children: [
+                                                                              Text(
+                                                                                "\$${dish.discountedPrice}",
+                                                                                style: const TextStyle(color: Colors.green, fontSize: 25, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 10,
+                                                                              ),
+                                                                              Text(
+                                                                                "\$${dish.regularPrice}",
+                                                                                style: const TextStyle(decoration: TextDecoration.lineThrough),
+                                                                              ),
+                                                                            ],
+                                                                          )
+                                                                        : Text(
+                                                                            "\$${dish.regularPrice}",
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                                                                          ))
                                                           ],
                                                         ),
-                                                        CachedNetworkImage(
-                                                          imageUrl: dish.image,
-                                                          width: 150,
-                                                          height: 150,
-                                                          fit: BoxFit.cover,
-                                                          placeholder: (context,
-                                                                  url) =>
-                                                              const Center(
-                                                                  child:
-                                                                      CircularProgressIndicator()),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              const Icon(
-                                                                  Icons.error),
-                                                        )
-                                                      ],
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 10,
-                                                    ),
-                                                    ElevatedButton.icon(
-                                                        icon: const Icon(
-                                                            FontAwesomeIcons
-                                                                .cartShopping),
-                                                        onPressed: () {
-                                                          showDialog(
-                                                            context: context,
-                                                            builder:
-                                                                (BuildContext
-                                                                    context) {
-                                                              return DishDialog(
-                                                                  dish: dish);
-                                                            },
-                                                          );
-                                                        },
-                                                        label: const Text(
-                                                            "AGREGAR AL CARRITO"))
-                                                  ],
+                                                      ),
+                                                      CachedNetworkImage(
+                                                        imageUrl: dish.image,
+                                                        width: 170,
+                                                        fit: BoxFit.cover,
+                                                        placeholder: (context,
+                                                                url) =>
+                                                            const Center(
+                                                                child:
+                                                                    CircularProgressIndicator()),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            const Icon(
+                                                                Icons.error),
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                              )),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                ElevatedButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return DishDialog(
+                                                              dish: dish);
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(FontAwesomeIcons
+                                                            .cartShopping),
+                                                        SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Text(
+                                                            "AGREGAR AL CARRITO"),
+                                                      ],
+                                                    ))
+                                              ],
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                );
-                              },
-                            )
-                          ],
-                        )))
-                    .toList(),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              )
+                            ],
+                          )))
+                      .toList(),
+                ),
               ),
             );
           },
         ),
       ],
+    );
+  }
+
+  ButtonStyle cardItemStyle() {
+    return const ButtonStyle(
+      backgroundColor: WidgetStatePropertyAll(Colors.white),
+      foregroundColor: WidgetStatePropertyAll(Colors.black),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+        ),
+      ),
     );
   }
 }

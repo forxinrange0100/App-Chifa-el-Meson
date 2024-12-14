@@ -20,22 +20,22 @@ class _NoteDialogState extends State<NoteDialog> {
         ? ""
         : widget.cartItem.preferenceNote;
     return AlertDialog(
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _notesController,
-            maxLines: 5,
-            decoration: InputDecoration(
-              hintText: "Escribe tus notas aquí...",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      contentPadding: EdgeInsets.zero,
+      content: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: TextField(
+          controller: _notesController,
+          maxLines: 5,
+          decoration: InputDecoration(
+            hintText: "Escribe tus notas aquí...",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
-        ],
+        ),
       ),
+      actionsPadding: const EdgeInsets.all(8.0),
       actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: [
         TextButton(

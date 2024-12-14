@@ -10,7 +10,6 @@ class ShoppingCartProvider extends ChangeNotifier {
 
   int get length => _cardItems.cartItems.length;
   List<CartItem> get cardItems => _cardItems.cartItems;
-  int get subTotal => _cardItems.shoppingCartPrice;
   ShoppingCart get shoppingCart => _cardItems;
 
   void addCardItem(Dish dish, int quantity, String preferenceNote) {

@@ -24,7 +24,7 @@ Future<Dishes> fetchDishes() async {
             discountedPrice: product['discounted_price'],
             image: "${Urls.apiUrl}/storage/${product['image']}",
             categoryId: product['category_id'],
-            enabled: product['enabled'],
+            enabled: product['enabled'] == 1 ? true : false,
             displayOrder: product['display_order'],
             units: product['units']));
       }
