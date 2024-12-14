@@ -16,8 +16,10 @@ Future<DeliveryZones> fetchDeliveryZones() async {
       for (var dispatchZone in dispatchZones) {
         deliveryZones.add(DeliveryZone(
             id: dispatchZone['id'],
+            createdAt: DateTime.parse(dispatchZone['created_at']),
+            updatedAt: DateTime.parse(dispatchZone['updated_at']),
             name: dispatchZone['name'],
-            price: (dispatchZone['price'] as num).toDouble()));
+            price: dispatchZone['price']));
       }
       return DeliveryZones(zones: deliveryZones);
     } else {

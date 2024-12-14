@@ -16,15 +16,17 @@ Future<Dishes> fetchDishes() async {
       for (var product in products) {
         dishes.add(Dish(
             id: product['id'],
+            createdAt: DateTime.parse(product['created_at']),
+            updatedAt: DateTime.parse(product['updated_at']),
             name: product['name'],
             description: product['description'],
+            regularPrice: product['regular_price'],
+            discountedPrice: product['discounted_price'],
+            image: "${Urls.apiUrl}/storage/${product['image']}",
             categoryId: product['category_id'],
-            unitPrice: (product['regular_price'] as num).toDouble(),
-            discountPrice: product['discounted_price'] == 0
-                ? null
-                : (product['regular_price'] as num).toDouble() -
-                    (product['discounted_price'] as num).toDouble(),
-            imageUrl: "${Urls.apiUrl}/storage/${product['image']}"));
+            enabled: product['enabled'],
+            displayOrder: product['display_order'],
+            units: product['units']));
       }
       return Dishes(dishes: dishes);
     } else {

@@ -45,7 +45,7 @@ class HomeInfoPage extends StatelessWidget {
           children: [
             Stack(children: [
               CachedNetworkImage(
-                imageUrl: restaurantInfoProvider.restaurantInfo.backgroundUrl,
+                imageUrl: restaurantInfoProvider.restaurantInfo.heroImage,
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
@@ -100,7 +100,7 @@ class HomeInfoPage extends StatelessWidget {
                                     width: 5,
                                   ),
                                   Text(restaurantInfoProvider
-                                      .restaurantInfo.phoneNumber),
+                                      .restaurantInfo.phone),
                                 ],
                               ),
                               const SizedBox(
@@ -116,15 +116,14 @@ class HomeInfoPage extends StatelessWidget {
                                     width: 5,
                                   ),
                                   Text(restaurantInfoProvider
-                                      .restaurantInfo.openingHour),
+                                      .restaurantInfo.schedule),
                                 ],
                               )
                             ],
                           )),
                       ClipOval(
                         child: CachedNetworkImage(
-                          imageUrl:
-                              restaurantInfoProvider.restaurantInfo.iconUrl,
+                          imageUrl: restaurantInfoProvider.restaurantInfo.logo,
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
@@ -280,12 +279,12 @@ class HomeInfoPage extends StatelessWidget {
                                                                 dish.description,
                                                               ),
                                                             ),
-                                                            dish.discountPrice !=
-                                                                    null
+                                                            dish.discountedPrice !=
+                                                                    0
                                                                 ? Row(
                                                                     children: [
                                                                       Text(
-                                                                        "\$${dish.unitPrice.toStringAsFixed(0)}",
+                                                                        "\$${dish.discountedPrice}",
                                                                         style: const TextStyle(
                                                                             color: Colors
                                                                                 .green,
@@ -299,7 +298,7 @@ class HomeInfoPage extends StatelessWidget {
                                                                             10,
                                                                       ),
                                                                       Text(
-                                                                        "\$${(dish.unitPrice + (dish.discountPrice ?? 0)).toStringAsFixed(0)}",
+                                                                        "\$${dish.regularPrice}",
                                                                         style: const TextStyle(
                                                                             decoration:
                                                                                 TextDecoration.lineThrough),
@@ -307,7 +306,7 @@ class HomeInfoPage extends StatelessWidget {
                                                                     ],
                                                                   )
                                                                 : Text(
-                                                                    "\$${dish.unitPrice.toStringAsFixed(0)}",
+                                                                    "\$${dish.regularPrice}",
                                                                     style: const TextStyle(
                                                                         fontWeight:
                                                                             FontWeight
@@ -318,8 +317,7 @@ class HomeInfoPage extends StatelessWidget {
                                                           ],
                                                         ),
                                                         CachedNetworkImage(
-                                                          imageUrl:
-                                                              dish.imageUrl,
+                                                          imageUrl: dish.image,
                                                           width: 150,
                                                           height: 150,
                                                           fit: BoxFit.cover,

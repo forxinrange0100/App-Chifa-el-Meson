@@ -28,7 +28,7 @@ class _DishDialogState extends State<DishDialog> {
         child: ListView(
           children: [
             CachedNetworkImage(
-              imageUrl: widget.dish.imageUrl,
+              imageUrl: widget.dish.image,
               width: 400,
               fit: BoxFit.cover,
             ),
@@ -37,13 +37,13 @@ class _DishDialogState extends State<DishDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  widget.dish.discountPrice != null
+                  widget.dish.discountedPrice != 0
                       ? Container(
                           color: Colors.green,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Ahorras un ${(((widget.dish.discountPrice ?? 0) / ((widget.dish.discountPrice ?? 0) + widget.dish.unitPrice)) * 100).toStringAsFixed(0)}%",
+                              "Ahorras un ${((1 - (widget.dish.discountedPrice / widget.dish.regularPrice)) * 100).toStringAsFixed(0)}%",
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -63,11 +63,11 @@ class _DishDialogState extends State<DishDialog> {
                   ExpandableText(text: widget.dish.description),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: widget.dish.discountPrice != null
+                    child: widget.dish.discountedPrice != 0
                         ? Row(
                             children: [
                               Text(
-                                "\$${widget.dish.unitPrice.toStringAsFixed(0)}",
+                                "\$${widget.dish.regularPrice}",
                                 style: const TextStyle(
                                     fontSize: 25, fontWeight: FontWeight.bold),
                               ),
@@ -75,14 +75,14 @@ class _DishDialogState extends State<DishDialog> {
                                 width: 10,
                               ),
                               Text(
-                                "\$${(widget.dish.unitPrice + (widget.dish.discountPrice ?? 0)).toStringAsFixed(0)}",
+                                "\$${widget.dish.regularPrice}",
                                 style: const TextStyle(
                                     decoration: TextDecoration.lineThrough),
                               ),
                             ],
                           )
                         : Text(
-                            "\$${widget.dish.unitPrice.toStringAsFixed(0)}",
+                            "\$${widget.dish.regularPrice}",
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 25),
                           ),
@@ -159,7 +159,7 @@ class _DishDialogState extends State<DishDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "\$${(_counter * widget.dish.unitPrice).toStringAsFixed(0)}",
+                  "\$${(_counter * widget.dish.regularPrice).toStringAsFixed(0)}",
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
                 ),

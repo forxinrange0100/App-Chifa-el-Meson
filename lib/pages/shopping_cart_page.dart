@@ -137,7 +137,7 @@ class ShoppingCartPage extends StatelessWidget {
                                                       BorderRadius.circular(12),
                                                   child: CachedNetworkImage(
                                                     imageUrl:
-                                                        cartItem.dish.imageUrl,
+                                                        cartItem.dish.image,
                                                     height: 100,
                                                     width: 150,
                                                     fit: BoxFit.cover,
@@ -157,13 +157,13 @@ class ShoppingCartPage extends StatelessWidget {
                                                                   .dish
                                                                   .description)),
                                                       cartItem.dish
-                                                                  .discountPrice !=
-                                                              null
+                                                                  .discountedPrice !=
+                                                              0
                                                           ? Container(
                                                               color:
                                                                   Colors.green,
                                                               child: Text(
-                                                                "Ahorras un ${(((cartItem.dish.discountPrice ?? 0) / ((cartItem.dish.discountPrice ?? 0) + cartItem.dish.unitPrice)) * 100).toStringAsFixed(0)}% DTO",
+                                                                "Ahorras un ${(((1 - (cartItem.dish.discountedPrice / cartItem.dish.regularPrice))) * 100).toStringAsFixed(0)}% DTO",
                                                                 style: const TextStyle(
                                                                     color: Colors
                                                                         .white,
@@ -176,15 +176,15 @@ class ShoppingCartPage extends StatelessWidget {
                                                             )
                                                           : const SizedBox(),
                                                       cartItem.dish
-                                                                  .discountPrice !=
-                                                              null
+                                                                  .discountedPrice !=
+                                                              0
                                                           ? Column(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .end,
                                                               children: [
                                                                 Text(
-                                                                  "\$${(cartItem.dish.unitPrice + (cartItem.dish.discountPrice ?? 0)).toStringAsFixed(0)}",
+                                                                  "\$${cartItem.dish.regularPrice}",
                                                                   textAlign:
                                                                       TextAlign
                                                                           .end,
@@ -197,7 +197,7 @@ class ShoppingCartPage extends StatelessWidget {
                                                                   width: 10,
                                                                 ),
                                                                 Text(
-                                                                  "\$${(cartItem.dish.unitPrice * cartItem.quantity).toStringAsFixed(0)}",
+                                                                  "\$${cartItem.dish.regularPrice * cartItem.quantity}",
                                                                   textAlign:
                                                                       TextAlign
                                                                           .end,
@@ -211,7 +211,7 @@ class ShoppingCartPage extends StatelessWidget {
                                                               ],
                                                             )
                                                           : Text(
-                                                              "\$${(cartItem.dish.unitPrice * cartItem.quantity).toStringAsFixed(0)}",
+                                                              "\$${cartItem.dish.regularPrice * cartItem.quantity}",
                                                               style: const TextStyle(
                                                                   fontWeight:
                                                                       FontWeight

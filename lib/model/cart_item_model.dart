@@ -10,6 +10,6 @@ class CartItem {
       required this.quantity,
       required this.preferenceNote})
       : id = DateTime.now().millisecondsSinceEpoch.toString();
-  double get cartItemPrice => dish.unitPrice * quantity;
-  double get cartItemDiscount => (dish.discountPrice ?? 0) * quantity;
+  int get cartItemPrice => dish.regularPrice * quantity;
+  int get cartItemDiscount => dish.discountedPrice * quantity;
 }

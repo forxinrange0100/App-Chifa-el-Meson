@@ -14,8 +14,14 @@ Future<DishCategories> fetchDishCategories() async {
       final categoriesResult = result['categories'];
       List<DishCategory> categories = [];
       for (var category in categoriesResult) {
-        categories
-            .add(DishCategory(id: category['id'], name: category['name']));
+        categories.add(DishCategory(
+          id: category['id'],
+          createdAt: category['created_at'],
+          updatedAt: category['updated_at'],
+          name: category['name'],
+          description: category['description'],
+          displayOrder: category['display_order'],
+        ));
       }
       return DishCategories(categories: categories);
     } else {

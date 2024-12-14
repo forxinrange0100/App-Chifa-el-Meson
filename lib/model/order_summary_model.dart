@@ -10,16 +10,17 @@ class OrderSummary {
       {required this.details,
       required this.userDetails,
       required this.shoppingCart});
-  double get subtotal => shoppingCart.shoppingCartPrice;
-  double get discount => shoppingCart.shoppingCartDiscount;
-  double get deliveryCost {
+  int get subtotal => shoppingCart.shoppingCartPrice;
+  int get discount => shoppingCart.shoppingCartDiscount;
+
+  int get deliveryCost {
     if (details is HomeDelivery) {
       return (details as HomeDelivery).zone.price;
     }
     return 0;
   }
 
-  double get total => subtotal - discount + deliveryCost;
+  int get total => subtotal - discount + deliveryCost;
 }
 
 abstract class DeliveryDetails {}

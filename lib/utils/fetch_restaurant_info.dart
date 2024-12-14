@@ -13,13 +13,18 @@ Future<RestaurantInfo> fetchRestaurantInfo() async {
 
       return RestaurantInfo(
         id: result['company']['id'],
+        createdAt: DateTime.parse(result['company']['created_at']),
+        updatedAt: DateTime.parse(result['company']['updated_at']),
         name: result['company']['name'],
         description: result['company']['description'],
+        logo: result['company']['logo'],
+        heroImage: result['company']['hero_image'],
+        instagram: result['company']['instagram'],
+        facebook: result['company']['facebook'],
+        whatsapp: result['company']['whatsapp'],
         address: result['company']['address'],
-        phoneNumber: result['company']['phone'],
-        openingHour: result['company']['schedule'],
-        iconUrl: result['company']['logo'],
-        backgroundUrl: result['company']['hero_image'],
+        phone: result['company']['phone'],
+        schedule: result['company']['schedule'],
       );
     } else {
       throw FetchRestaurantInfoException(response.body.toString());
