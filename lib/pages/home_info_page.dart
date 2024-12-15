@@ -333,7 +333,7 @@ class HomeInfoPage extends StatelessWidget {
                                                             ExpandableText(
                                                               text: dish
                                                                   .description,
-                                                              maxLines: 3,
+                                                              maxLines: 1,
                                                               enabled: false,
                                                               color:
                                                                   Colors.grey,
