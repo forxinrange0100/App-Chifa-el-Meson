@@ -4,6 +4,7 @@ import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:chifa_el_meson/widget/expandable_text_widget.dart';
 import 'package:chifa_el_meson/widget/note_dialog_widget.dart';
+import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -157,8 +158,10 @@ class ShoppingCartPage extends StatelessWidget {
                                                     SizedBox(
                                                         width: 200,
                                                         child: ExpandableText(
-                                                            text: cartItem.dish
-                                                                .description)),
+                                                          text: cartItem
+                                                              .dish.description,
+                                                          enabled: false,
+                                                        )),
                                                     cartItem.dish
                                                                 .discountedPrice !=
                                                             0
@@ -184,41 +187,38 @@ class ShoppingCartPage extends StatelessWidget {
                                                                 CrossAxisAlignment
                                                                     .end,
                                                             children: [
-                                                              Text(
-                                                                "\$${cartItem.dish.regularPrice}",
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .end,
-                                                                style: const TextStyle(
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .lineThrough),
-                                                              ),
+                                                              PriceWidget(
+                                                                  price: cartItem
+                                                                      .dish
+                                                                      .regularPrice,
+                                                                  textDecoration:
+                                                                      TextDecoration
+                                                                          .lineThrough),
                                                               const SizedBox(
                                                                 width: 10,
                                                               ),
-                                                              Text(
-                                                                "\$${cartItem.dish.discountedPrice * cartItem.quantity}",
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .end,
-                                                                style: const TextStyle(
-                                                                    fontSize:
-                                                                        25,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : Text(
-                                                            "\$${cartItem.dish.regularPrice * cartItem.quantity}",
-                                                            style: const TextStyle(
+                                                              PriceWidget(
+                                                                price: cartItem
+                                                                        .dish
+                                                                        .discountedPrice *
+                                                                    cartItem
+                                                                        .quantity,
+                                                                fontSize: 25,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                fontSize: 25),
-                                                          ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : PriceWidget(
+                                                            price: cartItem.dish
+                                                                    .regularPrice *
+                                                                cartItem
+                                                                    .quantity,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 25,
+                                                          )
                                                   ],
                                                 ),
                                               ),
@@ -268,10 +268,11 @@ class ShoppingCartPage extends StatelessWidget {
                               style: TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 20),
                             ),
-                            Text(
-                              "\$${shoppingCartProvider.shoppingCart.shoppingCartDiscountedPrice}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            PriceWidget(
+                              price: shoppingCartProvider
+                                  .shoppingCart.shoppingCartDiscountedPrice,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
                             )
                           ],
                         ),

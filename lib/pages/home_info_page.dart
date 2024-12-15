@@ -6,6 +6,7 @@ import 'package:chifa_el_meson/provider/scroll_controller_provider.dart';
 import 'package:chifa_el_meson/provider/shift_provider.dart';
 import 'package:chifa_el_meson/widget/dish_dialog_widget.dart';
 import 'package:chifa_el_meson/widget/expandable_text_widget.dart';
+import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -150,17 +151,23 @@ class HomeInfoPage extends StatelessWidget {
                                         ),
                                       ),
                                     )
-                                  : const Row(
-                                      children: [
-                                        Icon(
-                                          FontAwesomeIcons.doorClosed,
-                                          color: Colors.white,
+                                  : Container(
+                                      color: Colors.redAccent.shade700,
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              FontAwesomeIcons.doorClosed,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("Turno Cerrado"),
+                                          ],
                                         ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Text("Turno Cerrado"),
-                                      ],
+                                      ),
                                     ),
                             ],
                           )),
@@ -332,31 +339,32 @@ class HomeInfoPage extends StatelessWidget {
                                                                   Colors.grey,
                                                             ),
                                                             Center(
-                                                                child:
-                                                                    dish.discountedPrice !=
-                                                                            0
-                                                                        ? Row(
-                                                                            children: [
-                                                                              Text(
-                                                                                "\$${dish.discountedPrice}",
-                                                                                style: const TextStyle(color: Colors.green, fontSize: 25, fontWeight: FontWeight.bold),
-                                                                              ),
-                                                                              const SizedBox(
-                                                                                width: 10,
-                                                                              ),
-                                                                              Text(
-                                                                                "\$${dish.regularPrice}",
-                                                                                style: const TextStyle(decoration: TextDecoration.lineThrough),
-                                                                              ),
-                                                                            ],
-                                                                          )
-                                                                        : Text(
-                                                                            "\$${dish.regularPrice}",
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                                                                          ))
+                                                                child: dish.discountedPrice !=
+                                                                        0
+                                                                    ? Row(
+                                                                        children: [
+                                                                          PriceWidget(
+                                                                              price: dish.discountedPrice,
+                                                                              color: Colors.green,
+                                                                              fontSize: 22,
+                                                                              fontWeight: FontWeight.bold),
+                                                                          const SizedBox(
+                                                                            width:
+                                                                                10,
+                                                                          ),
+                                                                          PriceWidget(
+                                                                              price: dish.regularPrice,
+                                                                              textDecoration: TextDecoration.lineThrough),
+                                                                        ],
+                                                                      )
+                                                                    : PriceWidget(
+                                                                        price: dish
+                                                                            .regularPrice,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontSize:
+                                                                            25))
                                                           ],
                                                         ),
                                                       ),

@@ -5,6 +5,7 @@ class ShoppingCart {
   ShoppingCart();
   int get shoppingCartRegularPrice => cartItems.fold(
       0, (total, cartItem) => total + cartItem.cartItemRegularPrice);
+
   int get shoppingCartDiscountedPrice => cartItems.fold(
       0,
       (total, cartItem) => total + cartItem.cartItemDisccountedPrice != 0

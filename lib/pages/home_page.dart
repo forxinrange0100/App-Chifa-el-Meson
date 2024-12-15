@@ -54,6 +54,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       canPop: false,
       onPopInvoked: (didPop) {
         if (!didPop) {
+          if (context.read<BottomNavigationBarProvider>().index ==
+              BottomNavigationBarEnum.shoppingCar.index) {
+            context.read<BottomNavigationBarProvider>().showHome();
+            return;
+          }
           final now = DateTime.now();
           final isFirstBackPress = lastPressedAt == null ||
               now.difference(lastPressedAt!) > const Duration(seconds: 5);

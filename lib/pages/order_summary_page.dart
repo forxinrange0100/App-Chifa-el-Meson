@@ -3,7 +3,9 @@ import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
+import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:chifa_el_meson/toast/toast.dart';
+import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +33,6 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
           backgroundColor: Colors.white,
           centerTitle: true,
@@ -213,11 +214,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                         style: const TextStyle(
                                             fontWeight: FontWeight.w500),
                                       ),
-                                      Text(
-                                        "\$${(context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price.toStringAsFixed(0)}",
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      )
+                                      PriceWidget(
+                                          price: (context
+                                                  .watch<OrderSummaryProvider>()
+                                                  .details as HomeDelivery)
+                                              .zone
+                                              .price,
+                                          fontWeight: FontWeight.w500),
                                     ],
                                   ),
                                 ),
@@ -250,8 +253,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(zone.name),
-                                            Text(
-                                                "\$${zone.price.toStringAsFixed(0)}")
+                                            PriceWidget(price: zone.price)
                                           ],
                                         ));
                                   }).toList(),
@@ -428,16 +430,16 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Subtotal"),
-                Text(
-                    "\$${context.watch<OrderSummaryProvider>().orderSummary.subtotal}")
+                PriceWidget(
+                    price: context.watch<ShoppingCartProvider>().subtotal)
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Descuentos"),
-                Text(
-                    "-\$${context.watch<OrderSummaryProvider>().orderSummary.discount}")
+                PriceWidget(
+                    price: context.watch<ShoppingCartProvider>().discount)
               ],
             ),
             Row(
@@ -445,9 +447,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               children: [
                 const Text("Costo de Envío"),
                 (context.watch<OrderSummaryProvider>().details is HomeDelivery)
-                    ? Text(
-                        "\$${(context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price.toStringAsFixed(0)}")
-                    : const Text("\$0")
+                    ? PriceWidget(
+                        price: (context.watch<OrderSummaryProvider>().details
+                                as HomeDelivery)
+                            .zone
+                            .price)
+                    : const PriceWidget(price: 0)
               ],
             ),
             const Divider(),
@@ -455,8 +460,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("TOTAL"),
-                Text(
-                    "\$${context.watch<OrderSummaryProvider>().orderSummary.total}")
+                PriceWidget(
+                    price: context.watch<OrderSummaryProvider>().details.cost +
+                        context.watch<ShoppingCartProvider>().subtotal)
               ],
             ),
             const Divider(),

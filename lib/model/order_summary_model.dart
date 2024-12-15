@@ -10,22 +10,11 @@ class OrderSummary {
       {required this.details,
       required this.userDetails,
       required this.shoppingCart});
-  int get subtotal => shoppingCart.shoppingCartRegularPrice;
-  int get discount =>
-      shoppingCart.shoppingCartRegularPrice -
-      shoppingCart.shoppingCartDiscountedPrice;
-
-  int get deliveryCost {
-    if (details is HomeDelivery) {
-      return (details as HomeDelivery).zone.price;
-    }
-    return 0;
-  }
-
-  int get total => subtotal - discount + deliveryCost;
 }
 
-abstract class DeliveryDetails {}
+abstract class DeliveryDetails {
+  int get cost => 0;
+}
 
 class PickUp extends DeliveryDetails {
   final String address;
@@ -36,4 +25,6 @@ class HomeDelivery extends DeliveryDetails {
   String address;
   final DeliveryZone zone;
   HomeDelivery({required this.address, required this.zone});
+  @override
+  int get cost => zone.price;
 }

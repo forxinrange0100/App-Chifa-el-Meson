@@ -20,7 +20,6 @@ class OrderSummaryProvider extends ChangeNotifier {
             PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
   DeliveryDetails get details => _details;
   String get urlPayment => _urlPayment;
-  OrderSummary get orderSummary => _orderSummary;
 
   Future<void> setOrderSummary(
       String fullName, String email, String phoneNumber) async {
