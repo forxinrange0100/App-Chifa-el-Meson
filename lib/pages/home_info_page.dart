@@ -3,6 +3,7 @@ import 'package:chifa_el_meson/provider/dish_categories_provider.dart';
 import 'package:chifa_el_meson/provider/dishes_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/scroll_controller_provider.dart';
+import 'package:chifa_el_meson/provider/shift_provider.dart';
 import 'package:chifa_el_meson/widget/dish_dialog_widget.dart';
 import 'package:chifa_el_meson/widget/expandable_text_widget.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +50,14 @@ class HomeInfoPage extends StatelessWidget {
                 width: double.infinity,
                 height: 250,
                 fit: BoxFit.cover,
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  return Container(
+                    width: double.infinity,
+                    height: 250,
+                    color: Colors.redAccent.shade700,
+                  );
+                },
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
               Container(
                 width: double.infinity,
@@ -118,7 +127,41 @@ class HomeInfoPage extends StatelessWidget {
                                   Text(restaurantInfoProvider
                                       .restaurantInfo.schedule),
                                 ],
-                              )
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              context.watch<ShiftProvider>().isOpen
+                                  ? Container(
+                                      color: Colors.green,
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              FontAwesomeIcons.doorOpen,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text("Turno Abierto"),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : const Row(
+                                      children: [
+                                        Icon(
+                                          FontAwesomeIcons.doorClosed,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text("Turno Cerrado"),
+                                      ],
+                                    ),
                             ],
                           )),
                       ClipOval(
@@ -338,7 +381,7 @@ class HomeInfoPage extends StatelessWidget {
                                                   height: 10,
                                                 ),
                                                 ElevatedButton(
-                                                    onPressed: () {
+                                                    onPressed: () async {
                                                       showDialog(
                                                         context: context,
                                                         builder: (BuildContext

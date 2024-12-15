@@ -2,6 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 
+void closeAppToast() {
+  toastification.show(
+    icon: const Icon(FontAwesomeIcons.triangleExclamation),
+    title: const Text(
+      'Si presionas nuevamente hacia atrás, se cerrará la aplicación',
+      overflow: TextOverflow.ellipsis,
+      maxLines: 2,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.warning,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.orange),
+    autoCloseDuration: const Duration(seconds: 5),
+  );
+}
+
+void shiftIsCloseToast() {
+  toastification.show(
+    icon: const Icon(FontAwesomeIcons.solidCircleCheck),
+    title: const Text('Restaurant Cerrado'),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.error,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
+    autoCloseDuration: const Duration(seconds: 5),
+  );
+}
+
 void addingCartItemToast() {
   toastification.show(
     icon: const Icon(FontAwesomeIcons.solidCircleCheck),

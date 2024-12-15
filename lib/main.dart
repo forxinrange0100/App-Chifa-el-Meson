@@ -7,6 +7,7 @@ import 'package:chifa_el_meson/provider/dishes_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/scroll_controller_provider.dart';
+import 'package:chifa_el_meson/provider/shift_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => ScrollControllerProvider()),
           ChangeNotifierProvider(create: (_) => ShoppingCartProvider()),
           ChangeNotifierProvider(create: (_) => DeliveryDetailsProvider()),
+          ChangeNotifierProvider(create: (_) => ShiftProvider()),
           ChangeNotifierProvider(
               create: (context) => OrderSummaryProvider(
                     context.read<RestaurantInfoProvider>(),
@@ -63,6 +65,10 @@ class MyApp extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               )),
+              progressIndicatorTheme: ProgressIndicatorThemeData(
+                color: Colors.white,
+                refreshBackgroundColor: Colors.redAccent.shade700,
+              ),
               useMaterial3: true,
             ),
             home: const HomePage(),

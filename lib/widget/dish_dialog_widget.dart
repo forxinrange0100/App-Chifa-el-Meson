@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chifa_el_meson/model/dish_model.dart';
+import 'package:chifa_el_meson/provider/shift_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:chifa_el_meson/toast/toast.dart';
 import 'package:chifa_el_meson/widget/expandable_text_widget.dart';
@@ -33,7 +34,7 @@ class _DishDialogState extends State<DishDialog> {
             children: [
               CachedNetworkImage(
                 imageUrl: widget.dish.image,
-                width: 400,
+                height: 300,
                 fit: BoxFit.cover,
               ),
               Padding(
@@ -138,6 +139,15 @@ class _DishDialogState extends State<DishDialog> {
                       decoration: InputDecoration(
                         hintText: "Escribe aquí tus notas...",
                         border: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: Colors.black, style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: Colors.black,
+                            width: 2.0,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
@@ -149,33 +159,39 @@ class _DishDialogState extends State<DishDialog> {
           ),
         ),
       ),
+      actionsPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       actions: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: ElevatedButton(
-            style: const ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll<Color>(Colors.green)),
-            onPressed: () {
-              context
-                  .read<ShoppingCartProvider>()
-                  .addCardItem(widget.dish, _counter, _notesController.text);
-              addingCartItemToast();
-              Navigator.of(context).pop();
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "\$${widget.dish.discountedPrice != 0 ? _counter * widget.dish.discountedPrice : _counter * widget.dish.regularPrice}",
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  "AGREGAR",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+        ElevatedButton(
+          style: const ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll<Color>(Colors.green)),
+          onPressed: () async {
+            await context.read<ShiftProvider>().updateIsOpen();
+            if (!context.mounted) {
+              return;
+            }
+            if (!context.read<ShiftProvider>().isOpen) {
+              shiftIsCloseToast();
+              return;
+            }
+            context
+                .read<ShoppingCartProvider>()
+                .addCardItem(widget.dish, _counter, _notesController.text);
+            addingCartItemToast();
+            Navigator.of(context).pop();
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "\$${widget.dish.discountedPrice != 0 ? _counter * widget.dish.discountedPrice : _counter * widget.dish.regularPrice}",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const Text(
+                "AGREGAR",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         ),
       ],

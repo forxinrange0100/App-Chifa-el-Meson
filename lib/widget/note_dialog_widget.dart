@@ -30,6 +30,15 @@ class _NoteDialogState extends State<NoteDialog> {
           decoration: InputDecoration(
             hintText: "Escribe tus notas aquí...",
             border: OutlineInputBorder(
+              borderSide: const BorderSide(
+                  color: Colors.black, style: BorderStyle.solid),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: Colors.black,
+                width: 2.0,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
           ),
