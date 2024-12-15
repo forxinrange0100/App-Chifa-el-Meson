@@ -1,5 +1,6 @@
 import 'package:chifa_el_meson/enum/delivery_detail_enum.dart';
 import 'package:chifa_el_meson/model/order_summary_model.dart';
+import 'package:chifa_el_meson/pages/payment_page.dart';
 import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
@@ -9,7 +10,6 @@ import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OrderSummaryPage extends StatefulWidget {
   const OrderSummaryPage({super.key});
@@ -29,6 +29,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       TextEditingController();
   final TextEditingController _textEditingControllerPhoneNumber =
       TextEditingController();
+  bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -470,6 +471,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton(
                   onPressed: () async {
+                    if (_isSubmitting) return;
                     if (context.read<OrderSummaryProvider>().details
                             is HomeDelivery &&
                         _formAddress.currentState?.validate() == false) {
@@ -486,6 +488,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       context.read<OrderSummaryProvider>().setDeliveryAddress(
                           _textEditingControllerAddress.text);
                     }
+                    setState(() {
+                      _isSubmitting = true;
+                    });
                     await context.read<OrderSummaryProvider>().setOrderSummary(
                         _textEditingControllerFullName.text,
                         _textEditingControllerEmail.text,
@@ -493,25 +498,35 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                     if (!context.mounted) return;
                     if (context
                         .read<OrderSummaryProvider>()
+                        .orderResult
                         .urlPayment
                         .isNotEmpty) {
-                      final url =
-                          context.read<OrderSummaryProvider>().urlPayment;
+                      final url = context
+                          .read<OrderSummaryProvider>()
+                          .orderResult
+                          .urlPayment;
                       final Uri uri = Uri.parse(url);
                       context.read<OrderSummaryProvider>().clearUrlPayment();
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                      } else {}
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return PaymentPage(uri: uri);
+                        },
+                      ));
                     }
+                    setState(() {
+                      _isSubmitting = false;
+                    });
                   },
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         "Finalizar Pago",
                         style: TextStyle(fontSize: 20),
                       ),
-                      Icon(FontAwesomeIcons.arrowRight)
+                      _isSubmitting
+                          ? const CircularProgressIndicator()
+                          : const Icon(FontAwesomeIcons.arrowRight)
                     ],
                   )),
             )

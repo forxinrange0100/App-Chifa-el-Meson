@@ -1,3 +1,4 @@
+import 'package:chifa_el_meson/model/order_result_model.dart';
 import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:chifa_el_meson/model/shopping_cart_model.dart';
 import 'package:chifa_el_meson/model/user_details_model.dart';
@@ -13,13 +14,13 @@ class OrderSummaryProvider extends ChangeNotifier {
       shoppingCart: ShoppingCart());
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
-  String _urlPayment = "";
+  OrderResult _orderResult = OrderResult(urlPayment: "", publicId: 0);
   DeliveryDetails _details;
   OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
       : _details =
             PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
   DeliveryDetails get details => _details;
-  String get urlPayment => _urlPayment;
+  OrderResult get orderResult => _orderResult;
 
   Future<void> setOrderSummary(
       String fullName, String email, String phoneNumber) async {
@@ -28,7 +29,7 @@ class OrderSummaryProvider extends ChangeNotifier {
         userDetails: UserDetails(
             fullName: fullName, email: email, phoneNumber: phoneNumber),
         shoppingCart: _shoppingCartProvider.shoppingCart);
-    _urlPayment = await fetchOrder(_orderSummary);
+    _orderResult = await fetchOrder(_orderSummary);
     notifyListeners();
   }
 
@@ -49,6 +50,6 @@ class OrderSummaryProvider extends ChangeNotifier {
   }
 
   void clearUrlPayment() {
-    _urlPayment = "";
+    _orderResult = OrderResult(urlPayment: "", publicId: 0);
   }
 }

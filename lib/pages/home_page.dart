@@ -115,15 +115,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               top: 0,
                               child: CircleAvatar(
                                 radius: 8,
-                                backgroundColor: Colors.red,
-                                child: Text(
-                                  context
-                                      .watch<ShoppingCartProvider>()
-                                      .length
-                                      .toString(),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white,
+                                backgroundColor: Colors.black,
+                                child: CircleAvatar(
+                                  radius: 7,
+                                  backgroundColor: Colors.white,
+                                  child: Center(
+                                    child: Text(
+                                      context
+                                          .watch<ShoppingCartProvider>()
+                                          .length
+                                          .toString(),
+                                      style: const TextStyle(
+                                        fontSize: 9,
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

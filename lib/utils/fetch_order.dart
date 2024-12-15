@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:chifa_el_meson/environment.dart';
 import 'package:chifa_el_meson/errors/errors.dart';
+import 'package:chifa_el_meson/model/order_result_model.dart';
 import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:http/http.dart' as http;
 
-Future<String> fetchOrder(OrderSummary orderSummary) async {
+Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
   try {
     final body = jsonEncode({
       "delivery_type":
@@ -40,10 +41,12 @@ Future<String> fetchOrder(OrderSummary orderSummary) async {
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       final String paymentUrl = result['payment_url'];
+      final int publicId = result['order']['public_id'];
+
       if (paymentUrl.isEmpty) {
         throw FetchOrderException(response.body.toString());
       }
-      return paymentUrl;
+      return OrderResult(urlPayment: paymentUrl, publicId: publicId);
     } else {
       throw FetchOrderException(response.body.toString());
     }
