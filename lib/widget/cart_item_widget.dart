@@ -21,6 +21,12 @@ class _CartItemWidgetState extends State<CartItemWidget>
     with SingleTickerProviderStateMixin {
   late final controller = SlidableController(this);
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ShoppingCartProvider>(
       builder: (context, shoppingCartProvider, child) {
