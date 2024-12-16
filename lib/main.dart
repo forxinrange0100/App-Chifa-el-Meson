@@ -4,6 +4,7 @@ import 'package:chifa_el_meson/provider/data_provider.dart';
 import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/dish_categories_provider.dart';
 import 'package:chifa_el_meson/provider/dishes_provider.dart';
+import 'package:chifa_el_meson/provider/invoice_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/payment_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => DeliveryDetailsProvider()),
           ChangeNotifierProvider(create: (_) => ShiftProvider()),
           ChangeNotifierProvider(create: (_) => PaymentProvider()),
+          ChangeNotifierProvider(create: (_) => InvoiceProvider()),
           ChangeNotifierProvider(
               create: (context) => OrderSummaryProvider(
                     context.read<RestaurantInfoProvider>(),

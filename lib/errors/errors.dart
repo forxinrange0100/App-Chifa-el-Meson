@@ -55,3 +55,14 @@ class FetchOrderException implements Exception {
     return 'FetchOrderException: $message';
   }
 }
+
+class FetchOrderFullException implements Exception {
+  final String message;
+
+  FetchOrderFullException([this.message = 'Failed to fetch order full']);
+
+  @override
+  String toString() {
+    return 'FetchOrderFullException: $message';
+  }
+}

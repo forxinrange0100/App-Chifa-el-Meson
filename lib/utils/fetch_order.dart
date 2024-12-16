@@ -42,7 +42,6 @@ Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
       final result = json.decode(response.body);
       final String paymentUrl = result['payment_url'];
       final int publicId = result['order']['public_id'];
-
       if (paymentUrl.isEmpty) {
         throw FetchOrderException(response.body.toString());
       }

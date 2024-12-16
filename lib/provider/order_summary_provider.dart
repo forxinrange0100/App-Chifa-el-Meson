@@ -50,6 +50,6 @@ class OrderSummaryProvider extends ChangeNotifier {
   }
 
   void clearUrlPayment() {
-    _orderResult = OrderResult(urlPayment: "", publicId: 0);
+    _orderResult.urlPayment = "";
   }
 }
