@@ -49,7 +49,8 @@ void addingCartItemToast() {
 void errorOrderSummary(String error) {
   toastification.show(
     icon: const Icon(FontAwesomeIcons.circleXmark),
-    title: Text(error),
+    title: const Text("Faltan campos"),
+    description: Text(error),
     style: ToastificationStyle.flat,
     type: ToastificationType.error,
     showProgressBar: true,

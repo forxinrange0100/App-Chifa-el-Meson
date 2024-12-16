@@ -1,4 +1,5 @@
 import 'package:chifa_el_meson/enum/delivery_detail_enum.dart';
+import 'package:chifa_el_meson/enum/input_status_enum.dart';
 import 'package:chifa_el_meson/model/input_status_model.dart';
 import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:chifa_el_meson/pages/payment_page.dart';
@@ -6,6 +7,7 @@ import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
+import 'package:chifa_el_meson/toast/toast.dart';
 import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,31 +22,30 @@ class OrderSummaryPage extends StatefulWidget {
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
   final InputStatus _inputStatusAddress = InputStatus(
-      isValid: (String value) => (value.length > 4)
-          ? ""
-          : "Dirección debería tener al menos 5 caracteres");
+      errorMessage: "Dirección debería tener al menos 5 caracteres",
+      isValid: (String value) => (value.length > 4));
   final TextEditingController _textEditingControllerAddress =
       TextEditingController();
   final InputStatus _inputStatusFullName = InputStatus(
-      isValid: (String value) => (value.length > 4)
-          ? ""
-          : "Nombre debería tener al menos 5 caracteres");
+      errorMessage: "Nombre debería tener al menos 5 caracteres",
+      isValid: (String value) => (value.length > 4));
   final TextEditingController _textEditingControllerFullName =
       TextEditingController();
-  final InputStatus _inputStatusEmail = InputStatus(isValid: (String value) {
-    final RegExp emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(value) ? "" : "Correo es inválido";
-  });
+  final InputStatus _inputStatusEmail = InputStatus(
+      errorMessage: "Correo es inválido",
+      isValid: (String value) {
+        final RegExp emailRegex =
+            RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        return emailRegex.hasMatch(value);
+      });
 
   final TextEditingController _textEditingControllerEmail =
       TextEditingController();
   final InputStatus _inputStatusPhoneNumber = InputStatus(
+    errorMessage: "Número de celular inválido. Ejemplo: 987654321",
     isValid: (String value) {
       final RegExp phoneRegex = RegExp(r'^\d{9,15}$');
-      return phoneRegex.hasMatch(value)
-          ? ""
-          : "Número de celular inválido. Ejemplo: 987654321";
+      return phoneRegex.hasMatch(value);
     },
   );
   final TextEditingController _textEditingControllerPhoneNumber =
@@ -325,9 +326,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                                 horizontal: 15.0),
                                       ),
                                     ),
-                                    _inputStatusAddress.errorMessage.isNotEmpty
-                                        ? Text(_inputStatusAddress.errorMessage)
-                                        : const SizedBox()
+                                    (_inputStatusAddress.status ==
+                                            InputStatusEnum.invalid)
+                                        ? Text(
+                                            _inputStatusAddress.errorMessage,
+                                            style: const TextStyle(
+                                                color: Colors.red),
+                                          )
+                                        : const SizedBox(),
                                   ],
                                 ),
                               )
@@ -388,6 +394,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ),
               ),
             ),
+            (_inputStatusFullName.status == InputStatusEnum.invalid)
+                ? Text(
+                    _inputStatusFullName.errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                  )
+                : const SizedBox(),
             const Text("Email (*):"),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -417,6 +429,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ),
               ),
             ),
+            (_inputStatusEmail.status == InputStatusEnum.invalid)
+                ? Text(
+                    _inputStatusEmail.errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                  )
+                : const SizedBox(),
             const Text("Celular (*):"),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -430,7 +448,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su celular ej. +56912345678',
+                  hintText: 'Ingrese su celular. Ejemplo: 987654321',
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: BorderSide(
@@ -448,6 +466,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ),
               ),
             ),
+            (_inputStatusPhoneNumber.status == InputStatusEnum.invalid)
+                ? Text(
+                    _inputStatusPhoneNumber.errorMessage,
+                    style: const TextStyle(color: Colors.red),
+                  )
+                : const SizedBox(),
             const Divider(),
             const Text(
               "Resumen de compra",
@@ -498,8 +522,25 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               child: ElevatedButton(
                   onPressed: () async {
                     if (_isSubmitting) return;
+                    if (_inputStatusFullName.status != InputStatusEnum.valid) {
+                      errorOrderSummary(_inputStatusFullName.errorMessage);
+                      return;
+                    }
+                    if (_inputStatusEmail.status != InputStatusEnum.valid) {
+                      errorOrderSummary(_inputStatusEmail.errorMessage);
+                      return;
+                    }
+                    if (_inputStatusPhoneNumber.status !=
+                        InputStatusEnum.valid) {
+                      errorOrderSummary(_inputStatusPhoneNumber.errorMessage);
+                      return;
+                    }
                     if (context.read<OrderSummaryProvider>().details
                         is HomeDelivery) {
+                      if (_inputStatusAddress.status != InputStatusEnum.valid) {
+                        errorOrderSummary(_inputStatusAddress.errorMessage);
+                        return;
+                      }
                       context.read<OrderSummaryProvider>().setDeliveryAddress(
                           _textEditingControllerAddress.text);
                     }

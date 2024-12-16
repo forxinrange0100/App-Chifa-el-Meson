@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 
 class InputStatus {
   InputStatusEnum status;
-  String errorMessage;
-  String Function(String) isValid;
+  final String errorMessage;
+  bool Function(String) isValid;
 
   InputStatus(
       {this.status = InputStatusEnum.empty,
-      this.errorMessage = "",
-      required this.isValid});
+      required this.isValid,
+      required this.errorMessage});
 
   void verify(String value) {
     if (value.isEmpty) {
       status = InputStatusEnum.empty;
+      return;
     }
-    errorMessage = isValid(value);
-    if (errorMessage.isEmpty) {
+    if (isValid(value)) {
       status = InputStatusEnum.valid;
     } else {
       status = InputStatusEnum.invalid;
