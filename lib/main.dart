@@ -34,12 +34,14 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => DeliveryDetailsProvider()),
           ChangeNotifierProvider(create: (_) => ShiftProvider()),
           ChangeNotifierProvider(create: (_) => PaymentProvider()),
-          ChangeNotifierProvider(create: (_) => InvoiceProvider()),
           ChangeNotifierProvider(
               create: (context) => OrderSummaryProvider(
                     context.read<RestaurantInfoProvider>(),
                     context.read<ShoppingCartProvider>(),
                   )),
+          ChangeNotifierProvider(
+              create: (context) =>
+                  InvoiceProvider(context.read<OrderSummaryProvider>())),
           ChangeNotifierProvider(
               create: (context) => DataProvider(
                     context.read<RestaurantInfoProvider>(),

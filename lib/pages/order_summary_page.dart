@@ -1,11 +1,11 @@
 import 'package:chifa_el_meson/enum/delivery_detail_enum.dart';
+import 'package:chifa_el_meson/model/input_status_model.dart';
 import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:chifa_el_meson/pages/payment_page.dart';
 import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
-import 'package:chifa_el_meson/toast/toast.dart';
 import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,14 +19,34 @@ class OrderSummaryPage extends StatefulWidget {
 }
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
-  final _formUserData = GlobalKey<FormState>();
-  final _formAddress = GlobalKey<FormState>();
+  final InputStatus _inputStatusAddress = InputStatus(
+      isValid: (String value) => (value.length > 4)
+          ? ""
+          : "Dirección debería tener al menos 5 caracteres");
   final TextEditingController _textEditingControllerAddress =
       TextEditingController();
+  final InputStatus _inputStatusFullName = InputStatus(
+      isValid: (String value) => (value.length > 4)
+          ? ""
+          : "Nombre debería tener al menos 5 caracteres");
   final TextEditingController _textEditingControllerFullName =
       TextEditingController();
+  final InputStatus _inputStatusEmail = InputStatus(isValid: (String value) {
+    final RegExp emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(value) ? "" : "Correo es inválido";
+  });
+
   final TextEditingController _textEditingControllerEmail =
       TextEditingController();
+  final InputStatus _inputStatusPhoneNumber = InputStatus(
+    isValid: (String value) {
+      final RegExp phoneRegex = RegExp(r'^\d{9,15}$');
+      return phoneRegex.hasMatch(value)
+          ? ""
+          : "Número de celular inválido. Ejemplo: 987654321";
+    },
+  );
   final TextEditingController _textEditingControllerPhoneNumber =
       TextEditingController();
   bool _isSubmitting = false;
@@ -264,47 +284,51 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                 is HomeDelivery)
                             ? Padding(
                                 padding: const EdgeInsets.only(top: 12.0),
-                                child: Form(
-                                  key: _formAddress,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Dirección de envío:",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      TextFormField(
-                                        controller:
-                                            _textEditingControllerAddress,
-                                        decoration: InputDecoration(
-                                          filled: true,
-                                          fillColor: Colors.grey.shade200,
-                                          hintText: 'Ingrese su dirección...',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            borderSide: BorderSide.none,
-                                          ),
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 10.0,
-                                                  horizontal: 15.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Dirección de envío:",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextFormField(
+                                      controller: _textEditingControllerAddress,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _inputStatusAddress.verify(value);
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.grey.shade200,
+                                        hintText: 'Ingrese su dirección...',
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color: _inputStatusAddress
+                                                  .getStatusColor()),
                                         ),
-                                        validator: (value) {
-                                          if (value == null ||
-                                              value.trim().isEmpty) {
-                                            return 'La dirección es requerida';
-                                          }
-                                          if (value.length < 5) {
-                                            return 'La dirección debe tener al menos 5 caracteres';
-                                          }
-                                          return null;
-                                        },
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color: _inputStatusAddress
+                                                  .getStatusColor()),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10.0,
+                                                horizontal: 15.0),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    _inputStatusAddress.errorMessage.isNotEmpty
+                                        ? Text(_inputStatusAddress.errorMessage)
+                                        : const SizedBox()
+                                  ],
                                 ),
                               )
                             : const SizedBox()
@@ -331,97 +355,99 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               ),
             ),
             const Divider(),
-            Form(
-                key: _formUserData,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Mis datos",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const Text("Nombre y Apellido (*):"),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextFormField(
-                          controller: _textEditingControllerFullName,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey.shade200,
-                            hintText: 'Ingrese su nombre',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 15.0),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'El nombre es requerido';
-                            }
-                            if (value.length < 5) {
-                              return 'El nombre debe tener al menos 5 caracteres';
-                            }
-                            return null;
-                          }),
-                    ),
-                    const Text("Email (*):"),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextFormField(
-                          controller: _textEditingControllerEmail,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey.shade200,
-                            hintText: 'Ingrese su correo',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 15.0),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'El correo es requerido';
-                            }
-                            final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                            if (!emailRegex.hasMatch(value)) {
-                              return 'El correo no es válido';
-                            }
-                            return null;
-                          }),
-                    ),
-                    const Text("Celular (*):"),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextFormField(
-                          controller: _textEditingControllerPhoneNumber,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey.shade200,
-                            hintText: 'Ingrese su celular ej. +56912345678',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 15.0),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'El número de celular es requerido';
-                            }
-                            final phoneRegex = RegExp(r'^\+569\d{8}$');
-                            if (!phoneRegex.hasMatch(value)) {
-                              return 'El número de celular no es válido';
-                            }
-                            return null;
-                          }),
-                    ),
-                  ],
-                )),
+            const Text(
+              "Mis datos",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const Text("Nombre y Apellido (*):"),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    _inputStatusFullName.verify(value);
+                  });
+                },
+                controller: _textEditingControllerFullName,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  hintText: 'Ingrese su nombre',
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                        width: 2, color: _inputStatusFullName.getStatusColor()),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                        width: 2, color: _inputStatusFullName.getStatusColor()),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 15.0),
+                ),
+              ),
+            ),
+            const Text("Email (*):"),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    _inputStatusEmail.verify(value);
+                  });
+                },
+                controller: _textEditingControllerEmail,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  hintText: 'Ingrese su correo',
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                        width: 2, color: _inputStatusEmail.getStatusColor()),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                        width: 2, color: _inputStatusEmail.getStatusColor()),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 15.0),
+                ),
+              ),
+            ),
+            const Text("Celular (*):"),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    _inputStatusPhoneNumber.verify(value);
+                  });
+                },
+                controller: _textEditingControllerPhoneNumber,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  hintText: 'Ingrese su celular ej. +56912345678',
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                        width: 2,
+                        color: _inputStatusPhoneNumber.getStatusColor()),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                        width: 2,
+                        color: _inputStatusPhoneNumber.getStatusColor()),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 15.0),
+                ),
+              ),
+            ),
             const Divider(),
             const Text(
               "Resumen de compra",
@@ -472,17 +498,6 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               child: ElevatedButton(
                   onPressed: () async {
                     if (_isSubmitting) return;
-                    if (context.read<OrderSummaryProvider>().details
-                            is HomeDelivery &&
-                        _formAddress.currentState?.validate() == false) {
-                      errorOrderSummary("La dirección es inválida");
-                      return;
-                    }
-                    if (_formUserData.currentState?.validate() == false) {
-                      errorOrderSummary(
-                          "Algunos datos de usuario son inválidos");
-                      return;
-                    }
                     if (context.read<OrderSummaryProvider>().details
                         is HomeDelivery) {
                       context.read<OrderSummaryProvider>().setDeliveryAddress(

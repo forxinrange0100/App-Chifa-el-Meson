@@ -1,9 +1,11 @@
 import 'package:chifa_el_meson/model/order_result_full_model.dart';
+import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/utils/fetch_order_full.dart';
 import 'package:flutter/material.dart';
 
 class InvoiceProvider extends ChangeNotifier {
-  bool _isLoading = false;
+  final OrderSummaryProvider _orderSummaryProvider;
+
   OrderResultFull _orderResultFull = OrderResultFull(
       id: 0,
       publicId: 0,
@@ -20,14 +22,11 @@ class InvoiceProvider extends ChangeNotifier {
       clientEmail: '',
       clientName: '',
       orderProducts: []);
-  InvoiceProvider();
-  bool get isLoading => _isLoading;
+  InvoiceProvider(this._orderSummaryProvider);
   OrderResultFull get orderResultFull => _orderResultFull;
-  Future<void> getOrderResultFull(int publicId) async {
-    _isLoading = true;
-    notifyListeners();
-    _orderResultFull = await fetchOrderFull(publicId);
-    _isLoading = false;
+  Future<void> getOrderResultFull() async {
+    _orderResultFull =
+        await fetchOrderFull(_orderSummaryProvider.orderResult.publicId);
     notifyListeners();
   }
 }
