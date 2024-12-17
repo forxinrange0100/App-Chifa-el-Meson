@@ -70,6 +70,7 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, bottomNavigationProvider, child) {
                       return Scaffold(
                         resizeToAvoidBottomInset: false,
+                        backgroundColor: Colors.white,
                         body: Stack(
                           children: [
                             pages[bottomNavigationProvider.index],

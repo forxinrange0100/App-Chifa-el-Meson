@@ -21,6 +21,8 @@ class ShoppingCartPage extends StatelessWidget {
                   Column(
                     children: [
                       AppBar(
+                        backgroundColor: Colors.white,
+                        surfaceTintColor: Colors.white,
                         leading: IconButton(
                             onPressed: () {
                               context

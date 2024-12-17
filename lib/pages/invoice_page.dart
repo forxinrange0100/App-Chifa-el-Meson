@@ -1,4 +1,5 @@
 import 'package:chifa_el_meson/pages/home_page.dart';
+import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
 import 'package:chifa_el_meson/provider/invoice_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/widget/price_widget.dart';
@@ -43,8 +44,10 @@ class _InvoicePageState extends State<InvoicePage> {
                   ),
                 )
               : Scaffold(
+                  backgroundColor: Colors.white,
                   appBar: AppBar(
                     backgroundColor: Colors.white,
+                    surfaceTintColor: Colors.white,
                     centerTitle: true,
                     title: const Text("BOLETA",
                         style: TextStyle(fontWeight: FontWeight.bold)),
@@ -72,6 +75,7 @@ class _InvoicePageState extends State<InvoicePage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 32.0, vertical: 24.0),
                             child: Card(
+                              elevation: 10,
                               color: Colors.white,
                               child: Padding(
                                 padding:
@@ -434,6 +438,9 @@ class _InvoicePageState extends State<InvoicePage> {
                                         const WidgetStatePropertyAll<Color>(
                                             Colors.black)),
                                 onPressed: () {
+                                  context
+                                      .read<BottomNavigationBarProvider>()
+                                      .showHome();
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
