@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
 import 'package:chifa_el_meson/provider/invoice_provider.dart';
@@ -6,7 +8,10 @@ import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class InvoicePage extends StatefulWidget {
   const InvoicePage({super.key});
@@ -424,7 +429,22 @@ class _InvoicePageState extends State<InvoicePage> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final pdf = pw.Document();
+                                  pdf.addPage(
+                                    pw.Page(
+                                      build: (context) => pw.Center(
+                                          child: pw.Text('Hello World!')),
+                                    ),
+                                  );
+                                  final pdfBytes = await pdf.save();
+                                  final directory =
+                                      await getTemporaryDirectory();
+                                  final tempFile =
+                                      File('${directory.path}/boleta.pdf');
+                                  await tempFile.writeAsBytes(pdfBytes);
+                                  OpenFilex.open(tempFile.path);
+                                },
                                 child: const Text("Descargar boleta")),
                           ),
                           Padding(

@@ -58,3 +58,39 @@ void errorOrderSummary(String error) {
     autoCloseDuration: const Duration(seconds: 5),
   );
 }
+
+void savedInvoice() {
+  toastification.show(
+    icon: const Icon(FontAwesomeIcons.file),
+    title: const Text("Boleta guardada"),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.success,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
+    autoCloseDuration: const Duration(seconds: 5),
+  );
+}
+
+void unsavedInvoice() {
+  toastification.show(
+    icon: const Icon(FontAwesomeIcons.file),
+    title: const Text("Boleta no guardada"),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.error,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
+    autoCloseDuration: const Duration(seconds: 5),
+  );
+}
+
+void storageNotGranted() {
+  toastification.show(
+    icon: const Icon(FontAwesomeIcons.solidFile),
+    title: const Text("Sin permiso de almacenamiento"),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.error,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
+    autoCloseDuration: const Duration(seconds: 5),
+  );
+}
