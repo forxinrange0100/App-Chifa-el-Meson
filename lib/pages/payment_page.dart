@@ -52,13 +52,25 @@ class PaymentPageState extends State<PaymentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.redAccent.shade700,
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
           if (_isLoading)
             const Center(
-              child: CircularProgressIndicator(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.blue,
+                    backgroundColor: Colors.grey,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text("Estamos redirigíendote al portal de pago...")
+                ],
+              ),
             ),
         ],
       ),

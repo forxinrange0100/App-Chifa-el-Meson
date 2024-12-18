@@ -71,10 +71,6 @@ class MyApp extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               )),
-              progressIndicatorTheme: ProgressIndicatorThemeData(
-                color: Colors.white,
-                refreshBackgroundColor: Colors.redAccent.shade700,
-              ),
               useMaterial3: true,
             ),
             home: const HomePage(),

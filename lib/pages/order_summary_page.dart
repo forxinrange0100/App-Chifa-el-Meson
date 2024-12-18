@@ -57,8 +57,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          backgroundColor: Colors.white,
           surfaceTintColor: Colors.white,
+          backgroundColor: Colors.white,
+          shadowColor: Colors.black,
+          elevation: 2,
           centerTitle: true,
           titleTextStyle: const TextStyle(
               color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
@@ -66,12 +68,15 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             "RESUMEN DE COMPRA",
           )),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
           children: [
-            const Text(
-              "Detalles de Entrega",
-              style: TextStyle(fontWeight: FontWeight.bold),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                "Detalles de Entrega",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(
               height: 5,
@@ -583,7 +588,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         style: TextStyle(fontSize: 20),
                       ),
                       _isSubmitting
-                          ? const CircularProgressIndicator()
+                          ? const CircularProgressIndicator(
+                              color: Colors.blue,
+                              backgroundColor: Colors.grey,
+                            )
                           : const Icon(FontAwesomeIcons.arrowRight)
                     ],
                   )),

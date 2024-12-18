@@ -21,8 +21,10 @@ class ShoppingCartPage extends StatelessWidget {
                   Column(
                     children: [
                       AppBar(
-                        backgroundColor: Colors.white,
                         surfaceTintColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        shadowColor: Colors.black,
+                        elevation: 2,
                         leading: IconButton(
                             onPressed: () {
                               context
@@ -37,7 +39,6 @@ class ShoppingCartPage extends StatelessWidget {
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      const Divider(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Column(

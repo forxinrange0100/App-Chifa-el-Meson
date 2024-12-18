@@ -34,10 +34,22 @@ class _HomePageState extends State<HomePage> {
       future: getData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            backgroundColor: Colors.redAccent.shade700,
-            body: const Center(
-              child: CircularProgressIndicator(),
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.blue,
+                    backgroundColor: Colors.grey,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text("Estamos cargando todo para ti, espera un momento...")
+                ],
+              ),
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done &&

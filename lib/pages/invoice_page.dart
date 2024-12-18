@@ -32,26 +32,54 @@ class _InvoicePageState extends State<InvoicePage> {
       future: getOrderFull(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            backgroundColor: Colors.redAccent.shade700,
-            body: const Center(
-              child: CircularProgressIndicator(),
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.blue,
+                    backgroundColor: Colors.grey,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                      "Estamos cargando la boleta para ti, espera un momento...")
+                ],
+              ),
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data == true) {
           return reloading
-              ? Scaffold(
-                  backgroundColor: Colors.redAccent.shade700,
-                  body: const Center(
-                    child: CircularProgressIndicator(),
+              ? const Scaffold(
+                  backgroundColor: Colors.white,
+                  body: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.blue,
+                          backgroundColor: Colors.grey,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                          "Estamos cargando la boleta para ti, espera un momento...")
+                    ],
                   ),
                 )
               : Scaffold(
                   backgroundColor: Colors.white,
                   appBar: AppBar(
-                    backgroundColor: Colors.white,
                     surfaceTintColor: Colors.white,
+                    backgroundColor: Colors.white,
+                    shadowColor: Colors.black,
+                    elevation: 2,
                     centerTitle: true,
                     title: const Text("BOLETA",
                         style: TextStyle(fontWeight: FontWeight.bold)),

@@ -1,5 +1,6 @@
 import 'package:chifa_el_meson/model/order_result_full_model.dart';
 import 'package:chifa_el_meson/model/restaurant_info_model.dart';
+import 'package:chifa_el_meson/widget/price_pw_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -169,10 +170,10 @@ Future<pw.Document> generateInvoicePdf(
                                         orderProduct.quantity.toString())),
                                 pw.Padding(
                                     padding: const pw.EdgeInsets.all(8.0),
-                                    child: pw.Text(
-                                        (orderProduct.product.regularPrice *
-                                                orderProduct.quantity)
-                                            .toString()))
+                                    child: PricePWWidget(
+                                        price:
+                                            orderProduct.product.regularPrice *
+                                                orderProduct.quantity))
                               ]);
                             })
                           ]))
@@ -185,13 +186,17 @@ Future<pw.Document> generateInvoicePdf(
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Text("Subtotal"),
-                            pw.Text(orderResultFull.subtotal.toString())
+                            PricePWWidget(
+                                price: orderResultFull.subtotal,
+                                fontWeight: pw.FontWeight.bold),
                           ]),
                       pw.Row(
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Text("Costo de envío"),
-                            pw.Text(orderResultFull.deliveryCost.toString())
+                            PricePWWidget(
+                                price: orderResultFull.deliveryCost,
+                                fontWeight: pw.FontWeight.bold),
                           ]),
                       pw.Row(
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -199,9 +204,9 @@ Future<pw.Document> generateInvoicePdf(
                             pw.Text("TOTAL",
                                 style: pw.TextStyle(
                                     fontWeight: pw.FontWeight.bold)),
-                            pw.Text(orderResultFull.total.toString(),
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold))
+                            PricePWWidget(
+                                price: orderResultFull.total,
+                                fontWeight: pw.FontWeight.bold),
                           ]),
                       pw.Padding(
                           padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
