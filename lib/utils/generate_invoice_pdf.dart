@@ -1,10 +1,15 @@
 import 'package:chifa_el_meson/model/order_result_full_model.dart';
 import 'package:chifa_el_meson/model/restaurant_info_model.dart';
+import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-pw.Document generateInvoicePdf(
-    OrderResultFull orderResultFull, RestaurantInfo restaurantInfo) {
+Future<pw.Document> generateInvoicePdf(
+    OrderResultFull orderResultFull, RestaurantInfo restaurantInfo) async {
+  final fontBytes = await rootBundle.load('assets/fontawesome.ttf');
+  final fontData = ByteData.sublistView(fontBytes.buffer.asUint8List());
+
+  final fontAwesome = pw.Font.ttf(fontData);
   final pw.Document pdf = pw.Document();
   pdf.addPage(
     pw.Page(
@@ -24,6 +29,8 @@ pw.Document generateInvoicePdf(
                         pw.Row(
                           mainAxisAlignment: pw.MainAxisAlignment.center,
                           children: [
+                            pw.Text('\u{f53a}',
+                                style: pw.TextStyle(font: fontAwesome)),
                             pw.Text("Nº de orden: ${orderResultFull.publicId}"),
                           ],
                         ),

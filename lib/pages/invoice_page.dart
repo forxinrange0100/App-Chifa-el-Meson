@@ -81,14 +81,15 @@ class _InvoicePageState extends State<InvoicePage> {
                             padding: const EdgeInsets.all(5.0),
                             child: ElevatedButton(
                                 onPressed: () async {
-                                  final pdfBytes = await generateInvoicePdf(
-                                          context
-                                              .read<InvoiceProvider>()
-                                              .orderResultFull,
-                                          context
-                                              .read<RestaurantInfoProvider>()
-                                              .restaurantInfo)
-                                      .save();
+                                  final pdfDocument = await generateInvoicePdf(
+                                    context
+                                        .read<InvoiceProvider>()
+                                        .orderResultFull,
+                                    context
+                                        .read<RestaurantInfoProvider>()
+                                        .restaurantInfo,
+                                  );
+                                  final pdfBytes = await pdfDocument.save();
                                   final directory =
                                       await getTemporaryDirectory();
                                   final tempFile =
