@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
 import 'package:chifa_el_meson/provider/invoice_provider.dart';
+import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
 import 'package:chifa_el_meson/utils/generate_invoice_pdf.dart';
 import 'package:chifa_el_meson/widget/invoice_card_widget.dart';
 import 'package:flutter/material.dart';
@@ -80,8 +81,14 @@ class _InvoicePageState extends State<InvoicePage> {
                             padding: const EdgeInsets.all(5.0),
                             child: ElevatedButton(
                                 onPressed: () async {
-                                  final pdfBytes =
-                                      await generateInvoicePdf().save();
+                                  final pdfBytes = await generateInvoicePdf(
+                                          context
+                                              .read<InvoiceProvider>()
+                                              .orderResultFull,
+                                          context
+                                              .read<RestaurantInfoProvider>()
+                                              .restaurantInfo)
+                                      .save();
                                   final directory =
                                       await getTemporaryDirectory();
                                   final tempFile =
