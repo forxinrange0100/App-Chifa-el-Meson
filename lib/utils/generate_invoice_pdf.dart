@@ -95,7 +95,9 @@ Future<pw.Document> generateInvoicePdf(
                                               fontWeight: pw.FontWeight.bold,
                                               fontSize: 15))
                                     ])))),
-                    pw.Divider(),
+                    pw.Divider(
+                        color: PdfColors.grey,
+                        borderStyle: const pw.BorderStyle(pattern: [3, 2])),
                     pw.Padding(
                         padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
                         child: pw.Column(children: [
@@ -126,7 +128,9 @@ Future<pw.Document> generateInvoicePdf(
                                     "Teléfono: ${orderResultFull.clientPhone}")
                               ])
                         ])),
-                    pw.Divider(),
+                    pw.Divider(
+                        color: PdfColors.grey,
+                        borderStyle: const pw.BorderStyle(pattern: [3, 2])),
                     pw.Padding(
                         padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
                         child: pw.Column(children: [
@@ -184,7 +188,9 @@ Future<pw.Document> generateInvoicePdf(
                                 })
                               ]))
                         ])),
-                    pw.Divider(),
+                    pw.Divider(
+                        color: PdfColors.grey,
+                        borderStyle: const pw.BorderStyle(pattern: [3, 2])),
                     pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
                         child: pw.Column(children: [
@@ -194,8 +200,8 @@ Future<pw.Document> generateInvoicePdf(
                               children: [
                                 pw.Text("Subtotal"),
                                 PricePWWidget(
-                                    price: orderResultFull.subtotal,
-                                    fontWeight: pw.FontWeight.bold),
+                                  price: orderResultFull.subtotal,
+                                ),
                               ]),
                           pw.Row(
                               mainAxisAlignment:
@@ -203,8 +209,8 @@ Future<pw.Document> generateInvoicePdf(
                               children: [
                                 pw.Text("Costo de envío"),
                                 PricePWWidget(
-                                    price: orderResultFull.deliveryCost,
-                                    fontWeight: pw.FontWeight.bold),
+                                  price: orderResultFull.deliveryCost,
+                                ),
                               ]),
                           pw.Row(
                               mainAxisAlignment:
