@@ -133,40 +133,36 @@ class HomeInfoPage extends StatelessWidget {
                                 height: 5,
                               ),
                               context.watch<ShiftProvider>().isOpen
-                                  ? Container(
-                                      color: Colors.green,
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              FontAwesomeIcons.doorOpen,
-                                              color: Colors.white,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text("Turno Abierto"),
-                                          ],
-                                        ),
+                                  ? const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            FontAwesomeIcons.solidCircle,
+                                            color: Colors.green,
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text("Turno Abierto"),
+                                        ],
                                       ),
                                     )
-                                  : Container(
-                                      color: Colors.redAccent.shade700,
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              FontAwesomeIcons.doorClosed,
-                                              color: Colors.white,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text("Turno Cerrado"),
-                                          ],
-                                        ),
+                                  : const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            FontAwesomeIcons.solidCircle,
+                                            color: Colors.red,
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text("Turno Cerrado"),
+                                        ],
                                       ),
                                     ),
                             ],

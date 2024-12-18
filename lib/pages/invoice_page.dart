@@ -81,6 +81,24 @@ class _InvoicePageState extends State<InvoicePage> {
                     shadowColor: Colors.black,
                     elevation: 2,
                     centerTitle: true,
+                    leading: IconButton(
+                        onPressed: () {
+                          context
+                              .read<BottomNavigationBarProvider>()
+                              .showHome();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return const HomePage();
+                              },
+                            ),
+                            (route) {
+                              return false;
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_back)),
                     title: const Text("BOLETA",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     actions: [
