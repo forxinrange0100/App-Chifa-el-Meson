@@ -1,5 +1,6 @@
 import 'package:chifa_el_meson/provider/invoice_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
+import 'package:chifa_el_meson/utils/format_date_time.dart';
 import 'package:chifa_el_meson/widget/price_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class InvoiceCardWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(
-                        FontAwesomeIcons.moneyBill1Wave,
+                        FontAwesomeIcons.moneyBillWave,
                         size: 15,
                       ),
                       const SizedBox(
@@ -72,11 +73,10 @@ class InvoiceCardWidget extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(context
+                      Text(formatDateTime(context
                           .watch<InvoiceProvider>()
                           .orderResultFull
-                          .timestamp
-                          .toString())
+                          .timestamp))
                     ],
                   ),
                   Padding(
@@ -89,7 +89,7 @@ class InvoiceCardWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(
-                              FontAwesomeIcons.fileInvoiceDollar,
+                              FontAwesomeIcons.moneyCheckDollar,
                               size: 15,
                             ),
                             const SizedBox(

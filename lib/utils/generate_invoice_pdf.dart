@@ -1,5 +1,6 @@
 import 'package:chifa_el_meson/model/order_result_full_model.dart';
 import 'package:chifa_el_meson/model/restaurant_info_model.dart';
+import 'package:chifa_el_meson/utils/format_date_time.dart';
 import 'package:chifa_el_meson/widget/price_pw_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
@@ -41,185 +42,196 @@ Future<pw.Document> generateInvoicePdf(
       pageFormat: PdfPageFormat.a4,
       build: (context) {
         return [
-          pw.Padding(
-              padding: const pw.EdgeInsets.symmetric(
-                  horizontal: 32.0, vertical: 24.0),
-              child: pw.Column(children: [
-                pw.Text("CLIENTE",
-                    style: pw.TextStyle(
-                        fontWeight: pw.FontWeight.bold, fontSize: 18)),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.center,
-                  children: [
-                    pw.Image(moneyBillWave, height: 15),
-                    pw.SizedBox(width: 10),
-                    pw.Text("Nº de orden: ${orderResultFull.publicId}"),
-                  ],
-                ),
-                pw.Text(restaurantInfo.name,
-                    style: pw.TextStyle(
-                        fontSize: 15, fontWeight: pw.FontWeight.bold)),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.center,
-                  children: [
-                    pw.Image(locationDot, height: 15),
-                    pw.SizedBox(width: 10),
-                    pw.Text(restaurantInfo.address),
-                  ],
-                ),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.center,
-                  children: [
-                    pw.Image(clock, height: 15),
-                    pw.SizedBox(width: 10),
-                    pw.Text(orderResultFull.timestamp.toString()),
-                  ],
-                ),
-                pw.Padding(
-                    padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
-                    child: pw.Container(
-                        color: PdfColors.greenAccent100,
-                        child: pw.Padding(
-                            padding:
-                                const pw.EdgeInsets.symmetric(vertical: 4.0),
-                            child: pw.Row(
-                                mainAxisAlignment: pw.MainAxisAlignment.center,
-                                children: [
-                                  pw.Image(moneyCheckDollar, height: 15),
-                                  pw.SizedBox(width: 10),
-                                  pw.Text(
-                                      "Pago: ${orderResultFull.paymentStatus}",
-                                      style: pw.TextStyle(
-                                          fontWeight: pw.FontWeight.bold,
-                                          fontSize: 15))
-                                ])))),
-                pw.Divider(),
-                pw.Padding(
-                    padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
-                    child: pw.Column(children: [
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.center,
-                          children: [
-                            pw.Image(user, height: 15),
-                            pw.SizedBox(width: 10),
-                            pw.Text("Cliente: ${orderResultFull.clientName}")
-                          ]),
-                      pw.SizedBox(height: 5),
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.center,
-                          children: [
-                            pw.Image(locationDot, height: 15),
-                            pw.SizedBox(width: 10),
-                            pw.Text(
-                                "Dirección: ${orderResultFull.clientAddress}")
-                          ]),
-                      pw.SizedBox(height: 5),
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.center,
-                          children: [
-                            pw.Image(phoneFlip, height: 15),
-                            pw.SizedBox(width: 10),
-                            pw.Text("Teléfono: ${orderResultFull.clientPhone}")
-                          ])
-                    ])),
-                pw.Divider(),
-                pw.Padding(
-                    padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
-                    child: pw.Column(children: [
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.center,
-                          children: [
-                            pw.Image(boxesStacked, height: 15),
-                            pw.SizedBox(width: 10),
-                            pw.Text("Detalles del pedido",
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ]),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Table(columnWidths: const {
-                            0: pw.FlexColumnWidth(2),
-                            1: pw.FlexColumnWidth(1),
-                            2: pw.FlexColumnWidth(1),
-                          }, children: [
-                            pw.TableRow(
-                                decoration: const pw.BoxDecoration(
-                                    border: pw.Border(
-                                        bottom: pw.BorderSide(
-                                            width: 1, color: PdfColors.black))),
-                                children: [
-                                  pw.Text('Producto',
-                                      style: pw.TextStyle(
-                                          fontWeight: pw.FontWeight.bold)),
-                                  pw.Text('Cant',
-                                      style: pw.TextStyle(
-                                          fontWeight: pw.FontWeight.bold)),
-                                  pw.Text('Importe',
-                                      style: pw.TextStyle(
-                                          fontWeight: pw.FontWeight.bold))
-                                ]),
-                            ...orderResultFull.orderProducts
-                                .map((orderProduct) {
-                              return pw.TableRow(children: [
-                                pw.Padding(
-                                    padding: const pw.EdgeInsets.all(8.0),
-                                    child: pw.Text(orderProduct.product.name)),
-                                pw.Padding(
-                                    padding: const pw.EdgeInsets.all(8.0),
-                                    child: pw.Text(
-                                        orderProduct.quantity.toString())),
-                                pw.Padding(
-                                    padding: const pw.EdgeInsets.all(8.0),
-                                    child: PricePWWidget(
-                                        price:
-                                            orderProduct.product.regularPrice *
-                                                orderProduct.quantity))
-                              ]);
-                            })
-                          ]))
-                    ])),
-                pw.Divider(),
-                pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Column(children: [
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.Text("Subtotal"),
-                            PricePWWidget(
-                                price: orderResultFull.subtotal,
-                                fontWeight: pw.FontWeight.bold),
-                          ]),
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.Text("Costo de envío"),
-                            PricePWWidget(
-                                price: orderResultFull.deliveryCost,
-                                fontWeight: pw.FontWeight.bold),
-                          ]),
-                      pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pw.Text("TOTAL",
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                            PricePWWidget(
-                                price: orderResultFull.total,
-                                fontWeight: pw.FontWeight.bold),
-                          ]),
-                      pw.Padding(
-                          padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
-                          child: pw.Row(
+          pw.Center(
+              child: pw.SizedBox(
+                  width: 300,
+                  child: pw.Column(children: [
+                    pw.Text("CLIENTE",
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold, fontSize: 18)),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Image(moneyBillWave, height: 15),
+                        pw.SizedBox(width: 10),
+                        pw.Text("Nº de orden: ${orderResultFull.publicId}"),
+                      ],
+                    ),
+                    pw.Text(restaurantInfo.name,
+                        style: pw.TextStyle(
+                            fontSize: 15, fontWeight: pw.FontWeight.bold)),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Image(locationDot, height: 15),
+                        pw.SizedBox(width: 10),
+                        pw.Text(restaurantInfo.address),
+                      ],
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Image(clock, height: 15),
+                        pw.SizedBox(width: 10),
+                        pw.Text(formatDateTime(orderResultFull.timestamp))
+                      ],
+                    ),
+                    pw.Padding(
+                        padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
+                        child: pw.Container(
+                            color: PdfColors.greenAccent100,
+                            child: pw.Padding(
+                                padding: const pw.EdgeInsets.symmetric(
+                                    vertical: 4.0),
+                                child: pw.Row(
+                                    mainAxisAlignment:
+                                        pw.MainAxisAlignment.center,
+                                    children: [
+                                      pw.Image(moneyCheckDollar, height: 15),
+                                      pw.SizedBox(width: 10),
+                                      pw.Text(
+                                          "Pago: ${orderResultFull.paymentStatus}",
+                                          style: pw.TextStyle(
+                                              fontWeight: pw.FontWeight.bold,
+                                              fontSize: 15))
+                                    ])))),
+                    pw.Divider(),
+                    pw.Padding(
+                        padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
+                        child: pw.Column(children: [
+                          pw.Row(
                               mainAxisAlignment: pw.MainAxisAlignment.center,
                               children: [
-                                pw.Text("¡Muchas gracias por tu compra!",
-                                    style: const pw.TextStyle(fontSize: 10)),
+                                pw.Image(user, height: 15),
                                 pw.SizedBox(width: 10),
-                                pw.Image(faceSmile, height: 12),
+                                pw.Text(
+                                    "Cliente: ${orderResultFull.clientName}")
+                              ]),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                              mainAxisAlignment: pw.MainAxisAlignment.center,
+                              children: [
+                                pw.Image(locationDot, height: 15),
+                                pw.SizedBox(width: 10),
+                                pw.Text(
+                                    "Dirección: ${orderResultFull.clientAddress}")
+                              ]),
+                          pw.SizedBox(height: 5),
+                          pw.Row(
+                              mainAxisAlignment: pw.MainAxisAlignment.center,
+                              children: [
+                                pw.Image(phoneFlip, height: 15),
+                                pw.SizedBox(width: 10),
+                                pw.Text(
+                                    "Teléfono: ${orderResultFull.clientPhone}")
+                              ])
+                        ])),
+                    pw.Divider(),
+                    pw.Padding(
+                        padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
+                        child: pw.Column(children: [
+                          pw.Row(
+                              mainAxisAlignment: pw.MainAxisAlignment.center,
+                              children: [
+                                pw.Image(boxesStacked, height: 15),
+                                pw.SizedBox(width: 10),
+                                pw.Text("Detalles del pedido",
+                                    style: pw.TextStyle(
+                                        fontWeight: pw.FontWeight.bold)),
+                              ]),
+                          pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Table(columnWidths: const {
+                                0: pw.FlexColumnWidth(2),
+                                1: pw.FlexColumnWidth(1),
+                                2: pw.FlexColumnWidth(1),
+                              }, children: [
+                                pw.TableRow(
+                                    decoration: const pw.BoxDecoration(
+                                        border: pw.Border(
+                                            bottom: pw.BorderSide(
+                                                width: 1,
+                                                color: PdfColors.black))),
+                                    children: [
+                                      pw.Text('Producto',
+                                          style: pw.TextStyle(
+                                              fontWeight: pw.FontWeight.bold)),
+                                      pw.Text('Cant',
+                                          style: pw.TextStyle(
+                                              fontWeight: pw.FontWeight.bold)),
+                                      pw.Text('Importe',
+                                          style: pw.TextStyle(
+                                              fontWeight: pw.FontWeight.bold))
+                                    ]),
+                                ...orderResultFull.orderProducts
+                                    .map((orderProduct) {
+                                  return pw.TableRow(children: [
+                                    pw.Padding(
+                                        padding: const pw.EdgeInsets.all(8.0),
+                                        child:
+                                            pw.Text(orderProduct.product.name)),
+                                    pw.Padding(
+                                        padding: const pw.EdgeInsets.all(8.0),
+                                        child: pw.Text(
+                                            orderProduct.quantity.toString())),
+                                    pw.Padding(
+                                        padding: const pw.EdgeInsets.all(8.0),
+                                        child: PricePWWidget(
+                                            price: orderProduct
+                                                    .product.regularPrice *
+                                                orderProduct.quantity))
+                                  ]);
+                                })
                               ]))
-                    ]))
-              ]))
+                        ])),
+                    pw.Divider(),
+                    pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Column(children: [
+                          pw.Row(
+                              mainAxisAlignment:
+                                  pw.MainAxisAlignment.spaceBetween,
+                              children: [
+                                pw.Text("Subtotal"),
+                                PricePWWidget(
+                                    price: orderResultFull.subtotal,
+                                    fontWeight: pw.FontWeight.bold),
+                              ]),
+                          pw.Row(
+                              mainAxisAlignment:
+                                  pw.MainAxisAlignment.spaceBetween,
+                              children: [
+                                pw.Text("Costo de envío"),
+                                PricePWWidget(
+                                    price: orderResultFull.deliveryCost,
+                                    fontWeight: pw.FontWeight.bold),
+                              ]),
+                          pw.Row(
+                              mainAxisAlignment:
+                                  pw.MainAxisAlignment.spaceBetween,
+                              children: [
+                                pw.Text("TOTAL",
+                                    style: pw.TextStyle(
+                                        fontWeight: pw.FontWeight.bold)),
+                                PricePWWidget(
+                                    price: orderResultFull.total,
+                                    fontWeight: pw.FontWeight.bold),
+                              ]),
+                          pw.Padding(
+                              padding:
+                                  const pw.EdgeInsets.symmetric(vertical: 8.0),
+                              child: pw.Row(
+                                  mainAxisAlignment:
+                                      pw.MainAxisAlignment.center,
+                                  children: [
+                                    pw.Text("¡Muchas gracias por tu compra!",
+                                        style:
+                                            const pw.TextStyle(fontSize: 10)),
+                                    pw.SizedBox(width: 10),
+                                    pw.Image(faceSmile, height: 12),
+                                  ]))
+                        ]))
+                  ])))
         ];
       },
     ),

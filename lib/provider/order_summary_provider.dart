@@ -52,4 +52,12 @@ class OrderSummaryProvider extends ChangeNotifier {
   void clearUrlPayment() {
     _orderResult.urlPayment = "";
   }
+
+  void clearOrderSummary() {
+    _orderSummary = OrderSummary(
+        details: PickUp(address: ""),
+        userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
+        shoppingCart: ShoppingCart());
+    notifyListeners();
+  }
 }

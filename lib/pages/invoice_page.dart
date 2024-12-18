@@ -73,107 +73,124 @@ class _InvoicePageState extends State<InvoicePage> {
                     ],
                   ),
                 )
-              : Scaffold(
-                  backgroundColor: Colors.white,
-                  appBar: AppBar(
-                    surfaceTintColor: Colors.white,
-                    backgroundColor: Colors.white,
-                    shadowColor: Colors.black,
-                    elevation: 2,
-                    centerTitle: true,
-                    leading: IconButton(
-                        onPressed: () {
-                          context
-                              .read<BottomNavigationBarProvider>()
-                              .showHome();
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                return const HomePage();
-                              },
-                            ),
-                            (route) {
-                              return false;
-                            },
-                          );
-                        },
-                        icon: const Icon(Icons.arrow_back)),
-                    title: const Text("BOLETA",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    actions: [
-                      IconButton(
-                          onPressed: () async {
-                            setState(() {
-                              reloading = true;
-                            });
-                            await getOrderFull();
-                            setState(() {
-                              reloading = false;
-                            });
+              : PopScope(
+                  canPop: false,
+                  onPopInvoked: (didPop) {
+                    if (!didPop) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return const HomePage();
                           },
-                          icon: const Icon(FontAwesomeIcons.arrowRotateRight))
-                    ],
-                  ),
-                  body: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const InvoiceCardWidget(),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Divider(),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: ElevatedButton(
-                                onPressed: () async {
-                                  final pdfDocument = await generateInvoicePdf(
-                                    context
-                                        .read<InvoiceProvider>()
-                                        .orderResultFull,
-                                    context
-                                        .read<RestaurantInfoProvider>()
-                                        .restaurantInfo,
-                                  );
-                                  final pdfBytes = await pdfDocument.save();
-                                  final directory =
-                                      await getTemporaryDirectory();
-                                  final tempFile =
-                                      File('${directory.path}/boleta.pdf');
-                                  await tempFile.writeAsBytes(pdfBytes);
-                                  OpenFilex.open(tempFile.path);
+                        ),
+                        (route) => false,
+                      );
+                    }
+                  },
+                  child: Scaffold(
+                    backgroundColor: Colors.white,
+                    appBar: AppBar(
+                      surfaceTintColor: Colors.white,
+                      backgroundColor: Colors.white,
+                      shadowColor: Colors.black,
+                      elevation: 2,
+                      centerTitle: true,
+                      leading: IconButton(
+                          onPressed: () {
+                            context
+                                .read<BottomNavigationBarProvider>()
+                                .showHome();
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return const HomePage();
                                 },
-                                child: const Text("Descargar boleta")),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor:
-                                        WidgetStatePropertyAll<Color>(
-                                            Colors.grey.shade400),
-                                    foregroundColor:
-                                        const WidgetStatePropertyAll<Color>(
-                                            Colors.black)),
-                                onPressed: () {
-                                  context
-                                      .read<BottomNavigationBarProvider>()
-                                      .showHome();
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return const HomePage();
-                                      },
-                                    ),
-                                    (route) => false,
-                                  );
-                                },
-                                child: const Text("Volver a la tienda")),
-                          )
-                        ],
-                      )
-                    ],
+                              ),
+                              (route) {
+                                return false;
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.arrow_back)),
+                      title: const Text("BOLETA",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      actions: [
+                        IconButton(
+                            onPressed: () async {
+                              setState(() {
+                                reloading = true;
+                              });
+                              await getOrderFull();
+                              setState(() {
+                                reloading = false;
+                              });
+                            },
+                            icon: const Icon(FontAwesomeIcons.arrowRotateRight))
+                      ],
+                    ),
+                    body: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const InvoiceCardWidget(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Divider(),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: ElevatedButton(
+                                  onPressed: () async {
+                                    final pdfDocument =
+                                        await generateInvoicePdf(
+                                      context
+                                          .read<InvoiceProvider>()
+                                          .orderResultFull,
+                                      context
+                                          .read<RestaurantInfoProvider>()
+                                          .restaurantInfo,
+                                    );
+                                    final pdfBytes = await pdfDocument.save();
+                                    final directory =
+                                        await getTemporaryDirectory();
+                                    final tempFile =
+                                        File('${directory.path}/boleta.pdf');
+                                    await tempFile.writeAsBytes(pdfBytes);
+                                    OpenFilex.open(tempFile.path);
+                                  },
+                                  child: const Text("Descargar boleta")),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          WidgetStatePropertyAll<Color>(
+                                              Colors.grey.shade400),
+                                      foregroundColor:
+                                          const WidgetStatePropertyAll<Color>(
+                                              Colors.black)),
+                                  onPressed: () {
+                                    context
+                                        .read<BottomNavigationBarProvider>()
+                                        .showHome();
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return const HomePage();
+                                        },
+                                      ),
+                                      (route) => false,
+                                    );
+                                  },
+                                  child: const Text("Volver a la tienda")),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 );
         } else {

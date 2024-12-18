@@ -4,7 +4,7 @@ import 'package:chifa_el_meson/model/shopping_cart_model.dart';
 import 'package:flutter/material.dart';
 
 class ShoppingCartProvider extends ChangeNotifier {
-  final ShoppingCart _cardItems = ShoppingCart();
+  ShoppingCart _cardItems = ShoppingCart();
 
   ShoppingCartProvider();
 
@@ -48,6 +48,11 @@ class ShoppingCartProvider extends ChangeNotifier {
       }
       return cartItem;
     }).toList();
+    notifyListeners();
+  }
+
+  void cleanShoppingCart() {
+    _cardItems = ShoppingCart();
     notifyListeners();
   }
 }

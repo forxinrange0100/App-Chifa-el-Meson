@@ -1,3 +1,4 @@
+import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/pages/invoice_page.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -51,28 +52,44 @@ class PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          WebViewWidget(controller: _controller),
-          if (_isLoading)
-            const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: Colors.blue,
-                    backgroundColor: Colors.grey,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text("Estamos redirigíendote al portal de pago...")
-                ],
-              ),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return const HomePage();
+              },
             ),
-        ],
+            (route) => false,
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            WebViewWidget(controller: _controller),
+            if (_isLoading)
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: Colors.blue,
+                      backgroundColor: Colors.grey,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text("Estamos redirigíendote al portal de pago...")
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:chifa_el_meson/enum/input_status_enum.dart';
 import 'package:chifa_el_meson/model/input_status_model.dart';
 import 'package:chifa_el_meson/model/order_summary_model.dart';
 import 'package:chifa_el_meson/pages/payment_page.dart';
+import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
 import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
@@ -575,6 +576,17 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           return PaymentPage(uri: uri);
                         },
                       ));
+                      context.read<ShoppingCartProvider>().cleanShoppingCart();
+                      context.read<OrderSummaryProvider>().clearOrderSummary();
+                      context.read<BottomNavigationBarProvider>().showHome();
+                      _textEditingControllerAddress.text = '';
+                      _textEditingControllerEmail.text = '';
+                      _textEditingControllerFullName.text = '';
+                      _textEditingControllerPhoneNumber.text = '';
+                      _inputStatusAddress.verify('');
+                      _inputStatusEmail.verify('');
+                      _inputStatusFullName.verify('');
+                      _inputStatusPhoneNumber.verify('');
                     }
                     setState(() {
                       _isSubmitting = false;
