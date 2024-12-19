@@ -20,7 +20,7 @@ class InvoicePage extends StatefulWidget {
 }
 
 class _InvoicePageState extends State<InvoicePage> {
-  bool reloading = false;
+  bool _reloading = false;
   Future<bool> getOrderFull() async {
     await context.read<InvoiceProvider>().getOrderResultFull();
     return true;
@@ -53,7 +53,7 @@ class _InvoicePageState extends State<InvoicePage> {
           );
         } else if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data == true) {
-          return reloading
+          return _reloading
               ? const Scaffold(
                   backgroundColor: Colors.white,
                   body: Column(
@@ -120,11 +120,11 @@ class _InvoicePageState extends State<InvoicePage> {
                         IconButton(
                             onPressed: () async {
                               setState(() {
-                                reloading = true;
+                                _reloading = true;
                               });
                               await getOrderFull();
                               setState(() {
-                                reloading = false;
+                                _reloading = false;
                               });
                             },
                             icon: const Icon(FontAwesomeIcons.arrowRotateRight))
@@ -142,6 +142,10 @@ class _InvoicePageState extends State<InvoicePage> {
                               padding: const EdgeInsets.all(5.0),
                               child: ElevatedButton(
                                   onPressed: () async {
+                                    context
+                                        .read<InvoiceProvider>()
+                                        .setIseGettingInvoice(true);
+
                                     final pdfDocument =
                                         await generateInvoicePdf(
                                       context
@@ -158,8 +162,37 @@ class _InvoicePageState extends State<InvoicePage> {
                                         File('${directory.path}/boleta.pdf');
                                     await tempFile.writeAsBytes(pdfBytes);
                                     OpenFilex.open(tempFile.path);
+                                    if (!context.mounted) {
+                                      return;
+                                    }
+                                    context
+                                        .read<InvoiceProvider>()
+                                        .setIseGettingInvoice(false);
                                   },
-                                  child: const Text("Descargar boleta")),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text("Descargar boleta"),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      context
+                                              .watch<InvoiceProvider>()
+                                              .isGettingInvoice
+                                          ? const SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.blue,
+                                                  backgroundColor: Colors.grey,
+                                                ),
+                                              ),
+                                            )
+                                          : const SizedBox()
+                                    ],
+                                  )),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(5.0),

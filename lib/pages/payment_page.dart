@@ -1,6 +1,10 @@
 import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/pages/invoice_page.dart';
+import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
+import 'package:chifa_el_meson/provider/order_summary_provider.dart';
+import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -24,6 +28,9 @@ class PaymentPageState extends State<PaymentPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
+            context.read<ShoppingCartProvider>().cleanShoppingCart();
+            context.read<OrderSummaryProvider>().clearOrderSummary();
+            context.read<BottomNavigationBarProvider>().showHome();
             setState(() {
               _isLoading = true;
             });

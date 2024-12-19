@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class InvoiceProvider extends ChangeNotifier {
   final OrderSummaryProvider _orderSummaryProvider;
+  bool _isGettingInvoice = false;
 
   OrderResultFull _orderResultFull = OrderResultFull(
       id: 0,
@@ -24,9 +25,15 @@ class InvoiceProvider extends ChangeNotifier {
       orderProducts: []);
   InvoiceProvider(this._orderSummaryProvider);
   OrderResultFull get orderResultFull => _orderResultFull;
+  bool get isGettingInvoice => _isGettingInvoice;
   Future<void> getOrderResultFull() async {
     _orderResultFull =
         await fetchOrderFull(_orderSummaryProvider.orderResult.publicId);
+    notifyListeners();
+  }
+
+  void setIseGettingInvoice(bool value) {
+    _isGettingInvoice = value;
     notifyListeners();
   }
 }
