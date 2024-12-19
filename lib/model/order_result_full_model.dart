@@ -45,23 +45,23 @@ class OrderResultFull {
         return PaymentStatus(
             name: 'Pendiente',
             color: Colors.black,
-            backgroundColor: Colors.yellow.shade300,
+            backgroundColor: Colors.yellowAccent.shade100,
             colorPdf: PdfColors.black,
-            backgroundColorPdf: PdfColors.yellow300);
+            backgroundColorPdf: PdfColors.yellowAccent100);
       case 'completed':
         return PaymentStatus(
             name: 'Completado',
             color: Colors.black,
-            backgroundColor: Colors.green.shade300,
+            backgroundColor: Colors.greenAccent.shade100,
             colorPdf: PdfColors.black,
-            backgroundColorPdf: PdfColors.green300);
+            backgroundColorPdf: PdfColors.greenAccent100);
       case 'failed':
         return PaymentStatus(
             name: 'Error',
             color: Colors.black,
-            backgroundColor: Colors.red.shade300,
+            backgroundColor: Colors.redAccent.shade100,
             colorPdf: PdfColors.black,
-            backgroundColorPdf: PdfColors.red300);
+            backgroundColorPdf: PdfColors.redAccent100);
       case 'refunded':
         return PaymentStatus(
             name: 'Reembolsado',
@@ -73,9 +73,9 @@ class OrderResultFull {
         return PaymentStatus(
             name: paymentStatus,
             color: Colors.black,
-            backgroundColor: Colors.teal.shade300,
+            backgroundColor: Colors.tealAccent.shade100,
             colorPdf: PdfColors.black,
-            backgroundColorPdf: PdfColors.teal300);
+            backgroundColorPdf: PdfColors.tealAccent100);
     }
   }
 }
