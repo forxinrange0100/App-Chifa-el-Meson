@@ -1,7 +1,7 @@
 import 'package:chifa_el_meson/model/order_result_full_model.dart';
 import 'package:chifa_el_meson/model/restaurant_info_model.dart';
 import 'package:chifa_el_meson/utils/format_date_time.dart';
-import 'package:chifa_el_meson/widget/price_pw_widget.dart';
+import 'package:chifa_el_meson/widget/pdf/price_pw_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -79,7 +79,8 @@ Future<pw.Document> generateInvoicePdf(
                     pw.Padding(
                         padding: const pw.EdgeInsets.symmetric(vertical: 8.0),
                         child: pw.Container(
-                            color: PdfColors.greenAccent100,
+                            color: orderResultFull
+                                .paymentStatusFull.backgroundColorPdf,
                             child: pw.Padding(
                                 padding: const pw.EdgeInsets.symmetric(
                                     vertical: 4.0),
@@ -90,8 +91,10 @@ Future<pw.Document> generateInvoicePdf(
                                       pw.Image(moneyCheckDollar, height: 15),
                                       pw.SizedBox(width: 10),
                                       pw.Text(
-                                          "Pago: ${orderResultFull.paymentStatus}",
+                                          "Pago: ${orderResultFull.paymentStatusFull.name}",
                                           style: pw.TextStyle(
+                                              color: orderResultFull
+                                                  .paymentStatusFull.colorPdf,
                                               fontWeight: pw.FontWeight.bold,
                                               fontSize: 15))
                                     ])))),

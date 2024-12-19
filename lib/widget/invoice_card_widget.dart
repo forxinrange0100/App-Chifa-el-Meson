@@ -82,7 +82,11 @@ class InvoiceCardWidget extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Container(
-                      color: Colors.greenAccent.shade100,
+                      color: context
+                          .watch<InvoiceProvider>()
+                          .orderResultFull
+                          .paymentStatusFull
+                          .backgroundColor,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Row(
@@ -96,9 +100,15 @@ class InvoiceCardWidget extends StatelessWidget {
                               width: 10,
                             ),
                             Text(
-                              "Pago: ${context.watch<InvoiceProvider>().orderResultFull.paymentStatus}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15),
+                              "Pago: ${context.watch<InvoiceProvider>().orderResultFull.paymentStatusFull.name}",
+                              style: TextStyle(
+                                  color: context
+                                      .watch<InvoiceProvider>()
+                                      .orderResultFull
+                                      .paymentStatusFull
+                                      .color,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
                             )
                           ],
                         ),

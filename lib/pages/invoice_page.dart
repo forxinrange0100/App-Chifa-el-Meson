@@ -4,7 +4,7 @@ import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
 import 'package:chifa_el_meson/provider/invoice_provider.dart';
 import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
-import 'package:chifa_el_meson/utils/generate_invoice_pdf.dart';
+import 'package:chifa_el_meson/utils/pdf/generate_invoice_pdf.dart';
 import 'package:chifa_el_meson/widget/invoice_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
