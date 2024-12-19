@@ -520,7 +520,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 const Text("TOTAL"),
                 PriceWidget(
                     price: context.watch<OrderSummaryProvider>().details.cost +
-                        context.watch<ShoppingCartProvider>().subtotal)
+                        context.watch<ShoppingCartProvider>().subtotal -
+                        context.watch<ShoppingCartProvider>().discount)
               ],
             ),
             const Divider(),

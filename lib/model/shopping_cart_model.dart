@@ -8,7 +8,9 @@ class ShoppingCart {
 
   int get shoppingCartDiscountedPrice => cartItems.fold(
       0,
-      (total, cartItem) => total + cartItem.cartItemDisccountedPrice != 0
-          ? cartItem.cartItemDisccountedPrice
-          : cartItem.cartItemRegularPrice);
+      (total, cartItem) =>
+          total +
+          (cartItem.cartItemDisccountedPrice != 0
+              ? cartItem.cartItemDisccountedPrice
+              : cartItem.cartItemRegularPrice));
 }
