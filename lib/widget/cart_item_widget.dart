@@ -59,7 +59,7 @@ class _CartItemWidgetState extends State<CartItemWidget>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SizedBox(
-                          width: MediaQuery.of(context).size.width / 2,
+                          width: 150,
                           child: Text(
                             widget.cartItem.dish.name.toUpperCase(),
                             style: const TextStyle(

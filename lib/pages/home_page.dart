@@ -152,16 +152,15 @@ class _HomePageState extends State<HomePage> {
                     },
                   )
                 : !context.watch<DataProvider>().done
-                    ? Scaffold(
-                        backgroundColor: Colors.redAccent.shade700,
-                        body: const Center(
+                    ? const Scaffold(
+                        backgroundColor: Colors.white,
+                        body: Center(
                           child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
+                              color: Colors.blue, backgroundColor: Colors.grey),
                         ),
                       )
                     : Scaffold(
-                        backgroundColor: Colors.redAccent.shade700,
+                        backgroundColor: Colors.white,
                         body: Center(
                           child: Text(
                               "Error ${context.watch<DataProvider>().errorMessage}"),
@@ -169,9 +168,9 @@ class _HomePageState extends State<HomePage> {
                       ),
           );
         } else {
-          return Scaffold(
-            backgroundColor: Colors.redAccent.shade700,
-            body: const Center(
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
               child: Text("Error"),
             ),
           );

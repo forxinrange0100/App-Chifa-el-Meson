@@ -13,7 +13,7 @@ class InvoiceCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 580,
+      height: MediaQuery.of(context).size.height * 2 / 3,
       child: ListView(children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),

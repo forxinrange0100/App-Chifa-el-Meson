@@ -228,6 +228,7 @@ class _InvoicePageState extends State<InvoicePage> {
                 );
         } else {
           return const Scaffold(
+            backgroundColor: Colors.white,
             body: Center(
               child: Text("Error"),
             ),
