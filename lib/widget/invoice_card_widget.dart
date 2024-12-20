@@ -13,15 +13,15 @@ class InvoiceCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 2 / 3,
-      child: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
-          child: Card(
-            elevation: 10,
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+      height: MediaQuery.of(context).size.height * 0.73,
+      child: ListView(
+        physics: const BouncingScrollPhysics(),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              elevation: 10,
+              color: Colors.white,
               child: Column(
                 children: [
                   const Text(
@@ -317,9 +317,9 @@ class InvoiceCardWidget extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ),
-      ]),
+          )
+        ],
+      ),
     );
   }
 }

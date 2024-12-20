@@ -44,8 +44,7 @@ class ShoppingCartPage extends StatelessWidget {
                         child: Column(
                           children: [
                             SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 3 / 5,
+                              height: MediaQuery.of(context).size.height * 0.68,
                               child: ListView(
                                 children: shoppingCartProvider.cardItems
                                     .map((cartItem) {
@@ -59,7 +58,8 @@ class ShoppingCartPage extends StatelessWidget {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(
+                        right: 8.0, left: 8.0, bottom: 8.0),
                     child: Column(
                       children: [
                         const Divider(),
