@@ -1,4 +1,3 @@
-import 'package:chifa_el_meson/pages/home_page.dart';
 import 'package:chifa_el_meson/pages/invoice_page.dart';
 import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
 import 'package:chifa_el_meson/provider/order_summary_provider.dart';
@@ -63,14 +62,11 @@ class PaymentPageState extends State<PaymentPage> {
       canPop: false,
       onPopInvoked: (didPop) {
         if (!didPop) {
-          Navigator.pushAndRemoveUntil(
+          Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) {
-                return const HomePage();
-              },
+              builder: (context) => const InvoicePage(),
             ),
-            (route) => false,
           );
         }
       },

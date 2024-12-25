@@ -173,20 +173,22 @@ class _InvoicePageState extends State<InvoicePage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const Text("Descargar boleta"),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
                                       context
                                               .watch<InvoiceProvider>()
                                               .isGettingInvoice
-                                          ? const SizedBox(
-                                              height: 20,
-                                              width: 20,
-                                              child: Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: Colors.blue,
-                                                  backgroundColor: Colors.grey,
+                                          ? const Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 8.0),
+                                              child: SizedBox(
+                                                height: 20,
+                                                width: 20,
+                                                child: Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: Colors.blue,
+                                                    backgroundColor:
+                                                        Colors.grey,
+                                                  ),
                                                 ),
                                               ),
                                             )

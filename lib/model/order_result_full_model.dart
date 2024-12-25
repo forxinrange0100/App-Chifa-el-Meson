@@ -57,7 +57,7 @@ class OrderResultFull {
             backgroundColorPdf: PdfColors.greenAccent100);
       case 'failed':
         return PaymentStatus(
-            name: 'Error',
+            name: 'Incompleto',
             color: Colors.black,
             backgroundColor: Colors.redAccent.shade100,
             colorPdf: PdfColors.black,

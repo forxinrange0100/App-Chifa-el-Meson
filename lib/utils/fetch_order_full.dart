@@ -4,6 +4,7 @@ import 'package:chifa_el_meson/errors/errors.dart';
 import 'package:chifa_el_meson/model/dish_model.dart';
 import 'package:chifa_el_meson/model/order_product_result_full_model.dart';
 import 'package:chifa_el_meson/model/order_result_full_model.dart';
+import 'package:chifa_el_meson/utils/date_time_chile.dart';
 import 'package:http/http.dart' as http;
 
 Future<OrderResultFull> fetchOrderFull(int publicId) async {
@@ -17,7 +18,8 @@ Future<OrderResultFull> fetchOrderFull(int publicId) async {
       final int publicId = result['order']['public_id'];
       final int subtotal = result['order']['subtotal'];
       final int total = result['order']['total'];
-      final DateTime timestamp = DateTime.parse(result['order']['timestamp']);
+      final DateTime timestamp =
+          dateTimeChile(DateTime.parse(result['order']['timestamp']));
       final String deliveryType = result['order']['delivery_type'];
       final int deliveryCost = result['order']['delivery_cost'];
       final String status = result['order']['status'];
