@@ -39,7 +39,10 @@ Future<pw.Document> generateInvoicePdf(
 
   pdf.addPage(
     pw.MultiPage(
-      pageFormat: PdfPageFormat.a4,
+      pageFormat: PdfPageFormat(
+        100 * PdfPageFormat.mm,
+        PdfPageFormat.a4.height,
+      ),
       build: (context) {
         return [
           pw.Center(
@@ -163,31 +166,54 @@ Future<pw.Document> generateInvoicePdf(
                                       pw.Text('Producto',
                                           style: pw.TextStyle(
                                               fontWeight: pw.FontWeight.bold)),
-                                      pw.Text('Cant',
-                                          style: pw.TextStyle(
-                                              fontWeight: pw.FontWeight.bold)),
-                                      pw.Text('Importe',
-                                          style: pw.TextStyle(
-                                              fontWeight: pw.FontWeight.bold))
+                                      pw.Center(
+                                          child: pw.Text('Cant',
+                                              style: pw.TextStyle(
+                                                  fontWeight:
+                                                      pw.FontWeight.bold))),
+                                      pw.Center(
+                                          child: pw.Text('Importe',
+                                              style: pw.TextStyle(
+                                                  fontWeight:
+                                                      pw.FontWeight.bold)))
                                     ]),
                                 ...orderResultFull.orderProducts
                                     .map((orderProduct) {
-                                  return pw.TableRow(children: [
-                                    pw.Padding(
-                                        padding: const pw.EdgeInsets.all(8.0),
-                                        child:
-                                            pw.Text(orderProduct.product.name)),
-                                    pw.Padding(
-                                        padding: const pw.EdgeInsets.all(8.0),
-                                        child: pw.Text(
-                                            orderProduct.quantity.toString())),
-                                    pw.Padding(
-                                        padding: const pw.EdgeInsets.all(8.0),
-                                        child: PricePWWidget(
-                                            price: orderProduct
-                                                    .product.regularPrice *
-                                                orderProduct.quantity))
-                                  ]);
+                                  return pw.TableRow(
+                                      decoration: (orderResultFull
+                                                  .orderProducts.lastOrNull ==
+                                              orderProduct)
+                                          ? null
+                                          : const pw.BoxDecoration(
+                                              border: pw.Border(
+                                                bottom: pw.BorderSide(
+                                                    width: 1,
+                                                    color: PdfColors.grey),
+                                              ),
+                                            ),
+                                      children: [
+                                        pw.Padding(
+                                            padding:
+                                                const pw.EdgeInsets.symmetric(
+                                                    vertical: 8.0),
+                                            child: pw.Text(
+                                                orderProduct.product.name)),
+                                        pw.Padding(
+                                            padding:
+                                                const pw.EdgeInsets.all(8.0),
+                                            child: pw.Center(
+                                                child: pw.Text(orderProduct
+                                                    .quantity
+                                                    .toString()))),
+                                        pw.Padding(
+                                            padding:
+                                                const pw.EdgeInsets.all(8.0),
+                                            child: pw.Center(
+                                                child: PricePWWidget(
+                                                    price: orderProduct.product
+                                                            .regularPrice *
+                                                        orderProduct.quantity)))
+                                      ]);
                                 })
                               ]))
                         ])),

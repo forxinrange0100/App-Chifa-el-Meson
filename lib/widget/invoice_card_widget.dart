@@ -206,12 +206,16 @@ class InvoiceCardWidget extends StatelessWidget {
                                   Text('Producto',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
-                                  Text('Cant',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  Text('Importe',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                  Center(
+                                    child: Text('Cant',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  Center(
+                                    child: Text('Importe',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
                                 ],
                               ),
                               ...context
@@ -220,22 +224,42 @@ class InvoiceCardWidget extends StatelessWidget {
                                   .orderProducts
                                   .map((orderProduct) {
                                 return TableRow(
+                                  decoration: (context
+                                              .watch<InvoiceProvider>()
+                                              .orderResultFull
+                                              .orderProducts
+                                              .lastOrNull ==
+                                          orderProduct)
+                                      ? null
+                                      : const BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                                width: 1, color: Colors.grey),
+                                          ),
+                                        ),
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0,
+                                      ),
                                       child: Text(orderProduct.product.name),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                          orderProduct.quantity.toString()),
+                                      child: Center(
+                                        child: Text(
+                                          orderProduct.quantity.toString(),
+                                        ),
+                                      ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: PriceWidget(
-                                          price: orderProduct
-                                                  .product.regularPrice *
-                                              orderProduct.quantity),
+                                      child: Center(
+                                        child: PriceWidget(
+                                            price: orderProduct
+                                                    .product.regularPrice *
+                                                orderProduct.quantity),
+                                      ),
                                     ),
                                   ],
                                 );
