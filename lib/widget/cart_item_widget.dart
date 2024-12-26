@@ -118,14 +118,14 @@ class _CartItemWidgetState extends State<CartItemWidget>
                           borderRadius: BorderRadius.circular(12),
                           child: CachedNetworkImage(
                             imageUrl: widget.cartItem.dish.image,
-                            height: MediaQuery.of(context).size.height / 7,
+                            height: MediaQuery.of(context).size.height / 6,
                             width: MediaQuery.of(context).size.width / 3,
                             fit: BoxFit.cover,
                           ),
                         ),
                         SizedBox(
-                          height: MediaQuery.of(context).size.height / 7,
-                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height / 6,
+                          width: MediaQuery.of(context).size.width * 0.55,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -136,19 +136,15 @@ class _CartItemWidgetState extends State<CartItemWidget>
                                 enabled: false,
                               )),
                               widget.cartItem.dish.discountedPrice != 0
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 2.0),
-                                      child: Container(
-                                        color: Colors.green,
-                                        child: Text(
-                                          "Ahorras un ${(((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0)}% DTO",
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
+                                  ? Container(
+                                      color: Colors.green,
+                                      child: Text(
+                                        "Ahorras un ${(((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0)}% DTO",
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     )
                                   : const SizedBox(),

@@ -13,7 +13,7 @@ class InvoiceCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.73,
+      height: MediaQuery.of(context).size.height * 0.65,
       child: ListView(
         physics: const BouncingScrollPhysics(),
         children: [

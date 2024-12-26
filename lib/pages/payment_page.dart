@@ -87,7 +87,11 @@ class PaymentPageState extends State<PaymentPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Text("Estamos redirigíendote al portal de pago...")
+                    Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text("Estamos redirigíendote al portal de pago...",
+                          textAlign: TextAlign.center),
+                    )
                   ],
                 ),
               ),

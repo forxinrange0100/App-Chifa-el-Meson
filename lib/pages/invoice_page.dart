@@ -42,11 +42,12 @@ class _InvoicePageState extends State<InvoicePage> {
                     color: Colors.blue,
                     backgroundColor: Colors.grey,
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                      "Estamos cargando la boleta para ti, espera un momento...")
+                  Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text(
+                        "Estamos cargando la boleta para ti, espera un momento...",
+                        textAlign: TextAlign.center),
+                  )
                 ],
               ),
             ),
@@ -65,11 +66,12 @@ class _InvoicePageState extends State<InvoicePage> {
                           backgroundColor: Colors.grey,
                         ),
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                          "Estamos cargando la boleta para ti, espera un momento...")
+                      Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Text(
+                            "Estamos cargando la boleta para ti, espera un momento...",
+                            textAlign: TextAlign.center),
+                      )
                     ],
                   ),
                 )

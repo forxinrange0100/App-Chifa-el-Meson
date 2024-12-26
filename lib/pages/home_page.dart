@@ -46,10 +46,12 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.blue,
                     backgroundColor: Colors.grey,
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text("Estamos cargando todo para ti, espera un momento...")
+                  Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Text(
+                        "Estamos cargando todo para ti, espera un momento...",
+                        textAlign: TextAlign.center),
+                  )
                 ],
               ),
             ),

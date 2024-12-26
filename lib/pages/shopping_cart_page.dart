@@ -44,7 +44,7 @@ class ShoppingCartPage extends StatelessWidget {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.68,
+                              height: MediaQuery.of(context).size.height * 0.57,
                               child: ListView(
                                 children: shoppingCartProvider.cardItems
                                     .map((cartItem) {
