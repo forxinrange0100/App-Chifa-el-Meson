@@ -59,7 +59,7 @@ class _CartItemWidgetState extends State<CartItemWidget>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SizedBox(
-                          width: 150,
+                          width: MediaQuery.of(context).size.width / 2,
                           child: Text(
                             widget.cartItem.dish.name.toUpperCase(),
                             style: const TextStyle(
@@ -112,37 +112,43 @@ class _CartItemWidgetState extends State<CartItemWidget>
                       ],
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: CachedNetworkImage(
                             imageUrl: widget.cartItem.dish.image,
-                            height: 100,
-                            width: 150,
+                            height: MediaQuery.of(context).size.height / 7,
+                            width: MediaQuery.of(context).size.width / 3,
                             fit: BoxFit.cover,
                           ),
                         ),
                         SizedBox(
-                          height: 100,
+                          height: MediaQuery.of(context).size.height / 7,
+                          width: MediaQuery.of(context).size.width * 0.6,
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               SizedBox(
-                                  width: 200,
                                   child: ExpandableText(
-                                    text: widget.cartItem.dish.description,
-                                    enabled: false,
-                                  )),
+                                text: widget.cartItem.dish.description,
+                                enabled: false,
+                              )),
                               widget.cartItem.dish.discountedPrice != 0
-                                  ? Container(
-                                      color: Colors.green,
-                                      child: Text(
-                                        "Ahorras un ${(((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0)}% DTO",
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2.0),
+                                      child: Container(
+                                        color: Colors.green,
+                                        child: Text(
+                                          "Ahorras un ${(((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0)}% DTO",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     )
                                   : const SizedBox(),
@@ -168,11 +174,18 @@ class _CartItemWidgetState extends State<CartItemWidget>
                                         ),
                                       ],
                                     )
-                                  : PriceWidget(
-                                      price: widget.cartItem.dish.regularPrice *
-                                          widget.cartItem.quantity,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25,
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        PriceWidget(
+                                          price: widget
+                                                  .cartItem.dish.regularPrice *
+                                              widget.cartItem.quantity,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25,
+                                        ),
+                                      ],
                                     )
                             ],
                           ),
