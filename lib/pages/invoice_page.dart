@@ -155,11 +155,15 @@ class _InvoicePageState extends State<InvoicePage> {
                                           .read<RestaurantInfoProvider>()
                                           .restaurantInfo,
                                     );
+                                    if (!context.mounted) return;
+                                    final orderResultFull = context
+                                        .read<InvoiceProvider>()
+                                        .orderResultFull;
                                     final pdfBytes = await pdfDocument.save();
                                     final directory =
                                         await getTemporaryDirectory();
-                                    final tempFile =
-                                        File('${directory.path}/boleta.pdf');
+                                    final tempFile = File(
+                                        '${directory.path}/orden-${orderResultFull.publicId}-${orderResultFull.timestamp.toIso8601String()}.pdf');
                                     await tempFile.writeAsBytes(pdfBytes);
                                     OpenFilex.open(tempFile.path);
                                     if (!context.mounted) {
