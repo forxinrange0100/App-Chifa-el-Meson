@@ -52,159 +52,162 @@ class _CartItemWidgetState extends State<CartItemWidget>
                         label: 'Eliminar',
                       ),
                     ]),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: Text(
-                            widget.cartItem.dish.name.toUpperCase(),
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            OutlinedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
-                                  overlayColor: Colors.blue,
-                                  shape: const CircleBorder(),
-                                ),
-                                onPressed: () {
-                                  if (widget.cartItem.quantity == 1) {
-                                    controller.openEndActionPane();
-                                    return;
-                                  }
-                                  shoppingCartProvider
-                                      .decrementQuantity(widget.cartItem);
-                                },
-                                child: const Icon(
-                                  FontAwesomeIcons.minus,
-                                  size: 15,
-                                )),
-                            Text(
-                              widget.cartItem.quantity.toString(),
-                              style: const TextStyle(fontSize: 20),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width / 2,
+                            child: Text(
+                              widget.cartItem.dish.name.toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            OutlinedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
-                                  overlayColor: Colors.blue,
-                                  shape: const CircleBorder(),
-                                ),
-                                onPressed: () {
-                                  controller.close();
-                                  shoppingCartProvider
-                                      .incrementQuantity(widget.cartItem);
-                                },
-                                child: const Icon(
-                                  FontAwesomeIcons.plus,
-                                  size: 15,
-                                )),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: CachedNetworkImage(
-                            imageUrl: widget.cartItem.dish.image,
-                            height: MediaQuery.of(context).size.height / 6,
-                            width: MediaQuery.of(context).size.width / 3,
-                            fit: BoxFit.cover,
                           ),
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height / 6,
-                          width: MediaQuery.of(context).size.width * 0.55,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Row(
                             children: [
-                              SizedBox(
-                                  child: ExpandableText(
-                                text: widget.cartItem.dish.description,
-                                enabled: false,
-                              )),
-                              widget.cartItem.dish.discountedPrice != 0
-                                  ? Container(
-                                      color: Colors.green,
-                                      child: Text(
-                                        "Ahorras un ${(((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0)}% DTO",
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                              widget.cartItem.dish.discountedPrice != 0
-                                  ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        PriceWidget(
-                                            price: widget
-                                                .cartItem.dish.regularPrice,
-                                            textDecoration:
-                                                TextDecoration.lineThrough),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        PriceWidget(
-                                          price: widget.cartItem.dish
-                                                  .discountedPrice *
-                                              widget.cartItem.quantity,
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        PriceWidget(
-                                          price: widget
-                                                  .cartItem.dish.regularPrice *
-                                              widget.cartItem.quantity,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 25,
-                                        ),
-                                      ],
-                                    )
+                              OutlinedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    overlayColor: Colors.blue,
+                                    shape: const CircleBorder(),
+                                  ),
+                                  onPressed: () {
+                                    if (widget.cartItem.quantity == 1) {
+                                      controller.openEndActionPane();
+                                      return;
+                                    }
+                                    shoppingCartProvider
+                                        .decrementQuantity(widget.cartItem);
+                                  },
+                                  child: const Icon(
+                                    FontAwesomeIcons.minus,
+                                    size: 15,
+                                  )),
+                              Text(
+                                widget.cartItem.quantity.toString(),
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                              OutlinedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    overlayColor: Colors.blue,
+                                    shape: const CircleBorder(),
+                                  ),
+                                  onPressed: () {
+                                    controller.close();
+                                    shoppingCartProvider
+                                        .incrementQuantity(widget.cartItem);
+                                  },
+                                  child: const Icon(
+                                    FontAwesomeIcons.plus,
+                                    size: 15,
+                                  )),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return NoteDialog(cartItem: widget.cartItem);
-                            },
-                          );
-                        },
-                        child: Text(
-                          widget.cartItem.preferenceNote.isNotEmpty
-                              ? "Ver notas"
-                              : "Añadir notas",
-                          style: const TextStyle(
-                              decoration: TextDecoration.underline),
-                        )),
-                  ],
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.cartItem.dish.image,
+                              height: MediaQuery.of(context).size.height / 6.5,
+                              width: MediaQuery.of(context).size.width / 3,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height / 6.5,
+                            width: MediaQuery.of(context).size.width * 0.55,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                    child: ExpandableText(
+                                  text: widget.cartItem.dish.description,
+                                  enabled: false,
+                                )),
+                                widget.cartItem.dish.discountedPrice != 0
+                                    ? Container(
+                                        color: Colors.green,
+                                        child: Text(
+                                          "Ahorras un ${(((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0)}% DTO",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      )
+                                    : const SizedBox(),
+                                widget.cartItem.dish.discountedPrice != 0
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          PriceWidget(
+                                              price: widget
+                                                  .cartItem.dish.regularPrice,
+                                              textDecoration:
+                                                  TextDecoration.lineThrough),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          PriceWidget(
+                                            price: widget.cartItem.dish
+                                                    .discountedPrice *
+                                                widget.cartItem.quantity,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          PriceWidget(
+                                            price: widget.cartItem.dish
+                                                    .regularPrice *
+                                                widget.cartItem.quantity,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 25,
+                                          ),
+                                        ],
+                                      )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return NoteDialog(cartItem: widget.cartItem);
+                              },
+                            );
+                          },
+                          child: Text(
+                            widget.cartItem.preferenceNote.isNotEmpty
+                                ? "Ver notas"
+                                : "Añadir notas",
+                            style: const TextStyle(
+                                decoration: TextDecoration.underline),
+                          )),
+                    ],
+                  ),
                 )),
             const Divider(
               height: 1.0,

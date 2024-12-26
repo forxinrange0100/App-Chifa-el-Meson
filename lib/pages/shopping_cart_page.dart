@@ -39,23 +39,14 @@ class ShoppingCartPage extends StatelessWidget {
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.57,
-                              child: ListView(
-                                children: shoppingCartProvider.cardItems
-                                    .map((cartItem) {
-                                  return CartItemWidget(cartItem: cartItem);
-                                }).toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
                     ],
+                  ),
+                  Expanded(
+                    child: ListView(
+                      children: shoppingCartProvider.cardItems.map((cartItem) {
+                        return CartItemWidget(cartItem: cartItem);
+                      }).toList(),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
