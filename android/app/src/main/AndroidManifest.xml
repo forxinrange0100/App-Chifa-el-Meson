@@ -20,7 +20,7 @@
         </intent>
     </queries>
     <application
-        android:label="chifa_el_meson"
+        android:label="Chifa El Mesón"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
