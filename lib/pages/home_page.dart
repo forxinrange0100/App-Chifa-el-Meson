@@ -8,6 +8,7 @@ import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:chifa_el_meson/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<bool> getData() async {
+    FlutterNativeSplash.remove();
     await context.read<DataProvider>().getData();
     return true;
   }

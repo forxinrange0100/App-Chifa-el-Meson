@@ -1,0 +1,6 @@
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/meson_splash.png
+  android_12:
+    image: assets/meson_splash.png
+    color: "#ffffff"

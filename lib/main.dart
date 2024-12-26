@@ -12,10 +12,13 @@ import 'package:chifa_el_meson/provider/scroll_controller_provider.dart';
 import 'package:chifa_el_meson/provider/shift_provider.dart';
 import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const MyApp());
 }
 
