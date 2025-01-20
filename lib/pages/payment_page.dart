@@ -5,6 +5,7 @@ import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:chifa_el_meson/environment.dart';
 
 class PaymentPage extends StatefulWidget {
   final Uri uri;
@@ -40,7 +41,7 @@ class PaymentPageState extends State<PaymentPage> {
             });
           },
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://meson.simsis.cl')) {
+            if (request.url.startsWith('${Urls.apiUrl}/payment/success')) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
