@@ -38,17 +38,18 @@ Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
           "Content-Type": "application/json",
         },
         body: body);
-    if (response.statusCode == 200) {
+    // if (response.statusCode == 200) {
       final result = json.decode(response.body);
       final String paymentUrl = result['payment_url'];
       final int publicId = result['order']['public_id'];
-      if (paymentUrl.isEmpty) {
-        throw FetchOrderException(response.body.toString());
+      if (paymentUrl.isNotEmpty) {
+        return OrderResult(urlPayment: paymentUrl, publicId: publicId);
+      } else {
+        throw FetchOrderException("Payment URL is empty");
       }
-      return OrderResult(urlPayment: paymentUrl, publicId: publicId);
-    } else {
-      throw FetchOrderException(response.body.toString());
-    }
+    // } else {
+    //   throw FetchOrderException(response.body.toString());
+    // }
   } catch (e) {
     throw FetchOrderException(e.toString());
   }

@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               )),
-              useMaterial3: true,
+              useMaterial3: false,
             ),
             home: const HomePage(),
           ),
