@@ -93,7 +93,7 @@ class _InvoicePageState extends State<InvoicePage> {
                   child: Scaffold(
                     backgroundColor: Colors.white,
                     appBar: AppBar(
-                      surfaceTintColor: Colors.white,
+                      surfaceTintColor: const Color.fromARGB(255, 89, 81, 81),
                       backgroundColor: Colors.white,
                       shadowColor: Colors.black,
                       elevation: 2,
@@ -115,7 +115,7 @@ class _InvoicePageState extends State<InvoicePage> {
                               },
                             );
                           },
-                          icon: const Icon(Icons.arrow_back)),
+                          icon: const Icon(Icons.arrow_back, color: Colors.black)),
                       title: const Text("BOLETA",
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       actions: [

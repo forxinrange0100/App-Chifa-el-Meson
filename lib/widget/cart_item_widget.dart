@@ -119,7 +119,9 @@ class _CartItemWidgetState extends State<CartItemWidget>
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: CachedNetworkImage(
-                              imageUrl: widget.cartItem.dish.image,
+                              imageUrl: widget.cartItem.dish.image.endsWith("null")
+                                  ? "https://chifaelmeson.cl/img/default.webp"
+                                  : widget.cartItem.dish.image,
                               height: MediaQuery.of(context).size.height / 6.5,
                               width: MediaQuery.of(context).size.width / 3,
                               fit: BoxFit.cover,

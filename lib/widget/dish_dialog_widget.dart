@@ -38,7 +38,9 @@ class _DishDialogState extends State<DishDialog> {
               child: ListView(
                 children: [
                   CachedNetworkImage(
-                    imageUrl: widget.dish.image,
+                    imageUrl: widget.dish.image.endsWith("null")
+                                ? "https://chifaelmeson.cl/img/default.webp"
+                                : widget.dish.image,
                     height: 300,
                     fit: BoxFit.cover,
                   ),
@@ -199,7 +201,6 @@ class _DishDialogState extends State<DishDialog> {
           style: const ButtonStyle(
               backgroundColor: WidgetStatePropertyAll<Color>(Colors.green)),
           onPressed: () async {
-            await context.read<ShiftProvider>().updateIsOpen();
             if (!context.mounted) {
               return;
             }

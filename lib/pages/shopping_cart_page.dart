@@ -31,7 +31,7 @@ class ShoppingCartPage extends StatelessWidget {
                                   .read<BottomNavigationBarProvider>()
                                   .showHome();
                             },
-                            icon: const Icon(FontAwesomeIcons.arrowLeft)),
+                            icon: const Icon(FontAwesomeIcons.arrowLeft, color: Colors.black,)),
                         centerTitle: true,
                         title: const Text(
                           "CARRITO",

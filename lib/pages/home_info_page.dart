@@ -365,7 +365,9 @@ class HomeInfoPage extends StatelessWidget {
                                                         ),
                                                       ),
                                                       CachedNetworkImage(
-                                                        imageUrl: dish.image,
+                                                        imageUrl: dish.image.endsWith("null")
+                                                            ? "https://chifaelmeson.cl/img/default.webp"
+                                                            : dish.image,
                                                         width: 170,
                                                         fit: BoxFit.cover,
                                                         placeholder: (context,
