@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chifa_el_meson/utils/fetch_shift.dart';
+import 'package:delivera/utils/fetch_shift.dart';
 import 'package:flutter/material.dart';
 
 class ShiftProvider extends ChangeNotifier {

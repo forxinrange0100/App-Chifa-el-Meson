@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chifa_el_meson/model/cart_item_model.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
-import 'package:chifa_el_meson/widget/expandable_text_widget.dart';
-import 'package:chifa_el_meson/widget/note_dialog_widget.dart';
-import 'package:chifa_el_meson/widget/price_widget.dart';
+import 'package:delivera/model/cart_item_model.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/widget/expandable_text_widget.dart';
+import 'package:delivera/widget/note_dialog_widget.dart';
+import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

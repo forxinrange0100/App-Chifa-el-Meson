@@ -1,5 +1,5 @@
-import 'package:chifa_el_meson/enum/delivery_detail_enum.dart';
-import 'package:chifa_el_meson/model/delivery_zones.dart';
+import 'package:delivera/enum/delivery_detail_enum.dart';
+import 'package:delivera/model/delivery_zones.dart';
 import 'package:flutter/material.dart';
 
 class DeliveryDetailsProvider extends ChangeNotifier {

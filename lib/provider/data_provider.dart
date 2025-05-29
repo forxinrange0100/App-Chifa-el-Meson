@@ -1,11 +1,11 @@
-import 'package:chifa_el_meson/provider/delivery_details_provider.dart';
-import 'package:chifa_el_meson/provider/dish_categories_provider.dart';
-import 'package:chifa_el_meson/provider/dishes_provider.dart';
-import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
-import 'package:chifa_el_meson/utils/fetch_delivery_zones.dart';
-import 'package:chifa_el_meson/utils/fetch_dish_categories.dart';
-import 'package:chifa_el_meson/utils/fetch_dishes.dart';
-import 'package:chifa_el_meson/utils/fetch_restaurant_info.dart';
+import 'package:delivera/provider/delivery_details_provider.dart';
+import 'package:delivera/provider/dish_categories_provider.dart';
+import 'package:delivera/provider/dishes_provider.dart';
+import 'package:delivera/provider/restaurant_info_provider.dart';
+import 'package:delivera/utils/fetch_delivery_zones.dart';
+import 'package:delivera/utils/fetch_dish_categories.dart';
+import 'package:delivera/utils/fetch_dishes.dart';
+import 'package:delivera/utils/fetch_restaurant_info.dart';
 import 'package:flutter/material.dart';
 
 class DataProvider extends ChangeNotifier {

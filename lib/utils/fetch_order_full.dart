@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:chifa_el_meson/environment.dart';
-import 'package:chifa_el_meson/errors/errors.dart';
-import 'package:chifa_el_meson/model/dish_model.dart';
-import 'package:chifa_el_meson/model/order_product_result_full_model.dart';
-import 'package:chifa_el_meson/model/order_result_full_model.dart';
-import 'package:chifa_el_meson/utils/date_time_chile.dart';
+import 'package:delivera/environment.dart';
+import 'package:delivera/errors/errors.dart';
+import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/order_product_result_full_model.dart';
+import 'package:delivera/model/order_result_full_model.dart';
+import 'package:delivera/utils/date_time_chile.dart';
 import 'package:http/http.dart' as http;
 
 Future<OrderResultFull> fetchOrderFull(int publicId) async {

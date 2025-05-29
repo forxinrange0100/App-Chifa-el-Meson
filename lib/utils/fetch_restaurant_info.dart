@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:chifa_el_meson/errors/errors.dart';
+import 'package:delivera/errors/errors.dart';
 import 'package:http/http.dart' as http;
-import 'package:chifa_el_meson/environment.dart';
-import 'package:chifa_el_meson/model/restaurant_info_model.dart';
+import 'package:delivera/environment.dart';
+import 'package:delivera/model/restaurant_info_model.dart';
 
 Future<RestaurantInfo> fetchRestaurantInfo() async {
   try {

@@ -1,10 +1,10 @@
-import 'package:chifa_el_meson/model/order_result_model.dart';
-import 'package:chifa_el_meson/model/order_summary_model.dart';
-import 'package:chifa_el_meson/model/shopping_cart_model.dart';
-import 'package:chifa_el_meson/model/user_details_model.dart';
-import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
-import 'package:chifa_el_meson/utils/fetch_order.dart';
+import 'package:delivera/model/order_result_model.dart';
+import 'package:delivera/model/order_summary_model.dart';
+import 'package:delivera/model/shopping_cart_model.dart';
+import 'package:delivera/model/user_details_model.dart';
+import 'package:delivera/provider/restaurant_info_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/utils/fetch_order.dart';
 import 'package:flutter/material.dart';
 
 class OrderSummaryProvider extends ChangeNotifier {

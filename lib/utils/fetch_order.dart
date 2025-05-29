@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:chifa_el_meson/environment.dart';
-import 'package:chifa_el_meson/errors/errors.dart';
-import 'package:chifa_el_meson/model/order_result_model.dart';
-import 'package:chifa_el_meson/model/order_summary_model.dart';
+import 'package:delivera/environment.dart';
+import 'package:delivera/errors/errors.dart';
+import 'package:delivera/model/order_result_model.dart';
+import 'package:delivera/model/order_summary_model.dart';
 import 'package:http/http.dart' as http;
 
 Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {

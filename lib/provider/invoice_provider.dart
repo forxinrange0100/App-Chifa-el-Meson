@@ -1,6 +1,6 @@
-import 'package:chifa_el_meson/model/order_result_full_model.dart';
-import 'package:chifa_el_meson/provider/order_summary_provider.dart';
-import 'package:chifa_el_meson/utils/fetch_order_full.dart';
+import 'package:delivera/model/order_result_full_model.dart';
+import 'package:delivera/provider/order_summary_provider.dart';
+import 'package:delivera/utils/fetch_order_full.dart';
 import 'package:flutter/material.dart';
 
 class InvoiceProvider extends ChangeNotifier {

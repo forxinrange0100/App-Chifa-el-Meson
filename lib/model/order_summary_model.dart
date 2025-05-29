@@ -1,6 +1,6 @@
-import 'package:chifa_el_meson/model/delivery_zone_model.dart';
-import 'package:chifa_el_meson/model/shopping_cart_model.dart';
-import 'package:chifa_el_meson/model/user_details_model.dart';
+import 'package:delivera/model/delivery_zone_model.dart';
+import 'package:delivera/model/shopping_cart_model.dart';
+import 'package:delivera/model/user_details_model.dart';
 
 class OrderSummary {
   DeliveryDetails details;

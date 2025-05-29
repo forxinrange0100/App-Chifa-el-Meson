@@ -1,11 +1,11 @@
-import 'package:chifa_el_meson/pages/invoice_page.dart';
-import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
-import 'package:chifa_el_meson/provider/order_summary_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
+import 'package:delivera/pages/invoice_page.dart';
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
+import 'package:delivera/provider/order_summary_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:chifa_el_meson/environment.dart';
+import 'package:delivera/environment.dart';
 
 class PaymentPage extends StatefulWidget {
   final Uri uri;

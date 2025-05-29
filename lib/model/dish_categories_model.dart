@@ -1,4 +1,4 @@
-import 'package:chifa_el_meson/model/dish_category_model.dart';
+import 'package:delivera/model/dish_category_model.dart';
 
 class DishCategories {
   final List<DishCategory> categories;

@@ -1,7 +1,7 @@
-import 'package:chifa_el_meson/model/order_result_full_model.dart';
-import 'package:chifa_el_meson/model/restaurant_info_model.dart';
-import 'package:chifa_el_meson/utils/format_date_time.dart';
-import 'package:chifa_el_meson/utils/pdf/price_pw_widget.dart';
+import 'package:delivera/model/order_result_full_model.dart';
+import 'package:delivera/model/restaurant_info_model.dart';
+import 'package:delivera/utils/format_date_time.dart';
+import 'package:delivera/utils/pdf/price_pw_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
