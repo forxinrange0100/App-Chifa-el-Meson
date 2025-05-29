@@ -36,7 +36,7 @@ class ShoppingCartPage extends StatelessWidget {
                         title: const Text(
                           "CARRITO",
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                         ),
                       ),
                     ],

@@ -57,6 +57,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.black),
           surfaceTintColor: Colors.white,
           backgroundColor: Colors.white,
           shadowColor: Colors.black,

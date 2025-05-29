@@ -83,14 +83,14 @@ void unsavedInvoice() {
   );
 }
 
-void storageNotGranted() {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.solidFile),
-    title: const Text("Sin permiso de almacenamiento"),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.error,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
-}
+// void storageNotGranted() {
+//   toastification.show(
+//     icon: const Icon(FontAwesomeIcons.solidFile),
+//     title: const Text("Sin permiso de almacenamiento"),
+//     style: ToastificationStyle.flat,
+//     type: ToastificationType.error,
+//     showProgressBar: true,
+//     progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
+//     autoCloseDuration: const Duration(seconds: 5),
+//   );
+// }
