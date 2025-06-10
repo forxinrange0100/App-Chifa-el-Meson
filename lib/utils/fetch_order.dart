@@ -10,7 +10,7 @@ Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
     final body = jsonEncode({
       "delivery_type":
           (orderSummary.details is HomeDelivery) ? "dispatch" : "pickup",
-      "payment_type": "card",
+      "payment_type": orderSummary.paymentType,
       "dispatch_zone_id": (orderSummary.details is HomeDelivery)
           ? (orderSummary.details as HomeDelivery).zone.id
           : null,
@@ -40,17 +40,25 @@ Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
         body: body);
     // if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      final String paymentUrl = result['payment_url'];
-      final int publicId = result['order']['public_id'];
-      if (paymentUrl.isNotEmpty) {
-        return OrderResult(urlPayment: paymentUrl, publicId: publicId);
-      } else {
-        throw FetchOrderException("Payment URL is empty");
+      if (response.statusCode != 200) {
+        throw FetchOrderException("Failed to fetch order: ${result['message']}");
       }
+      final String paymentUrl = result['payment_url'] ?? '';
+      final int publicId = result['order']?['public_id'] ?? 0;
+      // ignore: unnecessary_null_comparison
+      if (!paymentUrl.isNotEmpty) {
+        throw FetchOrderException("Payment URL is empty");
+      } 
+      if (publicId == 0) {
+        throw FetchOrderException("Public ID is not valid");
+      }
+
+      return OrderResult(urlPayment: paymentUrl, publicId: publicId);
+
     // } else {
     //   throw FetchOrderException(response.body.toString());
     // }
   } catch (e) {
-    throw FetchOrderException(e.toString());
+    throw Exception("Error fetching order: $e");
   }
 }

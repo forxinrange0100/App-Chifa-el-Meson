@@ -7,6 +7,10 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:delivera/environment.dart';
 
+/// A page that handles payment processing using the provided [uri].
+///
+/// This widget displays the payment UI and manages payment-related logic.
+/// Pass a [Uri] to specify the payment endpoint or resource.
 class PaymentPage extends StatefulWidget {
   final Uri uri;
   const PaymentPage({super.key, required this.uri});

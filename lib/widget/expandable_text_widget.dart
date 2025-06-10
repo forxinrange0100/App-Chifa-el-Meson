@@ -24,48 +24,56 @@ class ExpandableTextState extends State<ExpandableText> {
 
   @override
   Widget build(BuildContext context) {
-    TextSpan link = TextSpan(
-      text: widget.message,
-      style: const TextStyle(
-        color: Colors.blue,
-        decoration: TextDecoration.underline,
-        fontWeight: FontWeight.bold,
-      ),
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final String textToShow = _isExpanded
+            ? widget.text
+            : _truncateText(widget.text, widget.maxLines, constraints.maxWidth);
 
-    final String textToShow =
-        _isExpanded ? widget.text : _truncateText(widget.text, widget.maxLines);
+        TextSpan link = TextSpan(
+          text: widget.message,
+          style: const TextStyle(
+            color: Colors.blue,
+            decoration: TextDecoration.underline,
+            fontWeight: FontWeight.bold,
+          ),
+        );
 
-    return GestureDetector(
-      onTap: widget.enabled
-          ? () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            }
-          : null,
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: textToShow,
-              style: TextStyle(
-                color: widget.color,
-              ),
+        return GestureDetector(
+          onTap: widget.enabled
+              ? () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                }
+              : null,
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: textToShow,
+                  style: TextStyle(
+                    color: widget.color,
+                  ),
+                ),
+                if (widget.enabled && !_isExpanded) link,
+              ],
             ),
-            if (widget.enabled && !_isExpanded) link,
-          ],
-        ),
-      ),
+            maxLines: _isExpanded ? null : widget.maxLines,
+            overflow:
+                _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+          ),
+        );
+      },
     );
   }
 
-  String _truncateText(String text, int maxLines) {
+  String _truncateText(String text, int maxLines, double maxWidth) {
     final textPainter = TextPainter(
       text: TextSpan(text: text),
       maxLines: maxLines,
       textDirection: TextDirection.ltr,
-    )..layout(maxWidth: MediaQuery.of(context).size.width);
+    )..layout(maxWidth: maxWidth);
 
     if (textPainter.didExceedMaxLines) {
       final pos = textPainter.getPositionForOffset(

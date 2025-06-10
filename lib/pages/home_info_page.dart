@@ -294,29 +294,19 @@ class HomeInfoPage extends StatelessWidget {
                                               );
                                             },
                                             child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 SizedBox(
                                                   height: 160,
                                                   child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .stretch,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                                     children: [
                                                       SizedBox(
                                                         width: 150,
                                                         child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
                                                             Text(
                                                               dish.name,
@@ -327,12 +317,10 @@ class HomeInfoPage extends StatelessWidget {
                                                                           .bold),
                                                             ),
                                                             ExpandableText(
-                                                              text: dish
-                                                                  .description,
-                                                              maxLines: 1,
+                                                              text: dish.description,
+                                                              maxLines: 3,
                                                               enabled: false,
-                                                              color:
-                                                                  Colors.grey,
+                                                              color: Colors.grey,
                                                             ),
                                                             Center(
                                                                 child: dish.discountedPrice !=
@@ -354,18 +342,17 @@ class HomeInfoPage extends StatelessWidget {
                                                                         ],
                                                                       )
                                                                     : PriceWidget(
-                                                                        price: dish
-                                                                            .regularPrice,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .bold,
-                                                                        fontSize:
-                                                                            25))
+                                                                        price: dish.regularPrice,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        fontSize:25)
+                                                                    ),
                                                           ],
                                                         ),
                                                       ),
                                                       CachedNetworkImage(
-                                                        imageUrl: dish.image.endsWith("null")
+                                                        imageUrl: dish.image
+                                                                .endsWith(
+                                                                    "null")
                                                             ? "https://chifaelmeson.cl/img/default.webp"
                                                             : dish.image,
                                                         width: 170,
@@ -390,25 +377,18 @@ class HomeInfoPage extends StatelessWidget {
                                                     onPressed: () async {
                                                       showDialog(
                                                         context: context,
-                                                        builder: (BuildContext
-                                                            context) {
+                                                        builder: (BuildContext context) {
                                                           return DishDialog(
                                                               dish: dish);
                                                         },
                                                       );
                                                     },
                                                     child: const Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
-                                                        Icon(FontAwesomeIcons
-                                                            .cartShopping),
-                                                        SizedBox(
-                                                          width: 10,
-                                                        ),
-                                                        Text(
-                                                            "AGREGAR AL CARRITO"),
+                                                        Icon(FontAwesomeIcons.cartShopping),
+                                                        SizedBox(width: 10),
+                                                        Text("AGREGAR AL CARRITO"),
                                                       ],
                                                     ))
                                               ],

@@ -11,7 +11,8 @@ class OrderSummaryProvider extends ChangeNotifier {
   OrderSummary _orderSummary = OrderSummary(
       details: PickUp(address: ""),
       userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
-      shoppingCart: ShoppingCart());
+      shoppingCart: ShoppingCart(),
+      paymentType: "");
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
   OrderResult _orderResult = OrderResult(urlPayment: "", publicId: 0);
@@ -23,12 +24,13 @@ class OrderSummaryProvider extends ChangeNotifier {
   OrderResult get orderResult => _orderResult;
 
   Future<void> setOrderSummary(
-      String fullName, String email, String phoneNumber) async {
+      String fullName, String email, String phoneNumber, String paymentType) async {
     _orderSummary = OrderSummary(
         details: details,
         userDetails: UserDetails(
             fullName: fullName, email: email, phoneNumber: phoneNumber),
-        shoppingCart: _shoppingCartProvider.shoppingCart);
+        shoppingCart: _shoppingCartProvider.shoppingCart,
+        paymentType: paymentType);
     _orderResult = await fetchOrder(_orderSummary);
     notifyListeners();
   }
@@ -57,7 +59,8 @@ class OrderSummaryProvider extends ChangeNotifier {
     _orderSummary = OrderSummary(
         details: PickUp(address: ""),
         userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
-        shoppingCart: ShoppingCart());
+        shoppingCart: ShoppingCart(),
+        paymentType: "");
     notifyListeners();
   }
 }

@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../constants/payment_types_constant.dart' show PaymentType, paymentTypes;
+
 class OrderSummaryPage extends StatefulWidget {
   const OrderSummaryPage({super.key});
 
@@ -21,16 +23,20 @@ class OrderSummaryPage extends StatefulWidget {
 }
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
+  // Input status for address
   final InputStatus _inputStatusAddress = InputStatus(
       errorMessage: "Dirección debería tener al menos 5 caracteres",
       isValid: (String value) => (value.length > 4));
   final TextEditingController _textEditingControllerAddress =
       TextEditingController();
+
+  // Input status for full name, email, and phone number
   final InputStatus _inputStatusFullName = InputStatus(
       errorMessage: "Nombre debería tener al menos 5 caracteres",
       isValid: (String value) => (value.length > 4));
   final TextEditingController _textEditingControllerFullName =
       TextEditingController();
+
   final InputStatus _inputStatusEmail = InputStatus(
       errorMessage: "Correo es inválido",
       isValid: (String value) {
@@ -38,9 +44,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
         return emailRegex.hasMatch(value);
       });
-
   final TextEditingController _textEditingControllerEmail =
       TextEditingController();
+
   final InputStatus _inputStatusPhoneNumber = InputStatus(
     errorMessage: "Número de celular inválido. Ejemplo: 987654321",
     isValid: (String value) {
@@ -50,14 +56,43 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   );
   final TextEditingController _textEditingControllerPhoneNumber =
       TextEditingController();
+
+  // Flag to indicate if the form is currently submitting
   bool _isSubmitting = false;
+
+  String _paymentType = paymentTypes.first.string; // Default payment type
+
+  // Decorations
+  final ButtonStyle selectedOptionButtonStyle = ButtonStyle(
+    backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+        side: const BorderSide(color: Colors.black, width: 1),
+      ),
+    ),
+  );
+
+  final ButtonStyle unselectedOptionButtonStyle = ButtonStyle(
+    backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
+    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+        side: const BorderSide(color: Colors.grey, width: 1),
+      ),
+    ),
+  );
+
+  // TextStyles
+  static const titleStyle = TextStyle(fontWeight: FontWeight.bold);
+  static const textInvalidStyle = TextStyle(color: Colors.red);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.black),
+          iconTheme: const IconThemeData(color: Colors.black),
           surfaceTintColor: Colors.white,
           backgroundColor: Colors.white,
           shadowColor: Colors.black,
@@ -69,16 +104,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             "RESUMEN DE COMPRA",
           )),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: ListView(
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                "Detalles de Entrega",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
+            _showTitle("Detalles de entrega"),
             const SizedBox(
               height: 5,
             ),
@@ -173,15 +202,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                               children: [
                                 const Text(
                                   "Dirección:",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: titleStyle,
                                 ),
                                 Text(
                                   context
                                       .watch<RestaurantInfoProvider>()
                                       .restaurantInfo
                                       .address,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                  style: titleStyle,
                                 ),
                               ],
                             ),
@@ -200,7 +228,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           children: [
                             const Text(
                               "Zona de envío:",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: titleStyle,
                             ),
                             (context.watch<OrderSummaryProvider>().details
                                     is HomeDelivery)
@@ -298,8 +326,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                   children: [
                                     const Text(
                                       "Dirección de envío:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: titleStyle,
                                     ),
                                     TextFormField(
                                       controller: _textEditingControllerAddress,
@@ -338,8 +365,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                             InputStatusEnum.invalid)
                                         ? Text(
                                             _inputStatusAddress.errorMessage,
-                                            style: const TextStyle(
-                                                color: Colors.red),
+                                            style: textInvalidStyle,
                                           )
                                         : const SizedBox(),
                                   ],
@@ -350,28 +376,11 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                     ),
                   ),
             const Divider(),
-            const Text(
-              "Medio de pago",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.all(Radius.circular(6)),
-                  border: Border.all(color: Colors.black, width: 1),
-                ),
-                padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  "assets/getnet.jpg",
-                  height: 50,
-                ),
-              ),
-            ),
+            _selectPaymentMethod(),
             const Divider(),
             const Text(
               "Mis datos",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: titleStyle,
             ),
             const Text("Nombre y Apellido (*):"),
             Padding(
@@ -405,7 +414,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             (_inputStatusFullName.status == InputStatusEnum.invalid)
                 ? Text(
                     _inputStatusFullName.errorMessage,
-                    style: const TextStyle(color: Colors.red),
+                    style: textInvalidStyle,
                   )
                 : const SizedBox(),
             const Text("Email (*):"),
@@ -440,7 +449,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             (_inputStatusEmail.status == InputStatusEnum.invalid)
                 ? Text(
                     _inputStatusEmail.errorMessage,
-                    style: const TextStyle(color: Colors.red),
+                    style: textInvalidStyle,
                   )
                 : const SizedBox(),
             const Text("Celular (*):"),
@@ -477,13 +486,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             (_inputStatusPhoneNumber.status == InputStatusEnum.invalid)
                 ? Text(
                     _inputStatusPhoneNumber.errorMessage,
-                    style: const TextStyle(color: Colors.red),
+                    style: textInvalidStyle,
                   )
                 : const SizedBox(),
             const Divider(),
             const Text(
               "Resumen de compra",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: titleStyle,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -529,59 +538,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ElevatedButton(
-                  onPressed: () async {
-                    if (_isSubmitting) return;
-                    if (_inputStatusFullName.status != InputStatusEnum.valid) {
-                      errorOrderSummary(_inputStatusFullName.errorMessage);
-                      return;
-                    }
-                    if (_inputStatusEmail.status != InputStatusEnum.valid) {
-                      errorOrderSummary(_inputStatusEmail.errorMessage);
-                      return;
-                    }
-                    if (_inputStatusPhoneNumber.status !=
-                        InputStatusEnum.valid) {
-                      errorOrderSummary(_inputStatusPhoneNumber.errorMessage);
-                      return;
-                    }
-                    if (context.read<OrderSummaryProvider>().details
-                        is HomeDelivery) {
-                      if (_inputStatusAddress.status != InputStatusEnum.valid) {
-                        errorOrderSummary(_inputStatusAddress.errorMessage);
-                        return;
-                      }
-                      context.read<OrderSummaryProvider>().setDeliveryAddress(
-                          _textEditingControllerAddress.text);
-                    }
-                    setState(() {
-                      _isSubmitting = true;
-                    });
-                    await context.read<OrderSummaryProvider>().setOrderSummary(
-                        _textEditingControllerFullName.text,
-                        _textEditingControllerEmail.text,
-                        _textEditingControllerPhoneNumber.text);
-                    if (!context.mounted) return;
-                    if (context
-                        .read<OrderSummaryProvider>()
-                        .orderResult
-                        .urlPayment
-                        .isNotEmpty) {
-                      final url = context
-                          .read<OrderSummaryProvider>()
-                          .orderResult
-                          .urlPayment;
-                      final Uri uri = Uri.parse(url);
-                      context.read<OrderSummaryProvider>().clearUrlPayment();
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context) {
-                          return PaymentPage(uri: uri);
-                        },
-                      ));
-                    }
-                    setState(() {
-                      _isSubmitting = false;
-                    });
-                  },
+                  onPressed: () => _handleSubmit(context),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -608,5 +565,108 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         ),
       ),
     );
+  }
+
+  Column _selectPaymentMethod() {
+    ElevatedButton paymentMethodCard(PaymentType paymentType) {
+      final ButtonStyle getButtonStyle = (_paymentType == paymentType.string)
+        ? selectedOptionButtonStyle
+        : unselectedOptionButtonStyle;
+
+      return ElevatedButton(
+        style: getButtonStyle,
+        onPressed: () => setState(() {
+          _paymentType = paymentType.string;
+        }),
+        child: Image.asset(
+          height: 50,
+          width: 100,
+          fit: BoxFit.scaleDown,
+          paymentType.imgSrc,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _showTitle("Medio de pago"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: paymentTypes.map((paymentType) {
+            return paymentMethodCard(paymentType);
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Padding _showTitle(String title) {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Text(
+          title,
+          style: titleStyle,
+        ),
+      );
+  }
+
+  Future<void> _handleSubmit(BuildContext context) async {
+    // Check if the form is already submitting
+    if (_isSubmitting) return;
+    // Validate all input fields
+    if (_inputStatusFullName.status != InputStatusEnum.valid) {
+      errorOrderSummary(_inputStatusFullName.errorMessage);
+      return;
+    }
+    if (_inputStatusEmail.status != InputStatusEnum.valid) {
+      errorOrderSummary(_inputStatusEmail.errorMessage);
+      return;
+    }
+    if (_inputStatusPhoneNumber.status != InputStatusEnum.valid) {
+      errorOrderSummary(_inputStatusPhoneNumber.errorMessage);
+      return;
+    }
+    // If the delivery method is delivery, check if the address is valid
+    if (context.read<OrderSummaryProvider>().details is HomeDelivery) {
+      if (_inputStatusAddress.status != InputStatusEnum.valid) {
+        errorOrderSummary(_inputStatusAddress.errorMessage);
+        return;
+      }
+      context
+          .read<OrderSummaryProvider>()
+          .setDeliveryAddress(_textEditingControllerAddress.text);
+    }
+    // Set is submitting to true to prevent multiple submissions
+    setState(() {
+      _isSubmitting = true;
+    });
+    // Submit the form
+    await context.read<OrderSummaryProvider>().setOrderSummary(
+        _textEditingControllerFullName.text,
+        _textEditingControllerEmail.text,
+        _textEditingControllerPhoneNumber.text,
+        _paymentType);
+    // Check if the context is still mounted before navigating (the user might have navigated away)
+    if (!context.mounted) return;
+    // If the order result has a payment URL, navigate to the PaymentPage
+    if (context
+        .read<OrderSummaryProvider>()
+        .orderResult
+        .urlPayment
+        .isNotEmpty) {
+      final url = context.read<OrderSummaryProvider>().orderResult.urlPayment;
+      final Uri uri = Uri.parse(url);
+      context.read<OrderSummaryProvider>().clearUrlPayment();
+      Navigator.push(context, MaterialPageRoute(
+        builder: (context) {
+          return PaymentPage(uri: uri);
+        },
+      ));
+    }
+    // Set is submitting to false, allowing the user to submit again
+    setState(() {
+      _isSubmitting = false;
+    });
   }
 }

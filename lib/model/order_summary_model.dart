@@ -6,10 +6,12 @@ class OrderSummary {
   DeliveryDetails details;
   UserDetails userDetails;
   ShoppingCart shoppingCart;
+  String paymentType;
   OrderSummary(
       {required this.details,
       required this.userDetails,
-      required this.shoppingCart});
+      required this.shoppingCart,
+      required this.paymentType});
 }
 
 abstract class DeliveryDetails {
