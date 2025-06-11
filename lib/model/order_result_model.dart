@@ -1,6 +1,25 @@
+class PaymentData {
+  String paymentType = '';
+  String paymentUrl = '';
+  String? token;
+
+  PaymentData(
+      {required this.paymentType,
+      required this.paymentUrl,
+      this.token});
+
+  static fromJson(result) {
+    return PaymentData(
+        paymentType: result['payment_type'],
+        paymentUrl: result['payment_url'],
+        token: result['token']);
+  }
+}
+
+
 class OrderResult {
-  String urlPayment;
+  PaymentData? paymentData;
   final int publicId;
 
-  OrderResult({required this.urlPayment, required this.publicId});
+  OrderResult({this.paymentData, required this.publicId});
 }

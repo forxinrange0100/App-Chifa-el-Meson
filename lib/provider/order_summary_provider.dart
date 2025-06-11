@@ -15,7 +15,7 @@ class OrderSummaryProvider extends ChangeNotifier {
       paymentType: "");
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
-  OrderResult _orderResult = OrderResult(urlPayment: "", publicId: 0);
+  OrderResult _orderResult = OrderResult(publicId: 0);
   DeliveryDetails _details;
   OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
       : _details =
@@ -51,8 +51,8 @@ class OrderSummaryProvider extends ChangeNotifier {
     }
   }
 
-  void clearUrlPayment() {
-    _orderResult.urlPayment = "";
+  void clearPaymentData() {
+    _orderResult.paymentData = null;
   }
 
   void clearOrderSummary() {

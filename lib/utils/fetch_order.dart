@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:delivera/environment.dart';
 import 'package:delivera/errors/errors.dart';
 import 'package:delivera/model/order_result_model.dart';
@@ -38,27 +39,30 @@ Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
           "Content-Type": "application/json",
         },
         body: body);
-    // if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      if (response.statusCode != 200) {
-        throw FetchOrderException("Failed to fetch order: ${result['message']}");
-      }
-      final String paymentUrl = result['payment_url'] ?? '';
-      final int publicId = result['order']?['public_id'] ?? 0;
-      // ignore: unnecessary_null_comparison
-      if (!paymentUrl.isNotEmpty) {
-        throw FetchOrderException("Payment URL is empty");
-      } 
-      if (publicId == 0) {
-        throw FetchOrderException("Public ID is not valid");
-      }
 
-      return OrderResult(urlPayment: paymentUrl, publicId: publicId);
+    log("Haciendo fetch order");
+    log("Response status: ${response.statusCode}");
+    log("Response body: ${response.body}");
+  // if (response.statusCode == 200) {
+    final result = json.decode(response.body);
+    log("Result: $result");
+    if (response.statusCode != 201) {
+      // stats code
+      log(result['message']);
+      throw FetchOrderException("Failed to fetch order: ${result['message']}");
+    }
+
+    // Create PaymentData type { payment_type, payment_url, token? }
+    final paymentData = PaymentData.fromJson(result['payment_data']);
+
+    final int publicId = result['order']?['public_id'] ?? 0;
+
+    return OrderResult(paymentData: paymentData, publicId: publicId);
 
     // } else {
     //   throw FetchOrderException(response.body.toString());
     // }
   } catch (e) {
-    throw Exception("Error fetching order: $e");
+    rethrow;
   }
 }

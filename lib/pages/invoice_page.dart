@@ -77,7 +77,7 @@ class _InvoicePageState extends State<InvoicePage> {
                 )
               : PopScope(
                   canPop: false,
-                  onPopInvoked: (didPop) {
+                  onPopInvokedWithResult: (didPop, _) {
                     if (!didPop) {
                       Navigator.pushAndRemoveUntil(
                         context,
@@ -117,7 +117,7 @@ class _InvoicePageState extends State<InvoicePage> {
                           },
                           icon: const Icon(Icons.arrow_back, color: Colors.black)),
                       title: const Text("BOLETA",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                       actions: [
                         IconButton(
                             onPressed: () async {

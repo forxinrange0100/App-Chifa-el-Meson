@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
             snapshot.data == true) {
           return PopScope(
             canPop: false,
-            onPopInvoked: (didPop) {
+            onPopInvokedWithResult: (didPop, _) {
               if (!didPop) {
                 if (context.read<BottomNavigationBarProvider>().index ==
                     BottomNavigationBarEnum.shoppingCar.index) {

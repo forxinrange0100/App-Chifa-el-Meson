@@ -1,6 +1,7 @@
 import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/enum/input_status_enum.dart';
 import 'package:delivera/model/input_status_model.dart';
+import 'package:delivera/model/order_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/pages/payment_page.dart';
 import 'package:delivera/provider/delivery_details_provider.dart';
@@ -24,28 +25,22 @@ class OrderSummaryPage extends StatefulWidget {
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
   // Input status for address
-  final InputStatus _inputStatusAddress = InputStatus(
-      errorMessage: "Dirección debería tener al menos 5 caracteres",
-      isValid: (String value) => (value.length > 4));
-  final TextEditingController _textEditingControllerAddress =
-      TextEditingController();
+  final InputStatus _inputStatusAddress =
+      InputStatus(errorMessage: "Dirección debería tener al menos 5 caracteres", isValid: (String value) => (value.length > 4));
+  final TextEditingController _textEditingControllerAddress = TextEditingController();
 
   // Input status for full name, email, and phone number
-  final InputStatus _inputStatusFullName = InputStatus(
-      errorMessage: "Nombre debería tener al menos 5 caracteres",
-      isValid: (String value) => (value.length > 4));
-  final TextEditingController _textEditingControllerFullName =
-      TextEditingController();
+  final InputStatus _inputStatusFullName =
+      InputStatus(errorMessage: "Nombre debería tener al menos 5 caracteres", isValid: (String value) => (value.length > 4));
+  final TextEditingController _textEditingControllerFullName = TextEditingController();
 
   final InputStatus _inputStatusEmail = InputStatus(
       errorMessage: "Correo es inválido",
       isValid: (String value) {
-        final RegExp emailRegex =
-            RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        final RegExp emailRegex = RegExp(r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
         return emailRegex.hasMatch(value);
       });
-  final TextEditingController _textEditingControllerEmail =
-      TextEditingController();
+  final TextEditingController _textEditingControllerEmail = TextEditingController();
 
   final InputStatus _inputStatusPhoneNumber = InputStatus(
     errorMessage: "Número de celular inválido. Ejemplo: 987654321",
@@ -54,8 +49,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       return phoneRegex.hasMatch(value);
     },
   );
-  final TextEditingController _textEditingControllerPhoneNumber =
-      TextEditingController();
+  final TextEditingController _textEditingControllerPhoneNumber = TextEditingController();
 
   // Flag to indicate if the form is currently submitting
   bool _isSubmitting = false;
@@ -98,8 +92,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
           shadowColor: Colors.black,
           elevation: 2,
           centerTitle: true,
-          titleTextStyle: const TextStyle(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+          titleTextStyle: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
           title: const Text(
             "RESUMEN DE COMPRA",
           )),
@@ -114,8 +107,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             ElevatedButtonTheme(
               data: const ElevatedButtonThemeData(
                 style: ButtonStyle(
-                  padding:
-                      WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(16.0)),
+                  padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(16.0)),
                   foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
                   backgroundColor: WidgetStatePropertyAll<Color>(Colors.white),
                 ),
@@ -127,25 +119,16 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       style: ButtonStyle(
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(6)),
-                            side: context
-                                        .watch<DeliveryDetailsProvider>()
-                                        .deliveryDetailEnum ==
-                                    DeliveryDetailEnum.pickup
-                                ? const BorderSide(
-                                    color: Colors.black, width: 1)
+                            borderRadius: const BorderRadius.all(Radius.circular(6)),
+                            side: context.watch<DeliveryDetailsProvider>().deliveryDetailEnum == DeliveryDetailEnum.pickup
+                                ? const BorderSide(color: Colors.black, width: 1)
                                 : BorderSide.none,
                           ),
                         ),
                       ),
                       onPressed: () {
-                        context
-                            .read<DeliveryDetailsProvider>()
-                            .setDeliveryDetail(DeliveryDetailEnum.pickup);
-                        context
-                            .read<OrderSummaryProvider>()
-                            .setDeliveryDetailsPickUp();
+                        context.read<DeliveryDetailsProvider>().setDeliveryDetail(DeliveryDetailEnum.pickup);
+                        context.read<OrderSummaryProvider>().setDeliveryDetailsPickUp();
                       },
                       child: const Column(
                         children: [
@@ -157,22 +140,15 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       style: ButtonStyle(
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(6)),
-                            side: context
-                                        .watch<DeliveryDetailsProvider>()
-                                        .deliveryDetailEnum ==
-                                    DeliveryDetailEnum.homeDelivery
-                                ? const BorderSide(
-                                    color: Colors.black, width: 1)
+                            borderRadius: const BorderRadius.all(Radius.circular(6)),
+                            side: context.watch<DeliveryDetailsProvider>().deliveryDetailEnum == DeliveryDetailEnum.homeDelivery
+                                ? const BorderSide(color: Colors.black, width: 1)
                                 : BorderSide.none,
                           ),
                         ),
                       ),
                       onPressed: () {
-                        context
-                            .read<DeliveryDetailsProvider>()
-                            .setDeliveryDetail(DeliveryDetailEnum.homeDelivery);
+                        context.read<DeliveryDetailsProvider>().setDeliveryDetail(DeliveryDetailEnum.homeDelivery);
                       },
                       child: const Column(
                         children: [
@@ -183,8 +159,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ],
               ),
             ),
-            context.watch<DeliveryDetailsProvider>().deliveryDetailEnum ==
-                    DeliveryDetailEnum.pickup
+            context.watch<DeliveryDetailsProvider>().deliveryDetailEnum == DeliveryDetailEnum.pickup
                 ? Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -205,10 +180,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                   style: titleStyle,
                                 ),
                                 Text(
-                                  context
-                                      .watch<RestaurantInfoProvider>()
-                                      .restaurantInfo
-                                      .address,
+                                  context.watch<RestaurantInfoProvider>().restaurantInfo.address,
                                   style: titleStyle,
                                 ),
                               ],
@@ -230,28 +202,23 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                               "Zona de envío:",
                               style: titleStyle,
                             ),
-                            (context.watch<OrderSummaryProvider>().details
-                                    is HomeDelivery)
+                            (context.watch<OrderSummaryProvider>().details is HomeDelivery)
                                 ? TextButton.icon(
                                     icon: const Icon(
                                       FontAwesomeIcons.marker,
                                       size: 15,
                                     ),
                                     onPressed: () {
-                                      context
-                                          .read<OrderSummaryProvider>()
-                                          .setDeliveryDetailsPickUp();
+                                      context.read<OrderSummaryProvider>().setDeliveryDetailsPickUp();
                                     },
                                     label: const Text(
                                       "Cambiar zona",
-                                      style: TextStyle(
-                                          decoration: TextDecoration.underline),
+                                      style: TextStyle(decoration: TextDecoration.underline),
                                     ))
                                 : const SizedBox()
                           ],
                         ),
-                        (context.watch<OrderSummaryProvider>().details
-                                is HomeDelivery)
+                        (context.watch<OrderSummaryProvider>().details is HomeDelivery)
                             ? Card(
                                 color: Colors.white,
                                 shape: RoundedRectangleBorder(
@@ -260,24 +227,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        (context
-                                                .watch<OrderSummaryProvider>()
-                                                .details as HomeDelivery)
-                                            .zone
-                                            .name,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500),
+                                        (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.name,
+                                        style: const TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                       PriceWidget(
-                                          price: (context
-                                                  .watch<OrderSummaryProvider>()
-                                                  .details as HomeDelivery)
-                                              .zone
-                                              .price,
+                                          price: (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price,
                                           fontWeight: FontWeight.w500),
                                     ],
                                   ),
@@ -286,39 +243,22 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                             : SizedBox(
                                 height: 150,
                                 child: ListView(
-                                  children: context
-                                      .watch<DeliveryDetailsProvider>()
-                                      .deliveryZones
-                                      .zones
-                                      .map((zone) {
+                                  children: context.watch<DeliveryDetailsProvider>().deliveryZones.zones.map((zone) {
                                     return ElevatedButton(
                                         style: const ButtonStyle(
-                                            foregroundColor:
-                                                WidgetStatePropertyAll<Color>(
-                                                    Colors.black),
-                                            backgroundColor:
-                                                WidgetStatePropertyAll<Color>(
-                                                    Colors.white)),
+                                            foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
+                                            backgroundColor: WidgetStatePropertyAll<Color>(Colors.white)),
                                         onPressed: () {
-                                          context
-                                              .read<OrderSummaryProvider>()
-                                              .setDeliveryDetailsHomeDelivery(
-                                                  HomeDelivery(
-                                                      address: "", zone: zone));
+                                          context.read<OrderSummaryProvider>().setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
                                         },
                                         child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(zone.name),
-                                            PriceWidget(price: zone.price)
-                                          ],
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [Text(zone.name), PriceWidget(price: zone.price)],
                                         ));
                                   }).toList(),
                                 ),
                               ),
-                        (context.watch<OrderSummaryProvider>().details
-                                is HomeDelivery)
+                        (context.watch<OrderSummaryProvider>().details is HomeDelivery)
                             ? Padding(
                                 padding: const EdgeInsets.only(top: 12.0),
                                 child: Column(
@@ -340,29 +280,17 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                         fillColor: Colors.grey.shade200,
                                         hintText: 'Ingrese su dirección...',
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          borderSide: BorderSide(
-                                              width: 2,
-                                              color: _inputStatusAddress
-                                                  .getStatusColor()),
+                                          borderRadius: BorderRadius.circular(8.0),
+                                          borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          borderSide: BorderSide(
-                                              width: 2,
-                                              color: _inputStatusAddress
-                                                  .getStatusColor()),
+                                          borderRadius: BorderRadius.circular(8.0),
+                                          borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
                                         ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10.0,
-                                                horizontal: 15.0),
+                                        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                                       ),
                                     ),
-                                    (_inputStatusAddress.status ==
-                                            InputStatusEnum.invalid)
+                                    (_inputStatusAddress.status == InputStatusEnum.invalid)
                                         ? Text(
                                             _inputStatusAddress.errorMessage,
                                             style: textInvalidStyle,
@@ -398,16 +326,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   hintText: 'Ingrese su nombre',
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                        width: 2, color: _inputStatusFullName.getStatusColor()),
+                    borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                        width: 2, color: _inputStatusFullName.getStatusColor()),
+                    borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 15.0),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                 ),
               ),
             ),
@@ -433,16 +358,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   hintText: 'Ingrese su correo',
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                        width: 2, color: _inputStatusEmail.getStatusColor()),
+                    borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                        width: 2, color: _inputStatusEmail.getStatusColor()),
+                    borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 15.0),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                 ),
               ),
             ),
@@ -468,18 +390,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   hintText: 'Ingrese su celular. Ejemplo: 987654321',
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                        width: 2,
-                        color: _inputStatusPhoneNumber.getStatusColor()),
+                    borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                        width: 2,
-                        color: _inputStatusPhoneNumber.getStatusColor()),
+                    borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 15.0),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                 ),
               ),
             ),
@@ -496,30 +413,18 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Subtotal"),
-                PriceWidget(
-                    price: context.watch<ShoppingCartProvider>().subtotal)
-              ],
+              children: [const Text("Subtotal"), PriceWidget(price: context.watch<ShoppingCartProvider>().subtotal)],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Descuentos"),
-                PriceWidget(
-                    price: context.watch<ShoppingCartProvider>().discount)
-              ],
+              children: [const Text("Descuentos"), PriceWidget(price: context.watch<ShoppingCartProvider>().discount)],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Costo de Envío"),
                 (context.watch<OrderSummaryProvider>().details is HomeDelivery)
-                    ? PriceWidget(
-                        price: (context.watch<OrderSummaryProvider>().details
-                                as HomeDelivery)
-                            .zone
-                            .price)
+                    ? PriceWidget(price: (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price)
                     : const PriceWidget(price: 0)
               ],
             ),
@@ -569,9 +474,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
   Column _selectPaymentMethod() {
     ElevatedButton paymentMethodCard(PaymentType paymentType) {
-      final ButtonStyle getButtonStyle = (_paymentType == paymentType.string)
-        ? selectedOptionButtonStyle
-        : unselectedOptionButtonStyle;
+      final ButtonStyle getButtonStyle = (_paymentType == paymentType.string) ? selectedOptionButtonStyle : unselectedOptionButtonStyle;
 
       return ElevatedButton(
         style: getButtonStyle,
@@ -603,12 +506,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
   Padding _showTitle(String title) {
     return Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Text(
-          title,
-          style: titleStyle,
-        ),
-      );
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        title,
+        style: titleStyle,
+      ),
+    );
   }
 
   Future<void> _handleSubmit(BuildContext context) async {
@@ -633,34 +536,39 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         errorOrderSummary(_inputStatusAddress.errorMessage);
         return;
       }
-      context
-          .read<OrderSummaryProvider>()
-          .setDeliveryAddress(_textEditingControllerAddress.text);
+      context.read<OrderSummaryProvider>().setDeliveryAddress(_textEditingControllerAddress.text);
     }
     // Set is submitting to true to prevent multiple submissions
     setState(() {
       _isSubmitting = true;
     });
-    // Submit the form
-    await context.read<OrderSummaryProvider>().setOrderSummary(
-        _textEditingControllerFullName.text,
-        _textEditingControllerEmail.text,
-        _textEditingControllerPhoneNumber.text,
-        _paymentType);
+    try {
+      // Submit the form
+      await context.read<OrderSummaryProvider>().setOrderSummary(
+          _textEditingControllerFullName.text, _textEditingControllerEmail.text, _textEditingControllerPhoneNumber.text, _paymentType);
+    } catch (e) {
+      if (!context.mounted) return;
+      // If an error occurs, show a toast and set is submitting to false
+      serverErrorToast(e.toString());
+      setState(() {
+        _isSubmitting = false;
+      });
+      return;
+    }
+
     // Check if the context is still mounted before navigating (the user might have navigated away)
     if (!context.mounted) return;
     // If the order result has a payment URL, navigate to the PaymentPage
-    if (context
-        .read<OrderSummaryProvider>()
-        .orderResult
-        .urlPayment
-        .isNotEmpty) {
-      final url = context.read<OrderSummaryProvider>().orderResult.urlPayment;
+    if (context.read<OrderSummaryProvider>().orderResult.paymentData != null) {
+      final PaymentData paymentData = context.read<OrderSummaryProvider>().orderResult.paymentData!;
+      final url = paymentData.paymentUrl;
+      final paymentType = paymentData.paymentType;
+      final token = paymentData.token;
       final Uri uri = Uri.parse(url);
-      context.read<OrderSummaryProvider>().clearUrlPayment();
+      context.read<OrderSummaryProvider>().clearPaymentData();
       Navigator.push(context, MaterialPageRoute(
         builder: (context) {
-          return PaymentPage(uri: uri);
+          return PaymentPage(uri: uri, paymentType: paymentType, token: token);
         },
       ));
     }

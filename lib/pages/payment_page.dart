@@ -5,7 +5,6 @@ import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:delivera/environment.dart';
 
 /// A page that handles payment processing using the provided [uri].
 ///
@@ -13,7 +12,15 @@ import 'package:delivera/environment.dart';
 /// Pass a [Uri] to specify the payment endpoint or resource.
 class PaymentPage extends StatefulWidget {
   final Uri uri;
-  const PaymentPage({super.key, required this.uri});
+  final String paymentType;
+  final String? token;
+
+  const PaymentPage({
+    super.key,
+    required this.uri,
+    required this.paymentType,
+    this.token,
+  });
 
   @override
   PaymentPageState createState() => PaymentPageState();
@@ -45,7 +52,7 @@ class PaymentPageState extends State<PaymentPage> {
             });
           },
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('${Urls.apiUrl}/payment/success')) {
+            if (request.url.contains('/order/')) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -57,15 +64,32 @@ class PaymentPageState extends State<PaymentPage> {
             return NavigationDecision.navigate;
           },
         ),
-      )
-      ..loadRequest(widget.uri);
+      );
+
+    // Aquí la lógica para transbank
+    if (widget.paymentType == 'transbank' && widget.token != null) {
+      final html = '''
+        <html>
+          <body onload="document.forms[0].submit()">
+            <form action="${widget.uri.toString()}" method="POST">
+              <input type="hidden" name="token_ws" value="${widget.token}"/>
+            </form>
+            <p>Redirigiendo a Transbank...</p>
+          </body>
+        </html>
+      ''';
+
+      _controller.loadHtmlString(html);
+    } else {
+      _controller.loadRequest(widget.uri);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, _) {
         if (!didPop) {
           Navigator.push(
             context,
