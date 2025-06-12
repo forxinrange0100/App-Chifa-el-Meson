@@ -310,8 +310,10 @@ class HomeInfoPage extends StatelessWidget {
                                                           children: [
                                                             Text(
                                                               dish.name,
+                                                              maxLines: 3,
                                                               style: const TextStyle(
                                                                   fontSize: 20,
+                                                                  overflow: TextOverflow.ellipsis,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold),
