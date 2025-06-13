@@ -40,166 +40,125 @@ class HomeInfoPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderRestaurantInfo(BuildContext context) {
-    return Consumer<RestaurantInfoProvider>(
-      builder: (context, restaurantInfoProvider, child) {
-        return Column(
-          children: [
-            Stack(children: [
-              CachedNetworkImage(
-                imageUrl: restaurantInfoProvider.restaurantInfo.heroImage,
+  Column _buildHeaderRestaurantInfo(BuildContext context) {
+    // Using Consumer to listen to changes in RestaurantInfoProvider
+    var restaurantInfoProvider = context.watch<RestaurantInfoProvider>();
+    var imageUrl = restaurantInfoProvider.restaurantInfo.heroImage;
+    var address = restaurantInfoProvider.restaurantInfo.address;
+    var phone = restaurantInfoProvider.restaurantInfo.phone;
+    var schedule = restaurantInfoProvider.restaurantInfo.schedule;
+    var logoUrl = restaurantInfoProvider.restaurantInfo.logo;
+    var name = restaurantInfoProvider.restaurantInfo.name;
+    var description = restaurantInfoProvider.restaurantInfo.description;
+
+    return Column(
+      children: [
+        Stack(children: [
+          CachedNetworkImage(
+            imageUrl: imageUrl,
+            width: double.infinity,
+            height: 250,
+            fit: BoxFit.cover,
+            progressIndicatorBuilder: (context, url, downloadProgress) {
+              return Container(
                 width: double.infinity,
                 height: 250,
-                fit: BoxFit.cover,
-                progressIndicatorBuilder: (context, url, downloadProgress) {
-                  return Container(
-                    width: double.infinity,
-                    height: 250,
-                    color: Colors.redAccent.shade700,
-                  );
-                },
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
-              Container(
-                width: double.infinity,
-                height: 250,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.8),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                  bottom: 10,
-                  left: 10,
-                  right: 10,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      DefaultTextStyle(
-                          style: const TextStyle(color: Colors.white),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(FontAwesomeIcons.locationDot,
-                                      color: Colors.white),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(restaurantInfoProvider
-                                      .restaurantInfo.address),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    FontAwesomeIcons.phone,
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(restaurantInfoProvider
-                                      .restaurantInfo.phone),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    FontAwesomeIcons.solidClock,
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(restaurantInfoProvider
-                                      .restaurantInfo.schedule),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              context.watch<ShiftProvider>().isOpen
-                                  ? const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            FontAwesomeIcons.solidCircle,
-                                            color: Colors.green,
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text("Turno Abierto"),
-                                        ],
-                                      ),
-                                    )
-                                  : const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            FontAwesomeIcons.solidCircle,
-                                            color: Colors.red,
-                                          ),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text("Turno Cerrado"),
-                                        ],
-                                      ),
-                                    ),
-                            ],
-                          )),
-                      ClipOval(
-                        child: CachedNetworkImage(
-                          imageUrl: restaurantInfoProvider.restaurantInfo.logo,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    ],
-                  ))
-            ]),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    restaurantInfoProvider.restaurantInfo.name.toUpperCase(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 30),
-                  ),
-                  const Text(
-                    "Descripción:",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  ExpandableText(
-                      text: restaurantInfoProvider.restaurantInfo.description)
+                color: Colors.redAccent.shade700,
+              );
+            },
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
+          Container(
+            width: double.infinity,
+            height: 250,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.8),
                 ],
               ),
-            )
-          ],
-        );
-      },
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            left: 10,
+            right: 10,
+            child: Table(
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(1),
+              },
+              children: [
+                TableRow(
+                  children: [
+                    DefaultTextStyle(
+                      style: const TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis),
+                      maxLines: 2,
+                      softWrap: true,
+                      overflow: TextOverflow.fade,
+                      child: Column(
+                        spacing: 5,
+                        children: [
+                          _showRowIconInfo(icon: FontAwesomeIcons.locationDot, text: address),
+                          _showRowIconInfo(icon: FontAwesomeIcons.phone, text: phone),
+                          _showRowIconInfo(icon: FontAwesomeIcons.solidClock, text: schedule),
+                          context.watch<ShiftProvider>().isOpen
+                              ? _showRowIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Abierto", color: Colors.green)
+                              : _showRowIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Cerrado", color: Colors.red),
+                        ],
+                      ),
+                    ),
+                    ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: logoUrl,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.scaleDown,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
+        ]),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name.toUpperCase(),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
+              const Text(
+                "Descripción:",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              ExpandableText(text: description)
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Row _showRowIconInfo({required IconData icon, required String text, Color? color}) {
+    return Row(
+      spacing: 5,
+      children: [
+        Icon(icon, color: color ?? Colors.white,),
+        Expanded(
+            child: Text(
+          text,
+          style: const TextStyle(color: Colors.white, overflow: TextOverflow.fade),
+          maxLines: 2,
+        )),
+      ],
     );
   }
 
@@ -214,8 +173,7 @@ class HomeInfoPage extends StatelessWidget {
             itemBuilder: (context, index) {
               return TextButton(
                 onPressed: () {
-                  final context = dishCategoriesProvider.dishCategories
-                      .categories[index].categoryKey.currentContext;
+                  final context = dishCategoriesProvider.dishCategories.categories[index].categoryKey.currentContext;
                   if (context != null) {
                     Scrollable.ensureVisible(
                       context,
@@ -227,8 +185,7 @@ class HomeInfoPage extends StatelessWidget {
                 },
                 child: Text(
                   dishCategoriesProvider.dishCategories.categories[index].name,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w500, fontSize: 20),
+                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                 ),
               );
             },
@@ -255,8 +212,7 @@ class HomeInfoPage extends StatelessWidget {
                           child: Column(
                             children: [
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 3.0),
+                                padding: const EdgeInsets.symmetric(vertical: 3.0),
                                 child: Center(
                                     child: Container(
                                   width: double.infinity,
@@ -264,21 +220,16 @@ class HomeInfoPage extends StatelessWidget {
                                   child: Text(
                                     category.name,
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold),
+                                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                                   ),
                                 )),
                               ),
                               Consumer<DishesProvider>(
                                 builder: (context, dishProvider, child) {
                                   return Column(
-                                    children: dishProvider
-                                        .getDishesByCategory(category.id)
-                                        .map((dish) {
+                                    children: dishProvider.getDishesByCategory(category.id).map((dish) {
                                       return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                                         child: Container(
                                           color: Colors.white,
                                           width: double.infinity,
@@ -287,8 +238,7 @@ class HomeInfoPage extends StatelessWidget {
                                             onPressed: () {
                                               showDialog(
                                                 context: context,
-                                                builder:
-                                                    (BuildContext context) {
+                                                builder: (BuildContext context) {
                                                   return DishDialog(dish: dish);
                                                 },
                                               );
@@ -312,11 +262,7 @@ class HomeInfoPage extends StatelessWidget {
                                                               dish.name,
                                                               maxLines: 3,
                                                               style: const TextStyle(
-                                                                  fontSize: 20,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
+                                                                  fontSize: 20, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
                                                             ),
                                                             ExpandableText(
                                                               text: dish.description,
@@ -325,8 +271,7 @@ class HomeInfoPage extends StatelessWidget {
                                                               color: Colors.grey,
                                                             ),
                                                             Center(
-                                                                child: dish.discountedPrice !=
-                                                                        0
+                                                                child: dish.discountedPrice != 0
                                                                     ? Row(
                                                                         children: [
                                                                           PriceWidget(
@@ -335,39 +280,24 @@ class HomeInfoPage extends StatelessWidget {
                                                                               fontSize: 22,
                                                                               fontWeight: FontWeight.bold),
                                                                           const SizedBox(
-                                                                            width:
-                                                                                10,
+                                                                            width: 10,
                                                                           ),
                                                                           PriceWidget(
-                                                                              price: dish.regularPrice,
-                                                                              textDecoration: TextDecoration.lineThrough),
+                                                                              price: dish.regularPrice, textDecoration: TextDecoration.lineThrough),
                                                                         ],
                                                                       )
                                                                     : PriceWidget(
-                                                                        price: dish.regularPrice,
-                                                                        fontWeight: FontWeight.bold,
-                                                                        fontSize:25)
-                                                                    ),
+                                                                        price: dish.regularPrice, fontWeight: FontWeight.bold, fontSize: 25)),
                                                           ],
                                                         ),
                                                       ),
                                                       CachedNetworkImage(
-                                                        imageUrl: dish.image
-                                                                .endsWith(
-                                                                    "null")
-                                                            ? "https://chifaelmeson.cl/img/default.webp"
-                                                            : dish.image,
+                                                        imageUrl:
+                                                            dish.image.endsWith("null") ? "https://chifaelmeson.cl/img/default.webp" : dish.image,
                                                         width: 170,
                                                         fit: BoxFit.cover,
-                                                        placeholder: (context,
-                                                                url) =>
-                                                            const Center(
-                                                                child:
-                                                                    CircularProgressIndicator()),
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            const Icon(
-                                                                Icons.error),
+                                                        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                                        errorWidget: (context, url, error) => const Icon(Icons.error),
                                                       )
                                                     ],
                                                   ),
@@ -380,8 +310,7 @@ class HomeInfoPage extends StatelessWidget {
                                                       showDialog(
                                                         context: context,
                                                         builder: (BuildContext context) {
-                                                          return DishDialog(
-                                                              dish: dish);
+                                                          return DishDialog(dish: dish);
                                                         },
                                                       );
                                                     },
