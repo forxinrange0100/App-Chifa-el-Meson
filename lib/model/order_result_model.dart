@@ -19,7 +19,7 @@ class PaymentData {
 
 class OrderResult {
   PaymentData? paymentData;
-  final int publicId;
+  int publicId;
 
   OrderResult({this.paymentData, required this.publicId});
 }

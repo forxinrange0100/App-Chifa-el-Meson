@@ -22,8 +22,14 @@ class InvoicePage extends StatefulWidget {
 class _InvoicePageState extends State<InvoicePage> {
   bool _reloading = false;
   Future<bool> getOrderFull() async {
-    await context.read<InvoiceProvider>().getOrderResultFull();
-    return true;
+    try {
+      await context.read<InvoiceProvider>().getOrderResultFull();
+      return true;
+    } catch (e, stackTrace) {
+      print("Error in invoice_page, getOrderFull: ${e.toString()}");
+      print("Stack trace: $stackTrace");
+      return false;
+    }
   }
 
   @override

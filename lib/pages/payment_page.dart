@@ -51,8 +51,19 @@ class PaymentPageState extends State<PaymentPage> {
               _isLoading = false;
             });
           },
+          onUrlChange: (UrlChange change) => print('URL changed to: ${change.url}'),
+          onWebResourceError: (WebResourceError error) {
+            print('Web resource error: ${error.errorCode}');
+            print('Web resource error description: ${error.description}');
+            print('Web resource error failingUrl: ${error.errorType}');
+          },
+          onHttpError: (HttpResponseError error) {
+            print('HTTP error: ${error.request}');
+            print('HTTP error status code: ${error.response}');
+          },
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.contains('/order/')) {
+              print('Navigating to invoice page: ${request.url}');
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -108,13 +119,11 @@ class PaymentPageState extends State<PaymentPage> {
               const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 20,
                   children: [
                     CircularProgressIndicator(
                       color: Colors.blue,
                       backgroundColor: Colors.grey,
-                    ),
-                    SizedBox(
-                      height: 20,
                     ),
                     Padding(
                       padding: EdgeInsets.all(20.0),
