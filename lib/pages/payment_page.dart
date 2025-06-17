@@ -1,15 +1,26 @@
-import 'package:chifa_el_meson/pages/invoice_page.dart';
-import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
-import 'package:chifa_el_meson/provider/order_summary_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
+import 'package:delivera/pages/invoice_page.dart';
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
+import 'package:delivera/provider/order_summary_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:chifa_el_meson/environment.dart';
 
+/// A page that handles payment processing using the provided [uri].
+///
+/// This widget displays the payment UI and manages payment-related logic.
+/// Pass a [Uri] to specify the payment endpoint or resource.
 class PaymentPage extends StatefulWidget {
   final Uri uri;
-  const PaymentPage({super.key, required this.uri});
+  final String paymentType;
+  final String? token;
+
+  const PaymentPage({
+    super.key,
+    required this.uri,
+    required this.paymentType,
+    this.token,
+  });
 
   @override
   PaymentPageState createState() => PaymentPageState();
@@ -40,8 +51,19 @@ class PaymentPageState extends State<PaymentPage> {
               _isLoading = false;
             });
           },
+          onUrlChange: (UrlChange change) => print('URL changed to: ${change.url}'),
+          onWebResourceError: (WebResourceError error) {
+            print('Web resource error: ${error.errorCode}');
+            print('Web resource error description: ${error.description}');
+            print('Web resource error failingUrl: ${error.errorType}');
+          },
+          onHttpError: (HttpResponseError error) {
+            print('HTTP error: ${error.request}');
+            print('HTTP error status code: ${error.response}');
+          },
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('${Urls.apiUrl}/payment/success')) {
+            if (request.url.contains('/order/')) {
+              print('Navigating to invoice page: ${request.url}');
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -53,15 +75,32 @@ class PaymentPageState extends State<PaymentPage> {
             return NavigationDecision.navigate;
           },
         ),
-      )
-      ..loadRequest(widget.uri);
+      );
+
+    // Aquí la lógica para transbank
+    if (widget.paymentType == 'transbank' && widget.token != null) {
+      final html = '''
+        <html>
+          <body onload="document.forms[0].submit()">
+            <form action="${widget.uri.toString()}" method="POST">
+              <input type="hidden" name="token_ws" value="${widget.token}"/>
+            </form>
+            <p>Redirigiendo a Transbank...</p>
+          </body>
+        </html>
+      ''';
+
+      _controller.loadHtmlString(html);
+    } else {
+      _controller.loadRequest(widget.uri);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, _) {
         if (!didPop) {
           Navigator.push(
             context,
@@ -80,13 +119,11 @@ class PaymentPageState extends State<PaymentPage> {
               const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 20,
                   children: [
                     CircularProgressIndicator(
                       color: Colors.blue,
                       backgroundColor: Colors.grey,
-                    ),
-                    SizedBox(
-                      height: 20,
                     ),
                     Padding(
                       padding: EdgeInsets.all(20.0),

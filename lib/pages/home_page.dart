@@ -1,11 +1,11 @@
-import 'package:chifa_el_meson/enum/bottom_navigation_bar_enum.dart';
-import 'package:chifa_el_meson/pages/home_info_page.dart';
-import 'package:chifa_el_meson/pages/shopping_cart_page.dart';
-import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
-import 'package:chifa_el_meson/provider/data_provider.dart';
-import 'package:chifa_el_meson/provider/shift_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
-import 'package:chifa_el_meson/toast/toast.dart';
+import 'package:delivera/enum/bottom_navigation_bar_enum.dart';
+import 'package:delivera/pages/home_info_page.dart';
+import 'package:delivera/pages/shopping_cart_page.dart';
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
+import 'package:delivera/provider/data_provider.dart';
+import 'package:delivera/provider/shift_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
             snapshot.data == true) {
           return PopScope(
             canPop: false,
-            onPopInvoked: (didPop) {
+            onPopInvokedWithResult: (didPop, _) {
               if (!didPop) {
                 if (context.read<BottomNavigationBarProvider>().index ==
                     BottomNavigationBarEnum.shoppingCar.index) {

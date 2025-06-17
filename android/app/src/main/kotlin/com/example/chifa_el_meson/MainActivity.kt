@@ -1,4 +1,4 @@
-package com.example.chifa_el_meson
+package com.example.delivera
 
 import io.flutter.embedding.android.FlutterActivity
 

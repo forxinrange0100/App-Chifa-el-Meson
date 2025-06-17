@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:chifa_el_meson/errors/errors.dart';
-import 'package:chifa_el_meson/model/delivery_zone_model.dart';
-import 'package:chifa_el_meson/model/delivery_zones.dart';
+import 'package:delivera/errors/errors.dart';
+import 'package:delivera/model/delivery_zone_model.dart';
+import 'package:delivera/model/delivery_zones.dart';
 import 'package:http/http.dart' as http;
-import 'package:chifa_el_meson/environment.dart';
+import 'package:delivera/environment.dart';
 
 Future<DeliveryZones> fetchDeliveryZones() async {
   try {

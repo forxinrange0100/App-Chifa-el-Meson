@@ -1,4 +1,4 @@
-import 'package:chifa_el_meson/enum/bottom_navigation_bar_enum.dart';
+import 'package:delivera/enum/bottom_navigation_bar_enum.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigationBarProvider extends ChangeNotifier {

@@ -1,20 +1,21 @@
-import 'package:chifa_el_meson/model/order_result_model.dart';
-import 'package:chifa_el_meson/model/order_summary_model.dart';
-import 'package:chifa_el_meson/model/shopping_cart_model.dart';
-import 'package:chifa_el_meson/model/user_details_model.dart';
-import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
-import 'package:chifa_el_meson/utils/fetch_order.dart';
+import 'package:delivera/model/order_result_model.dart';
+import 'package:delivera/model/order_summary_model.dart';
+import 'package:delivera/model/shopping_cart_model.dart';
+import 'package:delivera/model/user_details_model.dart';
+import 'package:delivera/provider/restaurant_info_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/utils/fetch_order.dart';
 import 'package:flutter/material.dart';
 
 class OrderSummaryProvider extends ChangeNotifier {
   OrderSummary _orderSummary = OrderSummary(
       details: PickUp(address: ""),
       userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
-      shoppingCart: ShoppingCart());
+      shoppingCart: ShoppingCart(),
+      paymentType: "");
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
-  OrderResult _orderResult = OrderResult(urlPayment: "", publicId: 0);
+  OrderResult _orderResult = OrderResult(publicId: 0);
   DeliveryDetails _details;
   OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
       : _details =
@@ -23,12 +24,13 @@ class OrderSummaryProvider extends ChangeNotifier {
   OrderResult get orderResult => _orderResult;
 
   Future<void> setOrderSummary(
-      String fullName, String email, String phoneNumber) async {
+      String fullName, String email, String phoneNumber, String paymentType) async {
     _orderSummary = OrderSummary(
         details: details,
         userDetails: UserDetails(
             fullName: fullName, email: email, phoneNumber: phoneNumber),
-        shoppingCart: _shoppingCartProvider.shoppingCart);
+        shoppingCart: _shoppingCartProvider.shoppingCart,
+        paymentType: paymentType);
     _orderResult = await fetchOrder(_orderSummary);
     notifyListeners();
   }
@@ -49,15 +51,16 @@ class OrderSummaryProvider extends ChangeNotifier {
     }
   }
 
-  void clearUrlPayment() {
-    _orderResult.urlPayment = "";
+  void clearPaymentData() {
+    _orderResult.paymentData = null;
   }
 
   void clearOrderSummary() {
     _orderSummary = OrderSummary(
         details: PickUp(address: ""),
         userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
-        shoppingCart: ShoppingCart());
+        shoppingCart: ShoppingCart(),
+        paymentType: "");
     notifyListeners();
   }
 }

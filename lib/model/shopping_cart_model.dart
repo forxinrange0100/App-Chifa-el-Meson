@@ -1,4 +1,4 @@
-import 'package:chifa_el_meson/model/cart_item_model.dart';
+import 'package:delivera/model/cart_item_model.dart';
 
 class ShoppingCart {
   List<CartItem> cartItems = [];

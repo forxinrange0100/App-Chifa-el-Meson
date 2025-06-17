@@ -1,4 +1,4 @@
-import 'package:chifa_el_meson/model/dish_model.dart';
+import 'package:delivera/model/dish_model.dart';
 
 class OrderProductResultFull {
   final Dish product;

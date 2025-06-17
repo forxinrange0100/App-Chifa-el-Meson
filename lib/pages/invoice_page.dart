@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:chifa_el_meson/pages/home_page.dart';
-import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
-import 'package:chifa_el_meson/provider/invoice_provider.dart';
-import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
-import 'package:chifa_el_meson/utils/pdf/generate_invoice_pdf.dart';
-import 'package:chifa_el_meson/widget/invoice_card_widget.dart';
+import 'package:delivera/pages/home_page.dart';
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
+import 'package:delivera/provider/invoice_provider.dart';
+import 'package:delivera/provider/restaurant_info_provider.dart';
+import 'package:delivera/utils/pdf/generate_invoice_pdf.dart';
+import 'package:delivera/widget/invoice_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:open_filex/open_filex.dart';
@@ -22,8 +22,14 @@ class InvoicePage extends StatefulWidget {
 class _InvoicePageState extends State<InvoicePage> {
   bool _reloading = false;
   Future<bool> getOrderFull() async {
-    await context.read<InvoiceProvider>().getOrderResultFull();
-    return true;
+    try {
+      await context.read<InvoiceProvider>().getOrderResultFull();
+      return true;
+    } catch (e, stackTrace) {
+      print("Error in invoice_page, getOrderFull: ${e.toString()}");
+      print("Stack trace: $stackTrace");
+      return false;
+    }
   }
 
   @override
@@ -77,7 +83,7 @@ class _InvoicePageState extends State<InvoicePage> {
                 )
               : PopScope(
                   canPop: false,
-                  onPopInvoked: (didPop) {
+                  onPopInvokedWithResult: (didPop, _) {
                     if (!didPop) {
                       Navigator.pushAndRemoveUntil(
                         context,
@@ -117,7 +123,7 @@ class _InvoicePageState extends State<InvoicePage> {
                           },
                           icon: const Icon(Icons.arrow_back, color: Colors.black)),
                       title: const Text("BOLETA",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                       actions: [
                         IconButton(
                             onPressed: () async {

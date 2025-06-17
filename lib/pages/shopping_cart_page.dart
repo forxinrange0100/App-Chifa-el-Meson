@@ -1,8 +1,8 @@
-import 'package:chifa_el_meson/pages/order_summary_page.dart';
-import 'package:chifa_el_meson/provider/bottom_navigation_bar_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
-import 'package:chifa_el_meson/widget/cart_item_widget.dart';
-import 'package:chifa_el_meson/widget/price_widget.dart';
+import 'package:delivera/pages/order_summary_page.dart';
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/widget/cart_item_widget.dart';
+import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +36,7 @@ class ShoppingCartPage extends StatelessWidget {
                         title: const Text(
                           "CARRITO",
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                         ),
                       ),
                     ],

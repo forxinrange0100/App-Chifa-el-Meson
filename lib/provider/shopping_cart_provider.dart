@@ -1,6 +1,6 @@
-import 'package:chifa_el_meson/model/cart_item_model.dart';
-import 'package:chifa_el_meson/model/dish_model.dart';
-import 'package:chifa_el_meson/model/shopping_cart_model.dart';
+import 'package:delivera/model/cart_item_model.dart';
+import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/shopping_cart_model.dart';
 import 'package:flutter/material.dart';
 
 class ShoppingCartProvider extends ChangeNotifier {

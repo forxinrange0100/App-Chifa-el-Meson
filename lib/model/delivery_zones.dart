@@ -1,4 +1,4 @@
-import 'package:chifa_el_meson/model/delivery_zone_model.dart';
+import 'package:delivera/model/delivery_zone_model.dart';
 
 class DeliveryZones {
   final List<DeliveryZone> zones;

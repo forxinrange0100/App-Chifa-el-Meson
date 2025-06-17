@@ -1,5 +1,5 @@
-import 'package:chifa_el_meson/model/dish_model.dart';
-import 'package:chifa_el_meson/model/dishes_model.dart';
+import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/dishes_model.dart';
 import 'package:flutter/material.dart';
 
 class DishesProvider extends ChangeNotifier {

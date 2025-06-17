@@ -83,10 +83,12 @@ void unsavedInvoice() {
   );
 }
 
-void storageNotGranted() {
+// Toast for server error
+void serverErrorToast(String error) {
   toastification.show(
-    icon: const Icon(FontAwesomeIcons.solidFile),
-    title: const Text("Sin permiso de almacenamiento"),
+    icon: const Icon(FontAwesomeIcons.triangleExclamation),
+    title: const Text("Error del servidor"),
+    description: Text(error),
     style: ToastificationStyle.flat,
     type: ToastificationType.error,
     showProgressBar: true,
@@ -94,3 +96,15 @@ void storageNotGranted() {
     autoCloseDuration: const Duration(seconds: 5),
   );
 }
+
+// void storageNotGranted() {
+//   toastification.show(
+//     icon: const Icon(FontAwesomeIcons.solidFile),
+//     title: const Text("Sin permiso de almacenamiento"),
+//     style: ToastificationStyle.flat,
+//     type: ToastificationType.error,
+//     showProgressBar: true,
+//     progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
+//     autoCloseDuration: const Duration(seconds: 5),
+//   );
+// }

@@ -1,4 +1,4 @@
-import 'package:chifa_el_meson/model/dish_categories_model.dart';
+import 'package:delivera/model/dish_categories_model.dart';
 import 'package:flutter/material.dart';
 
 class DishCategoriesProvider extends ChangeNotifier {

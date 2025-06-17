@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chifa_el_meson/model/dish_model.dart';
-import 'package:chifa_el_meson/provider/shift_provider.dart';
-import 'package:chifa_el_meson/provider/shopping_cart_provider.dart';
-import 'package:chifa_el_meson/toast/toast.dart';
-import 'package:chifa_el_meson/widget/expandable_text_widget.dart';
-import 'package:chifa_el_meson/widget/price_widget.dart';
+import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/provider/shift_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/toast/toast.dart';
+import 'package:delivera/widget/expandable_text_widget.dart';
+import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -175,7 +175,7 @@ class _DishDialogState extends State<DishDialog> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.6),
+                Colors.black.withValues(alpha: 0.6),
                 Colors.transparent,
               ],
             ),

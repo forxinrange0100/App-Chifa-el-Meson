@@ -1,7 +1,7 @@
-import 'package:chifa_el_meson/provider/invoice_provider.dart';
-import 'package:chifa_el_meson/provider/restaurant_info_provider.dart';
-import 'package:chifa_el_meson/utils/format_date_time.dart';
-import 'package:chifa_el_meson/widget/price_widget.dart';
+import 'package:delivera/provider/invoice_provider.dart';
+import 'package:delivera/provider/restaurant_info_provider.dart';
+import 'package:delivera/utils/format_date_time.dart';
+import 'package:delivera/widget/price_widget.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

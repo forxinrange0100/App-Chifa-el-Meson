@@ -1,5 +1,5 @@
-import 'package:chifa_el_meson/model/order_product_result_full_model.dart';
-import 'package:chifa_el_meson/model/payment_status_model.dart';
+import 'package:delivera/model/order_product_result_full_model.dart';
+import 'package:delivera/model/payment_status_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 
