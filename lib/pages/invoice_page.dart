@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:delivera/pages/home_page.dart';
@@ -26,8 +27,8 @@ class _InvoicePageState extends State<InvoicePage> {
       await context.read<InvoiceProvider>().getOrderResultFull();
       return true;
     } catch (e, stackTrace) {
-      print("Error in invoice_page, getOrderFull: ${e.toString()}");
-      print("Stack trace: $stackTrace");
+      log("Error in invoice_page, getOrderFull: ${e.toString()}");
+      log("Stack trace: $stackTrace");
       return false;
     }
   }

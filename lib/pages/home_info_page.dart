@@ -115,8 +115,6 @@ class HomeInfoPage extends StatelessWidget {
                     ClipOval(
                       child: CachedNetworkImage(
                         imageUrl: logoUrl,
-                        width: 100,
-                        height: 100,
                         fit: BoxFit.scaleDown,
                       ),
                     ),
@@ -154,7 +152,7 @@ class HomeInfoPage extends StatelessWidget {
         Icon(icon, color: color ?? Colors.white,),
         Expanded(
             child: Text(
-          text,
+          text.trim(),
           style: const TextStyle(color: Colors.white, overflow: TextOverflow.fade),
           maxLines: 2,
         )),
