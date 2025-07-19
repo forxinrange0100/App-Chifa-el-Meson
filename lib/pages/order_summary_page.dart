@@ -11,6 +11,7 @@ import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -352,6 +353,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   });
                 },
                 controller: _textEditingControllerEmail,
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
+                  ],
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey.shade200,
@@ -384,10 +388,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   });
                 },
                 controller: _textEditingControllerPhoneNumber,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Allow only digits
+                  FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
+                ],
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su celular. Ejemplo: 987654321',
+                  hintText: 'Ingrese su celular. Ejemplo: 912345678',
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
