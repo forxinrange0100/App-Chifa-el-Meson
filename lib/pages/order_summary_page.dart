@@ -84,6 +84,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
   @override
   Widget build(BuildContext context) {
+    DeliveryDetailsProvider deliveryDetailsProvider = context.watch<DeliveryDetailsProvider>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -121,7 +123,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: context.watch<DeliveryDetailsProvider>().deliveryDetailEnum == DeliveryDetailEnum.pickup
+                            side: deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.pickup
                                 ? const BorderSide(color: Colors.black, width: 1)
                                 : BorderSide.none,
                           ),
@@ -142,7 +144,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: context.watch<DeliveryDetailsProvider>().deliveryDetailEnum == DeliveryDetailEnum.homeDelivery
+                            side: deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery
                                 ? const BorderSide(color: Colors.black, width: 1)
                                 : BorderSide.none,
                           ),
@@ -160,150 +162,18 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ],
               ),
             ),
-            context.watch<DeliveryDetailsProvider>().deliveryDetailEnum == DeliveryDetailEnum.pickup
-                ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      color: Colors.grey.shade200,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Icon(FontAwesomeIcons.mapLocationDot),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Dirección:",
-                                  style: titleStyle,
-                                ),
-                                Text(
-                                  context.watch<RestaurantInfoProvider>().restaurantInfo.address,
-                                  style: titleStyle,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Zona de envío:",
-                              style: titleStyle,
-                            ),
-                            (context.watch<OrderSummaryProvider>().details is HomeDelivery)
-                                ? TextButton.icon(
-                                    icon: const Icon(
-                                      FontAwesomeIcons.marker,
-                                      size: 15,
-                                    ),
-                                    onPressed: () {
-                                      context.read<OrderSummaryProvider>().setDeliveryDetailsPickUp();
-                                    },
-                                    label: const Text(
-                                      "Cambiar zona",
-                                      style: TextStyle(decoration: TextDecoration.underline),
-                                    ))
-                                : const SizedBox()
-                          ],
-                        ),
-                        (context.watch<OrderSummaryProvider>().details is HomeDelivery)
-                            ? Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.name,
-                                        style: const TextStyle(fontWeight: FontWeight.w500),
-                                      ),
-                                      PriceWidget(
-                                          price: (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price,
-                                          fontWeight: FontWeight.w500),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : SizedBox(
-                                height: 150,
-                                child: ListView(
-                                  children: context.watch<DeliveryDetailsProvider>().deliveryZones.zones.map((zone) {
-                                    return ElevatedButton(
-                                        style: const ButtonStyle(
-                                            foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
-                                            backgroundColor: WidgetStatePropertyAll<Color>(Colors.white)),
-                                        onPressed: () {
-                                          context.read<OrderSummaryProvider>().setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [Text(zone.name), PriceWidget(price: zone.price)],
-                                        ));
-                                  }).toList(),
-                                ),
-                              ),
-                        (context.watch<OrderSummaryProvider>().details is HomeDelivery)
-                            ? Padding(
-                                padding: const EdgeInsets.only(top: 12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "Dirección de envío:",
-                                      style: titleStyle,
-                                    ),
-                                    TextFormField(
-                                      controller: _textEditingControllerAddress,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _inputStatusAddress.verify(value);
-                                        });
-                                      },
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Colors.grey.shade200,
-                                        hintText: 'Ingrese su dirección...',
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                          borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                          borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
-                                        ),
-                                        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                                      ),
-                                    ),
-                                    (_inputStatusAddress.status == InputStatusEnum.invalid)
-                                        ? Text(
-                                            _inputStatusAddress.errorMessage,
-                                            style: textInvalidStyle,
-                                          )
-                                        : const SizedBox(),
-                                  ],
-                                ),
-                              )
-                            : const SizedBox()
-                      ],
-                    ),
-                  ),
+            switch (deliveryDetailsProvider.deliveryDetailEnum) {
+              DeliveryDetailEnum.pickup => deliveryPickupSelected(context),
+              DeliveryDetailEnum.homeDelivery => deliveryDispatchSelected(context),
+              null => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Por favor, seleccione un método de entrega.",
+                  style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            },
             const Divider(),
             _selectPaymentMethod(),
             const Divider(),
@@ -355,7 +225,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 controller: _textEditingControllerEmail,
                 inputFormatters: [
                   FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
-                  ],
+                ],
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.grey.shade200,
@@ -480,6 +350,153 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     );
   }
 
+  Padding deliveryPickupSelected(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        color: Colors.grey.shade200,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              const Icon(FontAwesomeIcons.mapLocationDot),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Dirección:",
+                    style: titleStyle,
+                  ),
+                  Text(
+                    context.watch<RestaurantInfoProvider>().restaurantInfo.address,
+                    style: titleStyle,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding deliveryDispatchSelected(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Zona de envío:",
+                style: titleStyle,
+              ),
+              (context.watch<OrderSummaryProvider>().details is HomeDelivery)
+                  ? TextButton.icon(
+                      icon: const Icon(
+                        FontAwesomeIcons.marker,
+                        size: 15,
+                      ),
+                      onPressed: () {
+                        context.read<OrderSummaryProvider>().setDeliveryDetailsPickUp();
+                      },
+                      label: const Text(
+                        "Cambiar zona",
+                        style: TextStyle(decoration: TextDecoration.underline),
+                      ))
+                  : const SizedBox()
+            ],
+          ),
+          (context.watch<OrderSummaryProvider>().details is HomeDelivery)
+              ? Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.name,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        PriceWidget(price: (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price, fontWeight: FontWeight.w500),
+                      ],
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  height: 150,
+                  child: ListView(
+                    children: context.read<DeliveryDetailsProvider>().deliveryZones.zones.map((zone) {
+                      return ElevatedButton(
+                          style: const ButtonStyle(
+                              foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
+                              backgroundColor: WidgetStatePropertyAll<Color>(Colors.white)),
+                          onPressed: () {
+                            context.read<OrderSummaryProvider>().setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [Text(zone.name), PriceWidget(price: zone.price)],
+                          ));
+                    }).toList(),
+                  ),
+                ),
+          (context.watch<OrderSummaryProvider>().details is HomeDelivery)
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Dirección de envío:",
+                        style: titleStyle,
+                      ),
+                      TextFormField(
+                        controller: _textEditingControllerAddress,
+                        onChanged: (value) {
+                          setState(() {
+                            _inputStatusAddress.verify(value);
+                          });
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey.shade200,
+                          hintText: 'Ingrese su dirección...',
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                        ),
+                      ),
+                      (_inputStatusAddress.status == InputStatusEnum.invalid)
+                          ? Text(
+                              _inputStatusAddress.errorMessage,
+                              style: textInvalidStyle,
+                            )
+                          : const SizedBox(),
+                    ],
+                  ),
+                )
+              : const SizedBox()
+        ],
+      ),
+    );
+  }
+
   Column _selectPaymentMethod() {
     ElevatedButton paymentMethodCard(PaymentType paymentType) {
       final ButtonStyle getButtonStyle = (_paymentType == paymentType.string) ? selectedOptionButtonStyle : unselectedOptionButtonStyle;
@@ -523,6 +540,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   }
 
   Future<void> _handleSubmit(BuildContext context) async {
+    if (context.read<DeliveryDetailsProvider>().deliveryDetailEnum == null) {
+      // Handle the case where no delivery method is selected
+      errorOrderSummary("Método de entrega no seleccionado.");
+      return;
+    }
+
     // Check if the form is already submitting
     if (_isSubmitting) return;
     // Validate all input fields
