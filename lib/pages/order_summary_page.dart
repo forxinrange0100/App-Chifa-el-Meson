@@ -150,9 +150,21 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                 : BorderSide.none,
                           ),
                         ),
+                        backgroundColor: WidgetStatePropertyAll<Color>(
+                          deliveryDetailsProvider.dispatchEnabled == false
+                              ? Colors.grey.shade100
+                              : Colors.white,
+                        ),
+                        foregroundColor: WidgetStatePropertyAll<Color>(
+                          deliveryDetailsProvider.dispatchEnabled == false
+                              ? Colors.grey.shade600
+                              : Colors.black,
+                        ),
                       ),
                       onPressed: () {
-                        context.read<DeliveryDetailsProvider>().setDeliveryDetail(DeliveryDetailEnum.homeDelivery);
+                        deliveryDetailsProvider.dispatchEnabled == false
+                            ? errorOrderSummary("El envío a domicilio no está disponible en este momento.")
+                            : context.read<DeliveryDetailsProvider>().setDeliveryDetail(DeliveryDetailEnum.homeDelivery);
                       },
                       child: const Column(
                         children: [
@@ -167,13 +179,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               DeliveryDetailEnum.pickup => deliveryPickupSelected(context),
               DeliveryDetailEnum.homeDelivery => deliveryDispatchSelected(context),
               null => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  "Por favor, seleccione un método de entrega.",
-                  style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Por favor, seleccione un método de entrega.",
+                    style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
             },
             const Divider(),
             _selectPaymentMethod(),
@@ -542,7 +554,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
   Future<void> _handleSubmit(BuildContext context) async {
     // Very if the shift is open
-    if (!context.read<ShiftProvider>().isOpen) return; 
+    if (!context.read<ShiftProvider>().isOpen) return;
 
     // Check if a delivery method is selected
     if (context.read<DeliveryDetailsProvider>().deliveryDetailEnum == null) {
