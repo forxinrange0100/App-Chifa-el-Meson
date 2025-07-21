@@ -7,6 +7,7 @@ import 'package:delivera/pages/payment_page.dart';
 import 'package:delivera/provider/delivery_details_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
+import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
 import 'package:delivera/widget/price_widget.dart';
@@ -540,6 +541,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   }
 
   Future<void> _handleSubmit(BuildContext context) async {
+    // Very if the shift is open
+    if (!context.read<ShiftProvider>().isOpen) return; 
+
+    // Check if a delivery method is selected
     if (context.read<DeliveryDetailsProvider>().deliveryDetailEnum == null) {
       // Handle the case where no delivery method is selected
       errorOrderSummary("Método de entrega no seleccionado.");

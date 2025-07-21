@@ -32,9 +32,12 @@ class _HomePageState extends State<HomePage> {
       const HomeInfoPage(),
       const ShoppingCartPage(),
     ];
+
     return FutureBuilder<bool>(
       future: getData(),
       builder: (context, snapshot) {
+        DataProvider dataProvider = context.watch<DataProvider>();
+        
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             backgroundColor: Colors.white,
@@ -48,28 +51,23 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Text(
-                        "Estamos cargando todo para ti, espera un momento...",
-                        textAlign: TextAlign.center),
+                    child: Text("Estamos cargando todo para ti, espera un momento...", textAlign: TextAlign.center),
                   )
                 ],
               ),
             ),
           );
-        } else if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.data == true) {
+        } else if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
           return PopScope(
             canPop: false,
             onPopInvokedWithResult: (didPop, _) {
               if (!didPop) {
-                if (context.read<BottomNavigationBarProvider>().index ==
-                    BottomNavigationBarEnum.shoppingCar.index) {
+                if (context.read<BottomNavigationBarProvider>().index == BottomNavigationBarEnum.shoppingCar.index) {
                   context.read<BottomNavigationBarProvider>().showHome();
                   return;
                 }
                 final now = DateTime.now();
-                final isFirstBackPress = lastPressedAt == null ||
-                    now.difference(lastPressedAt!) > const Duration(seconds: 5);
+                final isFirstBackPress = lastPressedAt == null || now.difference(lastPressedAt!) > const Duration(seconds: 5);
 
                 if (isFirstBackPress) {
                   lastPressedAt = now;
@@ -80,8 +78,7 @@ class _HomePageState extends State<HomePage> {
                 }
               }
             },
-            child: context.watch<DataProvider>().done &&
-                    context.watch<DataProvider>().errorMessage.isEmpty
+            child: dataProvider.done && dataProvider.errorMessage.isEmpty
                 ? Consumer<BottomNavigationBarProvider>(
                     builder: (context, bottomNavigationProvider, child) {
                       return Scaffold(
@@ -99,11 +96,8 @@ class _HomePageState extends State<HomePage> {
                         bottomNavigationBar: BottomNavigationBar(
                           currentIndex: bottomNavigationProvider.index,
                           onTap: (int index) async {
-                            if (index ==
-                                BottomNavigationBarEnum.shoppingCar.index) {
-                              await context
-                                  .read<ShiftProvider>()
-                                  .updateIsOpen();
+                            if (index == BottomNavigationBarEnum.shoppingCar.index) {
+                              await context.read<ShiftProvider>().updateIsOpen();
                               if (!context.mounted) return;
                               if (!context.read<ShiftProvider>().isOpen) {
                                 shiftIsCloseToast();
@@ -133,10 +127,7 @@ class _HomePageState extends State<HomePage> {
                                         backgroundColor: Colors.white,
                                         child: Center(
                                           child: Text(
-                                            context
-                                                .watch<ShoppingCartProvider>()
-                                                .length
-                                                .toString(),
+                                            context.watch<ShoppingCartProvider>().length.toString(),
                                             style: const TextStyle(
                                               fontSize: 9,
                                               color: Colors.black,
@@ -155,19 +146,17 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   )
-                : !context.watch<DataProvider>().done
+                : !dataProvider.done
                     ? const Scaffold(
                         backgroundColor: Colors.white,
                         body: Center(
-                          child: CircularProgressIndicator(
-                              color: Colors.blue, backgroundColor: Colors.grey),
+                          child: CircularProgressIndicator(color: Colors.blue, backgroundColor: Colors.grey),
                         ),
                       )
                     : Scaffold(
                         backgroundColor: Colors.white,
                         body: Center(
-                          child: Text(
-                              "Error ${context.watch<DataProvider>().errorMessage}"),
+                          child: Text("Error ${dataProvider.errorMessage}"),
                         ),
                       ),
           );

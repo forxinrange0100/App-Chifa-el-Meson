@@ -6,13 +6,17 @@ import 'package:flutter/material.dart';
 class ShiftProvider extends ChangeNotifier {
   bool _isOpen = false;
   Timer _timer = Timer(Duration.zero, () {});
+
   bool get isOpen => _isOpen;
+  
   ShiftProvider() {
     startTimer();
   }
 
   Future<void> updateIsOpen() async {
-    _isOpen = await fetchShift();
+    // TODO: Update this
+    bool isPaused = false;
+    _isOpen = await fetchShift() && !isPaused;
     notifyListeners();
   }
 

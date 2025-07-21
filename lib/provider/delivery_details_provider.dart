@@ -5,13 +5,16 @@ import 'package:flutter/material.dart';
 class DeliveryDetailsProvider extends ChangeNotifier {
   DeliveryDetailEnum? _deliveryDetailEnum;
   DeliveryZones _deliveryZones = DeliveryZones.example();
+  bool? _dispatchEnabled;
 
   DeliveryDetailsProvider();
   DeliveryZones get deliveryZones => _deliveryZones;
   DeliveryDetailEnum? get deliveryDetailEnum => _deliveryDetailEnum;
+  bool? get dispatchEnabled => _dispatchEnabled;
 
-  void init(DeliveryZones deliveryZones) {
+  void init(DeliveryZones deliveryZones, bool dispatchEnabled) {
     _deliveryZones = deliveryZones;
+    _dispatchEnabled = dispatchEnabled;
     notifyListeners();
   }
 
