@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:delivera/utils/fetch_shift.dart';
+import 'package:delivera/utils/fetch_shift_is_paused.dart';
 import 'package:flutter/material.dart';
 
 class ShiftProvider extends ChangeNotifier {
@@ -14,9 +15,7 @@ class ShiftProvider extends ChangeNotifier {
   }
 
   Future<void> updateIsOpen() async {
-    // TODO: Update this
-    bool isPaused = false;
-    _isOpen = await fetchShift() && !isPaused;
+    _isOpen = await fetchShift() && !await fetchShiftIsPaused();
     notifyListeners();
   }
 
