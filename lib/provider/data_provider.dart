@@ -2,8 +2,6 @@ import 'package:delivera/provider/delivery_details_provider.dart';
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
-import 'package:delivera/utils/fech_dispatch_enabled.dart' show fetchDispatchEnabled;
-import 'package:delivera/utils/fetch_delivery_zones.dart';
 import 'package:delivera/utils/fetch_dish_categories.dart';
 import 'package:delivera/utils/fetch_dishes.dart';
 import 'package:delivera/utils/fetch_restaurant_info.dart';
@@ -49,7 +47,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> getDeliveryDetails() async {
-    _deliveryDetailsProvider.init(await fetchDeliveryZones(), await fetchDispatchEnabled());
+    await _deliveryDetailsProvider.update();
   }
 
   void reset() {

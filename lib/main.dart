@@ -11,14 +11,20 @@ import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/scroll_controller_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
+import 'dart:io' as io;
+
 
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  if (kDebugMode) {
+    io.HttpClient.enableTimelineLogging = true;
+  }
   runApp(const MyApp());
 }
 

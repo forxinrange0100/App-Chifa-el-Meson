@@ -83,9 +83,34 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   static const titleStyle = TextStyle(fontWeight: FontWeight.bold);
   static const textInvalidStyle = TextStyle(color: Colors.red);
 
+  late DeliveryDetailsProvider _deliveryDetailsProvider;
+  late OrderSummaryProvider _orderSummaryProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    // Llama al método update() del provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+        _deliveryDetailsProvider.update();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Usa la referencia guardada, no el context.read directamente
+    _deliveryDetailsProvider.clearDeliveryDetailEnum();
+    // Limpia los controladores
+    _textEditingControllerAddress.dispose();
+    _textEditingControllerFullName.dispose();
+    _textEditingControllerEmail.dispose();
+    _textEditingControllerPhoneNumber.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    DeliveryDetailsProvider deliveryDetailsProvider = context.watch<DeliveryDetailsProvider>();
+    _deliveryDetailsProvider = context.watch<DeliveryDetailsProvider>();
+    _orderSummaryProvider = context.watch<OrderSummaryProvider>();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -124,14 +149,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.pickup
+                            side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.pickup
                                 ? const BorderSide(color: Colors.black, width: 1)
                                 : BorderSide.none,
                           ),
                         ),
                       ),
                       onPressed: () {
-                        context.read<DeliveryDetailsProvider>().setDeliveryDetail(DeliveryDetailEnum.pickup);
+                        _deliveryDetailsProvider.setDeliveryDetailEnum(DeliveryDetailEnum.pickup);
                         context.read<OrderSummaryProvider>().setDeliveryDetailsPickUp();
                       },
                       child: const Column(
@@ -145,26 +170,27 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery
+                            side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery
                                 ? const BorderSide(color: Colors.black, width: 1)
                                 : BorderSide.none,
                           ),
                         ),
                         backgroundColor: WidgetStatePropertyAll<Color>(
-                          deliveryDetailsProvider.dispatchEnabled == false
+                          _deliveryDetailsProvider.dispatchEnabled == false
                               ? Colors.grey.shade100
                               : Colors.white,
                         ),
                         foregroundColor: WidgetStatePropertyAll<Color>(
-                          deliveryDetailsProvider.dispatchEnabled == false
+                          _deliveryDetailsProvider.dispatchEnabled == false
                               ? Colors.grey.shade600
                               : Colors.black,
                         ),
                       ),
                       onPressed: () {
-                        deliveryDetailsProvider.dispatchEnabled == false
+                        _deliveryDetailsProvider.dispatchEnabled == false
                             ? errorOrderSummary("El envío a domicilio no está disponible en este momento.")
-                            : context.read<DeliveryDetailsProvider>().setDeliveryDetail(DeliveryDetailEnum.homeDelivery);
+                            : _deliveryDetailsProvider.setDeliveryDetailEnum(DeliveryDetailEnum.homeDelivery);
+                        // Don't set the OrderSummaryProvider delivery details here
                       },
                       child: const Column(
                         children: [
@@ -175,9 +201,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ],
               ),
             ),
-            switch (deliveryDetailsProvider.deliveryDetailEnum) {
-              DeliveryDetailEnum.pickup => deliveryPickupSelected(context),
-              DeliveryDetailEnum.homeDelivery => deliveryDispatchSelected(context),
+            switch (_deliveryDetailsProvider.deliveryDetailEnum) {
+              DeliveryDetailEnum.pickup => _deliveryPickupSelected(context),
+              DeliveryDetailEnum.homeDelivery => _deliveryDispatchSelected(context),
               null => Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -314,8 +340,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Costo de Envío"),
-                (context.watch<OrderSummaryProvider>().details is HomeDelivery)
-                    ? PriceWidget(price: (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price)
+                (_orderSummaryProvider.details is HomeDelivery)
+                    ? PriceWidget(price: (_orderSummaryProvider.details as HomeDelivery).zone.price)
                     : const PriceWidget(price: 0)
               ],
             ),
@@ -325,7 +351,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               children: [
                 const Text("TOTAL"),
                 PriceWidget(
-                    price: context.watch<OrderSummaryProvider>().details.cost +
+                    price: _orderSummaryProvider.details.cost +
                         context.watch<ShoppingCartProvider>().subtotal -
                         context.watch<ShoppingCartProvider>().discount)
               ],
@@ -363,7 +389,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     );
   }
 
-  Padding deliveryPickupSelected(BuildContext context) {
+  Padding _deliveryPickupSelected(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -396,7 +422,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     );
   }
 
-  Padding deliveryDispatchSelected(BuildContext context) {
+  Padding _deliveryDispatchSelected(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -409,7 +435,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 "Zona de envío:",
                 style: titleStyle,
               ),
-              (context.watch<OrderSummaryProvider>().details is HomeDelivery)
+              (_orderSummaryProvider.details is HomeDelivery)
                   ? TextButton.icon(
                       icon: const Icon(
                         FontAwesomeIcons.marker,
@@ -425,7 +451,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   : const SizedBox()
             ],
           ),
-          (context.watch<OrderSummaryProvider>().details is HomeDelivery)
+          (_orderSummaryProvider.details is HomeDelivery)
               ? Card(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -437,10 +463,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.name,
+                          (_orderSummaryProvider.details as HomeDelivery).zone.name,
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
-                        PriceWidget(price: (context.watch<OrderSummaryProvider>().details as HomeDelivery).zone.price, fontWeight: FontWeight.w500),
+                        PriceWidget(price: (_orderSummaryProvider.details as HomeDelivery).zone.price, fontWeight: FontWeight.w500),
                       ],
                     ),
                   ),
@@ -448,7 +474,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               : SizedBox(
                   height: 150,
                   child: ListView(
-                    children: context.read<DeliveryDetailsProvider>().deliveryZones.zones.map((zone) {
+                    children: _deliveryDetailsProvider.deliveryZones.zones.map((zone) {
                       return ElevatedButton(
                           style: const ButtonStyle(
                               foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
@@ -463,7 +489,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                     }).toList(),
                   ),
                 ),
-          (context.watch<OrderSummaryProvider>().details is HomeDelivery)
+          (_orderSummaryProvider.details is HomeDelivery)
               ? Padding(
                   padding: const EdgeInsets.only(top: 12.0),
                   child: Column(
@@ -553,11 +579,32 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   }
 
   Future<void> _handleSubmit(BuildContext context) async {
+    // Update the shift status before proceeding
+    await context.read<ShiftProvider>().updateIsOpen(); // Ensure the shift status is updated before proceeding
+    if (!context.mounted) return;
+
     // Very if the shift is open
-    if (!context.read<ShiftProvider>().isOpen) return;
+    if (!context.read<ShiftProvider>().isOpen) {
+      errorOrderSummary("El turno ha cerrado. Por favor, intente más tarde.");
+      return;
+    }
+
+    // Update the delivery details before proceeding
+    await _deliveryDetailsProvider.update();
+    if (!context.mounted) return;
+
+    // Check if the selected method is enabled (dispatch)
+    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery &&
+        _deliveryDetailsProvider.dispatchEnabled == false) {
+      errorOrderSummary("El envío a domicilio no está disponible en este momento.");
+      _deliveryDetailsProvider.clearDeliveryDetailEnum(notify: true);
+      context.read<OrderSummaryProvider>().clearDeliveryDetails();
+
+      return;
+    }
 
     // Check if a delivery method is selected
-    if (context.read<DeliveryDetailsProvider>().deliveryDetailEnum == null) {
+    if (_deliveryDetailsProvider.deliveryDetailEnum == null) {
       // Handle the case where no delivery method is selected
       errorOrderSummary("Método de entrega no seleccionado.");
       return;
