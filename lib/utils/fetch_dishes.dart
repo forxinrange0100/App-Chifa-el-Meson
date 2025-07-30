@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:delivera/environment.dart';
 import 'package:delivera/errors/errors.dart';
 import 'package:delivera/model/dish_model.dart';
@@ -10,6 +11,8 @@ Future<Dishes> fetchDishes() async {
     final response = await http
         .get(Uri.parse("${Urls.apiUrl}/api/products/${Urls.companyId}"));
     if (response.statusCode == 200) {
+      log("Fetch Dishes: ${response.body}");
+      log("Fetch Dishes length: ${response.body.length}");
       final result = json.decode(response.body);
       final products = result['products'];
       List<Dish> dishes = [];

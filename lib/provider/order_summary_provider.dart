@@ -8,6 +8,7 @@ import 'package:delivera/utils/fetch_order.dart';
 import 'package:flutter/material.dart';
 
 class OrderSummaryProvider extends ChangeNotifier {
+  // TODO: hacer _details nullable
   OrderSummary _orderSummary = OrderSummary(
       details: PickUp(address: ""),
       userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
@@ -16,17 +17,20 @@ class OrderSummaryProvider extends ChangeNotifier {
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
   OrderResult _orderResult = OrderResult(publicId: 0);
+  // To track the delivery details selection
   DeliveryDetails _details;
+
   OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
       : _details =
             PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
+  
   DeliveryDetails get details => _details;
   OrderResult get orderResult => _orderResult;
 
   Future<void> setOrderSummary(
       String fullName, String email, String phoneNumber, String paymentType) async {
     _orderSummary = OrderSummary(
-        details: details,
+        details: _details,
         userDetails: UserDetails(
             fullName: fullName, email: email, phoneNumber: phoneNumber),
         shoppingCart: _shoppingCartProvider.shoppingCart,
@@ -49,6 +53,12 @@ class OrderSummaryProvider extends ChangeNotifier {
     if (_details is HomeDelivery) {
       (_details as HomeDelivery).address = address;
     }
+  }
+
+  // TODO: hacer _details nullable
+  void clearDeliveryDetails() {
+    _details = PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
+    notifyListeners();
   }
 
   void clearPaymentData() {

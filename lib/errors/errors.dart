@@ -10,6 +10,17 @@ class FetchDeliveryZonesException implements Exception {
   }
 }
 
+class FetchDispatchEnabledException implements Exception {
+  final String message;
+
+  FetchDispatchEnabledException([this.message = 'Failed to fetch dispatch enabled']);
+
+  @override
+  String toString() {
+    return "FetchDispatchEnabledException: $message";
+  }
+}
+
 class FetchDishesException implements Exception {
   final String message;
 

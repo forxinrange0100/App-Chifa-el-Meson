@@ -8,7 +8,7 @@ class PaymentData {
       required this.paymentUrl,
       this.token});
 
-  static fromJson(result) {
+  static PaymentData fromJson(result) {
     return PaymentData(
         paymentType: result['payment_type'],
         paymentUrl: result['payment_url'],

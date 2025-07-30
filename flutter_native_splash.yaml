@@ -1,6 +1,12 @@
 flutter_native_splash:
+  android: true
+  ios: true
   color: "#ffffff"
-  image: assets/logo_splash.png
+  image: assets/delivera/logo_splash.png
+  android_gravity: center
+  ios_content_mode: center
+
   android_12:
-    image: assets/logo_splash.png
+    image: assets/delivera/logo_splash.png
     color: "#ffffff"
+  

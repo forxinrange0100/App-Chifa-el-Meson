@@ -30,22 +30,22 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.2
+  http: ^1.4.0
   cached_network_image: ^3.4.1
-  provider: ^6.1.2
-  webview_flutter: ^4.8.0
+  provider: ^6.1.5
+  webview_flutter: ^4.13.0
   font_awesome_flutter: ^10.8.0
-  toastification: ^2.3.0
-  intl: ^0.18.0
-  flutter_slidable: ^3.1.2
+  toastification: ^3.0.3
+  intl: ^0.20.2
+  flutter_slidable: ^4.0.0
   dotted_line: ^3.2.3
-  cupertino_icons: ^1.0.6
-  pdf: ^3.11.1
+  cupertino_icons: ^1.0.8
+  pdf: ^3.11.3
   open_filex: ^4.7.0
   path_provider: ^2.1.5
-  timezone: ^0.8.0
-  flutter_launcher_icons: ^0.14.2
-  flutter_native_splash: ^2.4.1
+  timezone: ^0.10.1
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -56,7 +56,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -70,11 +70,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/icons/
+    - assets/delivera/
     - assets/getnet.jpg
     - assets/transbank.png
-    - assets/icons/
-    - assets/logo.png
-    - assets/logo_splash.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -102,14 +101,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: "assets/logo.png"
-  min_sdk_android: 21 # android min sdk min:16, default 21
-
-flutter_native_splash:
-  android: true
-  ios: true
-  color: "#ffffff"
-  image: assets/logo_splash.png

@@ -5,12 +5,14 @@ class Dish {
   final String name;
   final String description;
   final int regularPrice;
-  final int discountedPrice;
+  final int? _discountedPrice;
   final String image;
   final int categoryId;
   final bool enabled;
   final int displayOrder;
   final int units;
+
+  int get discountedPrice => _discountedPrice ?? 0;
 
   Dish(
       {required this.id,
@@ -19,10 +21,10 @@ class Dish {
       required this.name,
       required this.description,
       required this.regularPrice,
-      required this.discountedPrice,
+      int? discountedPrice,
       required this.image,
       required this.categoryId,
       required this.enabled,
       required this.displayOrder,
-      required this.units});
+      required this.units}): _discountedPrice = discountedPrice;
 }

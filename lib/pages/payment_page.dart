@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:delivera/pages/invoice_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart';
@@ -51,19 +53,19 @@ class PaymentPageState extends State<PaymentPage> {
               _isLoading = false;
             });
           },
-          onUrlChange: (UrlChange change) => print('URL changed to: ${change.url}'),
+          onUrlChange: (UrlChange change) => log('URL changed to: ${change.url}'),
           onWebResourceError: (WebResourceError error) {
-            print('Web resource error: ${error.errorCode}');
-            print('Web resource error description: ${error.description}');
-            print('Web resource error failingUrl: ${error.errorType}');
+            log('Web resource error: ${error.errorCode}');
+            log('Web resource error description: ${error.description}');
+            log('Web resource error failingUrl: ${error.errorType}');
           },
           onHttpError: (HttpResponseError error) {
-            print('HTTP error: ${error.request}');
-            print('HTTP error status code: ${error.response}');
+            log('HTTP error: ${error.request}');
+            log('HTTP error status code: ${error.response}');
           },
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.contains('/order/')) {
-              print('Navigating to invoice page: ${request.url}');
+              log('Navigating to invoice page: ${request.url}');
               Navigator.push(
                 context,
                 MaterialPageRoute(
