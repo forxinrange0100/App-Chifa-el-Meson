@@ -80,8 +80,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   );
 
   // TextStyles
-  static const titleStyle = TextStyle(fontWeight: FontWeight.bold);
-  static const textInvalidStyle = TextStyle(color: Colors.red);
+  static const _titleStyle = TextStyle(fontWeight: FontWeight.bold);
+  static const _textInvalidStyle = TextStyle(color: Colors.red);
 
   late DeliveryDetailsProvider _deliveryDetailsProvider;
   late OrderSummaryProvider _orderSummaryProvider;
@@ -157,7 +157,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       ),
                       onPressed: () {
                         _deliveryDetailsProvider.setDeliveryDetailEnum(DeliveryDetailEnum.pickup);
-                        context.read<OrderSummaryProvider>().setDeliveryDetailsPickUp();
+                        _orderSummaryProvider.setDeliveryDetailsPickUp();
                       },
                       child: const Column(
                         children: [
@@ -218,7 +218,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             const Divider(),
             const Text(
               "Mis datos",
-              style: titleStyle,
+              style: _titleStyle,
             ),
             const Text("Nombre y Apellido (*):"),
             Padding(
@@ -249,7 +249,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             (_inputStatusFullName.status == InputStatusEnum.invalid)
                 ? Text(
                     _inputStatusFullName.errorMessage,
-                    style: textInvalidStyle,
+                    style: _textInvalidStyle,
                   )
                 : const SizedBox(),
             const Text("Email (*):"),
@@ -284,7 +284,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             (_inputStatusEmail.status == InputStatusEnum.invalid)
                 ? Text(
                     _inputStatusEmail.errorMessage,
-                    style: textInvalidStyle,
+                    style: _textInvalidStyle,
                   )
                 : const SizedBox(),
             const Text("Celular (*):"),
@@ -320,13 +320,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             (_inputStatusPhoneNumber.status == InputStatusEnum.invalid)
                 ? Text(
                     _inputStatusPhoneNumber.errorMessage,
-                    style: textInvalidStyle,
+                    style: _textInvalidStyle,
                   )
                 : const SizedBox(),
             const Divider(),
             const Text(
               "Resumen de compra",
-              style: titleStyle,
+              style: _titleStyle,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -407,11 +407,11 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 children: [
                   const Text(
                     "Dirección:",
-                    style: titleStyle,
+                    style: _titleStyle,
                   ),
                   Text(
                     context.watch<RestaurantInfoProvider>().restaurantInfo.address,
-                    style: titleStyle,
+                    style: _titleStyle,
                   ),
                 ],
               ),
@@ -433,7 +433,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             children: [
               const Text(
                 "Zona de envío:",
-                style: titleStyle,
+                style: _titleStyle,
               ),
               (_orderSummaryProvider.details is HomeDelivery)
                   ? TextButton.icon(
@@ -442,7 +442,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         size: 15,
                       ),
                       onPressed: () {
-                        context.read<OrderSummaryProvider>().setDeliveryDetailsPickUp();
+                        _orderSummaryProvider.setDeliveryDetailsPickUp();
                       },
                       label: const Text(
                         "Cambiar zona",
@@ -480,7 +480,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                               foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
                               backgroundColor: WidgetStatePropertyAll<Color>(Colors.white)),
                           onPressed: () {
-                            context.read<OrderSummaryProvider>().setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
+                            _orderSummaryProvider.setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -496,8 +496,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "Dirección de envío:",
-                        style: titleStyle,
+                        "Dirección de envío (*):",
+                        style: _titleStyle,
                       ),
                       TextFormField(
                         controller: _textEditingControllerAddress,
@@ -524,7 +524,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       (_inputStatusAddress.status == InputStatusEnum.invalid)
                           ? Text(
                               _inputStatusAddress.errorMessage,
-                              style: textInvalidStyle,
+                              style: _textInvalidStyle,
                             )
                           : const SizedBox(),
                     ],
@@ -573,17 +573,24 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: titleStyle,
+        style: _titleStyle,
       ),
     );
   }
 
   Future<void> _handleSubmit(BuildContext context) async {
-    // Update the shift status before proceeding
-    await context.read<ShiftProvider>().updateIsOpen(); // Ensure the shift status is updated before proceeding
-    if (!context.mounted) return;
+    // Check if the form is already submitting
+    if (_isSubmitting) { 
+      serverErrorToast("Ya se está procesando su pedido. Por favor, espere.");
+      return;
+    }
 
-    // Very if the shift is open
+    // Update the shift status before proceeding
+    await context.read<ShiftProvider>().updateIsOpen();
+    // Check if the context is still mounted before navigating (the user might have navigated away)
+    if (!context.mounted) return; 
+
+    // Verify if the shift is open
     if (!context.read<ShiftProvider>().isOpen) {
       errorOrderSummary("El turno ha cerrado. Por favor, intente más tarde.");
       return;
@@ -593,16 +600,6 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     await _deliveryDetailsProvider.update();
     if (!context.mounted) return;
 
-    // Check if the selected method is enabled (dispatch)
-    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery &&
-        _deliveryDetailsProvider.dispatchEnabled == false) {
-      errorOrderSummary("El envío a domicilio no está disponible en este momento.");
-      _deliveryDetailsProvider.clearDeliveryDetailEnum(notify: true);
-      context.read<OrderSummaryProvider>().clearDeliveryDetails();
-
-      return;
-    }
-
     // Check if a delivery method is selected
     if (_deliveryDetailsProvider.deliveryDetailEnum == null) {
       // Handle the case where no delivery method is selected
@@ -610,8 +607,29 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       return;
     }
 
-    // Check if the form is already submitting
-    if (_isSubmitting) return;
+    // Check if the delivery method 'homeDelivery' (dispatch) is selected
+    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery){
+      // Check if dispatch is enabled
+      if(_deliveryDetailsProvider.dispatchEnabled == false) {
+        errorOrderSummary("El envío a domicilio no está disponible en este momento.");
+        _deliveryDetailsProvider.clearDeliveryDetailEnum(notify: true);
+        _orderSummaryProvider.clearDeliveryDetails();
+        return;
+      }
+
+      // Check if the zone is selected
+      if (_orderSummaryProvider.details is ! HomeDelivery) {
+        errorOrderSummary("Zona de envío no seleccionada.");
+        return;
+      }
+
+      // Check if the address is valid
+      if (_inputStatusAddress.status != InputStatusEnum.valid) {
+        errorOrderSummary(_inputStatusAddress.errorMessage);
+        return;
+      }
+    }
+
     // Validate all input fields
     if (_inputStatusFullName.status != InputStatusEnum.valid) {
       errorOrderSummary(_inputStatusFullName.errorMessage);
@@ -625,21 +643,20 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       errorOrderSummary(_inputStatusPhoneNumber.errorMessage);
       return;
     }
-    // If the delivery method is delivery, check if the address is valid
-    if (context.read<OrderSummaryProvider>().details is HomeDelivery) {
-      if (_inputStatusAddress.status != InputStatusEnum.valid) {
-        errorOrderSummary(_inputStatusAddress.errorMessage);
-        return;
-      }
-      context.read<OrderSummaryProvider>().setDeliveryAddress(_textEditingControllerAddress.text);
+
+    // if the delivery method is homeDelivery, set the delivery address
+    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery) {
+      _orderSummaryProvider.setDeliveryAddress(_textEditingControllerAddress.text);
     }
+
     // Set is submitting to true to prevent multiple submissions
     setState(() {
       _isSubmitting = true;
     });
+
     try {
       // Submit the form
-      await context.read<OrderSummaryProvider>().setOrderSummary(
+      await _orderSummaryProvider.setOrderSummary(
           _textEditingControllerFullName.text, _textEditingControllerEmail.text, _textEditingControllerPhoneNumber.text, _paymentType);
     } catch (e) {
       if (!context.mounted) return;
@@ -650,17 +667,16 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       });
       return;
     }
-
-    // Check if the context is still mounted before navigating (the user might have navigated away)
     if (!context.mounted) return;
+
     // If the order result has a payment URL, navigate to the PaymentPage
-    if (context.read<OrderSummaryProvider>().orderResult.paymentData != null) {
-      final PaymentData paymentData = context.read<OrderSummaryProvider>().orderResult.paymentData!;
+    if (_orderSummaryProvider.orderResult.paymentData != null) {
+      final PaymentData paymentData = _orderSummaryProvider.orderResult.paymentData!;
       final url = paymentData.paymentUrl;
       final paymentType = paymentData.paymentType;
       final token = paymentData.token;
       final Uri uri = Uri.parse(url);
-      context.read<OrderSummaryProvider>().clearPaymentData();
+      _orderSummaryProvider.clearPaymentData();
       Navigator.push(context, MaterialPageRoute(
         builder: (context) {
           return PaymentPage(uri: uri, paymentType: paymentType, token: token);

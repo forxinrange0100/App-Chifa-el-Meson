@@ -19,10 +19,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late Future<bool> _data = Future.value(false);
+
   Future<bool> getData() async {
     FlutterNativeSplash.remove();
     await context.read<DataProvider>().getData();
     return true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _data = getData();
   }
 
   @override
@@ -34,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return FutureBuilder<bool>(
-      future: getData(),
+      future: _data,
       builder: (context, snapshot) {
         DataProvider dataProvider = context.watch<DataProvider>();
         
