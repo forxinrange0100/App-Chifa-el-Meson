@@ -23,6 +23,14 @@ Future<DishCategories> fetchDishCategories() async {
           displayOrder: category['display_order'],
         ));
       }
+      // Add default category "Sin categoría" with id 0 at the end
+      categories.add(DishCategory(
+          id: 0,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          name: "Sin categoría",
+          description: "Sin categoría",
+          displayOrder: 9999));
       return DishCategories(categories: categories);
     } else {
       throw FetchDishCategoriesException(response.body.toString());

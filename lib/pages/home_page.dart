@@ -33,9 +33,12 @@ class _HomePageState extends State<HomePage> {
     _data = getData();
   }
 
+  late DataProvider dataProvider;
+
   @override
   Widget build(BuildContext context) {
     DateTime? lastPressedAt;
+    dataProvider = context.watch<DataProvider>();
     final List<Widget> pages = [
       const HomeInfoPage(),
       const ShoppingCartPage(),
@@ -44,7 +47,6 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder<bool>(
       future: _data,
       builder: (context, snapshot) {
-        DataProvider dataProvider = context.watch<DataProvider>();
         
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -169,10 +171,10 @@ class _HomePageState extends State<HomePage> {
                       ),
           );
         } else {
-          return const Scaffold(
+          return Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              child: Text("Error"),
+              child: Text("Error: ${dataProvider.errorMessage}"),
             ),
           );
         }

@@ -3,21 +3,22 @@
 import 'dart:convert' show json;
 
 import 'package:delivera/environment.dart' show Urls;
-import 'package:delivera/errors/errors.dart' show FetchDispatchEnabledException;
+// import 'package:delivera/errors/errors.dart' show FetchDispatchEnabledException;
 import 'package:http/http.dart' as http show get;
 
 Future<bool> fetchDispatchEnabled() async {
+  // TODO: detect conection error and inform
   try {
     // TODO: implement
     final response = await http.get(Uri.parse("${Urls.apiUrl}/api/configs/dispatch_enabled/${Urls.companyId}"));
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
+    late final result = json.decode(response.body);
+    if (result['success'] == true) {
       return result['dispatch_enabled'];
-    } else {
-      throw FetchDispatchEnabledException(response.body.toString());
     }
-    // return true;
+    
+    return false;
   } catch (e) {
-    throw FetchDispatchEnabledException(e.toString());
+    return false;
+    // throw FetchDispatchEnabledException(e.toString());
   }
 }
