@@ -20,25 +20,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<bool> _data = Future.value(false);
+  late DataProvider _dataProvider;
 
-  Future<bool> getData() async {
-    FlutterNativeSplash.remove();
+  Future<bool> _getData() async {
     await context.read<DataProvider>().getData();
+    if (!mounted) return false;
+    FlutterNativeSplash.remove();
     return true;
   }
 
   @override
   void initState() {
     super.initState();
-    _data = getData();
+    // Quitar splash despues de 3 segundos o al cargar los datos
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && context.read<DataProvider>().done) {
+        FlutterNativeSplash.remove();
+      }
+    });
+    _data = _getData();
   }
 
-  late DataProvider dataProvider;
 
   @override
   Widget build(BuildContext context) {
     DateTime? lastPressedAt;
-    dataProvider = context.watch<DataProvider>();
+    _dataProvider = context.watch<DataProvider>();
     final List<Widget> pages = [
       const HomeInfoPage(),
       const ShoppingCartPage(),
@@ -88,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                 }
               }
             },
-            child: dataProvider.done && dataProvider.errorMessage.isEmpty
+            child: _dataProvider.done && _dataProvider.errorMessage.isEmpty
                 ? Consumer<BottomNavigationBarProvider>(
                     builder: (context, bottomNavigationProvider, child) {
                       return Scaffold(
@@ -156,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                   )
-                : !dataProvider.done
+                : !_dataProvider.done
                     ? const Scaffold(
                         backgroundColor: Colors.white,
                         body: Center(
@@ -166,7 +173,7 @@ class _HomePageState extends State<HomePage> {
                     : Scaffold(
                         backgroundColor: Colors.white,
                         body: Center(
-                          child: Text("Error ${dataProvider.errorMessage}"),
+                          child: Text("Error ${_dataProvider.errorMessage}"),
                         ),
                       ),
           );
@@ -174,7 +181,7 @@ class _HomePageState extends State<HomePage> {
           return Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              child: Text("Error: ${dataProvider.errorMessage}"),
+              child: Text("Error: ${_dataProvider.errorMessage}"),
             ),
           );
         }
