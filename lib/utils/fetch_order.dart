@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:delivera/environment.dart';
 import 'package:delivera/errors/errors.dart';
-import 'package:delivera/model/order_result_model.dart';
+import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:http/http.dart' as http;
 
-Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
+Future<PaymentResult> fetchOrder(OrderSummary orderSummary) async {
   try {
     final body = jsonEncode({
       "delivery_type":
@@ -57,7 +57,7 @@ Future<OrderResult> fetchOrder(OrderSummary orderSummary) async {
 
     final int publicId = result['order']?['public_id'] ?? 0;
 
-    return OrderResult(paymentData: paymentData, publicId: publicId);
+    return PaymentResult(paymentData: paymentData, publicId: publicId);
 
     // } else {
     //   throw FetchOrderException(response.body.toString());

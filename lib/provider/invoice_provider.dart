@@ -1,4 +1,4 @@
-import 'package:delivera/model/order_result_full_model.dart';
+import 'package:delivera/model/order_model.dart';
 import 'package:delivera/provider/order_summary_provider.dart';
 import 'package:delivera/utils/fetch_order_full.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,7 @@ class InvoiceProvider extends ChangeNotifier {
   final OrderSummaryProvider _orderSummaryProvider;
   bool _isGettingInvoice = false;
 
-  OrderResultFull _orderResultFull = OrderResultFull(
+  Order _order = Order(
       id: 0,
       publicId: 0,
       subtotal: 0,
@@ -24,10 +24,10 @@ class InvoiceProvider extends ChangeNotifier {
       clientName: '',
       orderProducts: []);
   InvoiceProvider(this._orderSummaryProvider);
-  OrderResultFull get orderResultFull => _orderResultFull;
+  Order get order => _order;
   bool get isGettingInvoice => _isGettingInvoice;
-  Future<void> getOrderResultFull() async {
-    _orderResultFull =
+  Future<void> getOrder() async {
+    _order =
         await fetchOrderFull(_orderSummaryProvider.orderResult.publicId);
     notifyListeners();
   }

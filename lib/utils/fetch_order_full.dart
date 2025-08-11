@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:delivera/environment.dart';
 import 'package:delivera/errors/errors.dart';
 import 'package:delivera/model/dish_model.dart';
-import 'package:delivera/model/order_product_result_full_model.dart';
-import 'package:delivera/model/order_result_full_model.dart';
+import 'package:delivera/model/order_product_model.dart';
+import 'package:delivera/model/order_model.dart';
 import 'package:delivera/utils/date_time_chile.dart';
 import 'package:http/http.dart' as http;
 
-Future<OrderResultFull> fetchOrderFull(int publicId) async {
+Future<Order> fetchOrderFull(int publicId) async {
   try {
     final response = await http.get(Uri.parse(
       "${Urls.apiUrl}/api/orders/public/$publicId",
@@ -31,7 +31,7 @@ Future<OrderResultFull> fetchOrderFull(int publicId) async {
     final String clientPhone = result['order']['client_phone'];
     final String clientEmail = result['order']['client_email'];
     final String clientName = result['order']['client_name'];
-    final List<OrderProductResultFull> orderProducts = [];
+    final List<OrderProduct> orderProducts = [];
 
     for (var orderProduct in result['order']['order_products']) {
       final int id = orderProduct['product']['id'];
@@ -44,7 +44,7 @@ Future<OrderResultFull> fetchOrderFull(int publicId) async {
       final int quantity = orderProduct['quantity'];
       final String note = orderProduct['note'] ?? '';
 
-      orderProducts.add(OrderProductResultFull(
+      orderProducts.add(OrderProduct(
           product: Dish(
               id: id,
               createdAt: DateTime.now(),
@@ -62,7 +62,7 @@ Future<OrderResultFull> fetchOrderFull(int publicId) async {
           note: note));
     }
 
-    return OrderResultFull(
+    return Order(
         id: id,
         publicId: publicId,
         subtotal: subtotal,

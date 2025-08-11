@@ -17,9 +17,9 @@ class PaymentData {
 }
 
 
-class OrderResult {
+class PaymentResult {
   PaymentData? paymentData;
   int publicId;
 
-  OrderResult({this.paymentData, required this.publicId});
+  PaymentResult({this.paymentData, required this.publicId});
 }

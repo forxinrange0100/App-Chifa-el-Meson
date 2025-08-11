@@ -1,4 +1,4 @@
-import 'package:delivera/model/order_result_model.dart';
+import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/shopping_cart_model.dart';
 import 'package:delivera/model/user_details_model.dart';
@@ -16,7 +16,7 @@ class OrderSummaryProvider extends ChangeNotifier {
       paymentType: "");
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
-  OrderResult _orderResult = OrderResult(publicId: 0);
+  PaymentResult _orderResult = PaymentResult(publicId: 0);
   // To track the delivery details selection
   DeliveryDetails _details;
 
@@ -25,7 +25,7 @@ class OrderSummaryProvider extends ChangeNotifier {
             PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
   
   DeliveryDetails get details => _details;
-  OrderResult get orderResult => _orderResult;
+  PaymentResult get orderResult => _orderResult;
 
   Future<void> setOrderSummary(
       String fullName, String email, String phoneNumber, String paymentType) async {

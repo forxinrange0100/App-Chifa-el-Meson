@@ -12,6 +12,9 @@ class InvoiceCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final invoiceProvider = context.watch<InvoiceProvider>();
+    final restaurantInfoProvider = context.watch<RestaurantInfoProvider>();
+
     return Expanded(
       child: ListView(
         physics: const BouncingScrollPhysics(),
@@ -37,14 +40,12 @@ class InvoiceCardWidget extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(
-                          "Nº de orden: ${context.watch<InvoiceProvider>().orderResultFull.publicId}"),
+                      Text("Nº de orden: ${invoiceProvider.order.publicId}"),
                     ],
                   ),
                   Text(
-                    context.watch<RestaurantInfoProvider>().restaurantInfo.name,
-                    style: const TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.bold),
+                    restaurantInfoProvider.restaurantInfo.name,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -56,10 +57,7 @@ class InvoiceCardWidget extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(context
-                          .watch<RestaurantInfoProvider>()
-                          .restaurantInfo
-                          .address)
+                      Text(restaurantInfoProvider.restaurantInfo.address)
                     ],
                   ),
                   Row(
@@ -72,20 +70,13 @@ class InvoiceCardWidget extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(formatDateTime(context
-                          .watch<InvoiceProvider>()
-                          .orderResultFull
-                          .timestamp))
+                      Text(formatDateTime(invoiceProvider.order.timestamp))
                     ],
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Container(
-                      color: context
-                          .watch<InvoiceProvider>()
-                          .orderResultFull
-                          .paymentStatusFull
-                          .backgroundColor,
+                      color: invoiceProvider.order.paymentStatusStyle.backgroundColor,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Row(
@@ -99,15 +90,9 @@ class InvoiceCardWidget extends StatelessWidget {
                               width: 10,
                             ),
                             Text(
-                              "Pago: ${context.watch<InvoiceProvider>().orderResultFull.paymentStatusFull.name}",
+                              "Pago: ${invoiceProvider.order.paymentStatusStyle.label}",
                               style: TextStyle(
-                                  color: context
-                                      .watch<InvoiceProvider>()
-                                      .orderResultFull
-                                      .paymentStatusFull
-                                      .color,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15),
+                                  color: invoiceProvider.order.paymentStatusStyle.color, fontWeight: FontWeight.bold, fontSize: 15),
                             )
                           ],
                         ),
@@ -129,8 +114,7 @@ class InvoiceCardWidget extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text(
-                                "Cliente: ${context.watch<InvoiceProvider>().orderResultFull.clientName}")
+                            Text("Cliente: ${invoiceProvider.order.clientName}")
                           ],
                         ),
                         Row(
@@ -143,8 +127,7 @@ class InvoiceCardWidget extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text(
-                                "Dirección: ${context.watch<InvoiceProvider>().orderResultFull.clientAddress}")
+                            Text("Dirección: ${invoiceProvider.order.clientAddress}")
                           ],
                         ),
                         Row(
@@ -157,8 +140,7 @@ class InvoiceCardWidget extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text(
-                                "Teléfono: ${context.watch<InvoiceProvider>().orderResultFull.clientPhone}")
+                            Text("Teléfono: ${invoiceProvider.order.clientPhone}")
                           ],
                         )
                       ],
@@ -197,43 +179,26 @@ class InvoiceCardWidget extends StatelessWidget {
                               const TableRow(
                                 decoration: BoxDecoration(
                                   border: Border(
-                                    bottom: BorderSide(
-                                        width: 1, color: Colors.black),
+                                    bottom: BorderSide(width: 1, color: Colors.black),
                                   ),
                                 ),
                                 children: [
-                                  Text('Producto',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                  Text('Producto', style: TextStyle(fontWeight: FontWeight.bold)),
                                   Center(
-                                    child: Text('Cant',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
+                                    child: Text('Cant', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                   Center(
-                                    child: Text('Importe',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
+                                    child: Text('Importe', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                 ],
                               ),
-                              ...context
-                                  .watch<InvoiceProvider>()
-                                  .orderResultFull
-                                  .orderProducts
-                                  .map((orderProduct) {
+                              ...invoiceProvider.order.orderProducts.map((orderProduct) {
                                 return TableRow(
-                                  decoration: (context
-                                              .watch<InvoiceProvider>()
-                                              .orderResultFull
-                                              .orderProducts
-                                              .lastOrNull ==
-                                          orderProduct)
+                                  decoration: (invoiceProvider.order.orderProducts.lastOrNull == orderProduct)
                                       ? null
                                       : const BoxDecoration(
                                           border: Border(
-                                            bottom: BorderSide(
-                                                width: 1, color: Colors.grey),
+                                            bottom: BorderSide(width: 1, color: Colors.grey),
                                           ),
                                         ),
                                   children: [
@@ -254,10 +219,7 @@ class InvoiceCardWidget extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Center(
-                                        child: PriceWidget(
-                                            price: orderProduct
-                                                    .product.regularPrice *
-                                                orderProduct.quantity),
+                                        child: PriceWidget(price: orderProduct.product.regularPrice * orderProduct.quantity),
                                       ),
                                     ),
                                   ],
@@ -276,25 +238,11 @@ class InvoiceCardWidget extends StatelessWidget {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text("Subtotal"),
-                            PriceWidget(
-                                price: context
-                                    .watch<InvoiceProvider>()
-                                    .orderResultFull
-                                    .subtotal)
-                          ],
+                          children: [const Text("Subtotal"), PriceWidget(price: invoiceProvider.order.subtotal)],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text("Costo de envío"),
-                            PriceWidget(
-                                price: context
-                                    .watch<InvoiceProvider>()
-                                    .orderResultFull
-                                    .deliveryCost)
-                          ],
+                          children: [const Text("Costo de envío"), PriceWidget(price: invoiceProvider.order.deliveryCost)],
                         ),
                         const SizedBox(
                           height: 10,
@@ -307,10 +255,7 @@ class InvoiceCardWidget extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             PriceWidget(
-                              price: context
-                                  .watch<InvoiceProvider>()
-                                  .orderResultFull
-                                  .total,
+                              price: invoiceProvider.order.total,
                               fontWeight: FontWeight.bold,
                             )
                           ],

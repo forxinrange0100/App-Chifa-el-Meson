@@ -22,12 +22,12 @@ class InvoicePage extends StatefulWidget {
 
 class _InvoicePageState extends State<InvoicePage> {
   bool _reloading = false;
-  Future<bool> getOrderFull() async {
+  Future<bool> getOrder() async {
     try {
-      await context.read<InvoiceProvider>().getOrderResultFull();
+      await context.read<InvoiceProvider>().getOrder();
       return true;
     } catch (e, stackTrace) {
-      log("Error in invoice_page, getOrderFull: ${e.toString()}");
+      log("Error in invoice_page, getOrder: ${e.toString()}");
       log("Stack trace: $stackTrace");
       return false;
     }
@@ -36,7 +36,7 @@ class _InvoicePageState extends State<InvoicePage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-      future: getOrderFull(),
+      future: getOrder(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -131,7 +131,7 @@ class _InvoicePageState extends State<InvoicePage> {
                               setState(() {
                                 _reloading = true;
                               });
-                              await getOrderFull();
+                              await getOrder();
                               setState(() {
                                 _reloading = false;
                               });
@@ -159,20 +159,20 @@ class _InvoicePageState extends State<InvoicePage> {
                                         await generateInvoicePdf(
                                       context
                                           .read<InvoiceProvider>()
-                                          .orderResultFull,
+                                          .order,
                                       context
                                           .read<RestaurantInfoProvider>()
                                           .restaurantInfo,
                                     );
                                     if (!context.mounted) return;
-                                    final orderResultFull = context
+                                    final order = context
                                         .read<InvoiceProvider>()
-                                        .orderResultFull;
+                                        .order;
                                     final pdfBytes = await pdfDocument.save();
                                     final directory =
                                         await getTemporaryDirectory();
                                     final tempFile = File(
-                                        '${directory.path}/orden-${orderResultFull.publicId}-${orderResultFull.timestamp.toIso8601String()}.pdf');
+                                        '${directory.path}/orden-${order.publicId}-${order.timestamp.toIso8601String()}.pdf');
                                     await tempFile.writeAsBytes(pdfBytes);
                                     OpenFilex.open(tempFile.path);
                                     if (!context.mounted) {

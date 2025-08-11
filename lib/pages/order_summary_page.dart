@@ -1,7 +1,7 @@
 import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/enum/input_status_enum.dart';
 import 'package:delivera/model/input_status_model.dart';
-import 'package:delivera/model/order_result_model.dart';
+import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/pages/payment_page.dart';
 import 'package:delivera/provider/delivery_details_provider.dart';
