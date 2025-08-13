@@ -654,10 +654,11 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       _isSubmitting = true;
     });
 
+    // Set the order summary with the user inputs
+    _orderSummaryProvider.setOrderSummary(_textEditingControllerFullName.text, _textEditingControllerEmail.text, _textEditingControllerPhoneNumber.text, _paymentType);
     try {
-      // Submit the form
-      await _orderSummaryProvider.setOrderSummary(
-          _textEditingControllerFullName.text, _textEditingControllerEmail.text, _textEditingControllerPhoneNumber.text, _paymentType);
+      // Post the order
+      await _orderSummaryProvider.postOrder();
     } catch (e) {
       if (!context.mounted) return;
       // If an error occurs, show a toast and set is submitting to false

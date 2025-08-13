@@ -8,11 +8,12 @@ class PaymentData {
       required this.paymentUrl,
       this.token});
 
-  static PaymentData fromJson(result) {
+  factory PaymentData.fromJson(dynamic json) {
+    final map = Map<String, dynamic>.from(json);
     return PaymentData(
-        paymentType: result['payment_type'],
-        paymentUrl: result['payment_url'],
-        token: result['token']);
+        paymentType: map['payment_type'],
+        paymentUrl: map['payment_url'],
+        token: map['token']);
   }
 }
 

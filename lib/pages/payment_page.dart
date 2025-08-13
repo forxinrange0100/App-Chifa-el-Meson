@@ -1,9 +1,9 @@
 import 'dart:developer';
 
-import 'package:delivera/pages/invoice_page.dart';
-import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
-import 'package:delivera/provider/order_summary_provider.dart';
-import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
+import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
+import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -107,6 +107,7 @@ class PaymentPageState extends State<PaymentPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
+              // Navigate to InvoicePage when payment is done or canceled
               builder: (context) => const InvoicePage(),
             ),
           );
@@ -129,8 +130,7 @@ class PaymentPageState extends State<PaymentPage> {
                     ),
                     Padding(
                       padding: EdgeInsets.all(20.0),
-                      child: Text("Estamos redirigíendote al portal de pago...",
-                          textAlign: TextAlign.center),
+                      child: Text("Estamos redirigíendote al portal de pago...", textAlign: TextAlign.center),
                     )
                   ],
                 ),

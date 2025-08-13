@@ -37,22 +37,42 @@ class Order {
       required this.orderProducts})
       : paymentStatusStyle = PaymentStatusStyle(paymentStatus);
 
-  factory Order.fromJson(Map<String, dynamic> json) => Order(
-      id: json['id'],
-      publicId: json['public_id'],
-      subtotal: json['subtotal'],
-      total: json['total'],
-      timestamp: DateTime.parse(json['timestamp']),
-      deliveryType: json['delivery_type'],
-      deliveryCost: json['delivery_cost'],
-      status: json['status'],
-      paymentStatus: json['payment_status'],
-      paymentType: json['payment_type'],
-      clientAddress: json['client_address'],
-      clientPhone: json['client_phone'],
-      clientEmail: json['client_email'],
-      clientName: json['client_name'],
-      orderProducts: List<OrderProduct>.from(json['order_products'].map((x) => OrderProduct.fromJson(x))));
+  factory Order.empty() => Order(
+      id: 0,
+      publicId: 0,
+      subtotal: 0,
+      total: 0,
+      timestamp: DateTime.now(),
+      deliveryType: '',
+      deliveryCost: 0,
+      status: '',
+      paymentStatus: '',
+      paymentType: '',
+      clientAddress: '',
+      clientPhone: '',
+      clientEmail: '',
+      clientName: '',
+      orderProducts: []);
+
+  factory Order.fromJson(dynamic json) {
+    final map = json as Map<String, dynamic>;
+    return Order(
+        id: map['id'] as int,
+        publicId: map['public_id'] as int,
+        subtotal: map['subtotal'] as int,
+        total: map['total'] as int,
+        timestamp: DateTime.parse(map['timestamp']),
+        deliveryType: map['delivery_type'] as String,
+        deliveryCost: map['delivery_cost'] as int,
+        status: map['status'] as String,
+        paymentStatus: map['payment_status'] as String,
+        paymentType: map['payment_type'] as String,
+        clientAddress: map['client_address'] as String,
+        clientPhone: map['client_phone'] as String,
+        clientEmail: map['client_email'] as String,
+        clientName: map['client_name'] as String,
+        orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))));
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

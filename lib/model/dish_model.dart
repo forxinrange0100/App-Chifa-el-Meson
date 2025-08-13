@@ -29,19 +29,22 @@ class Dish {
       required this.units})
       : _discountedPrice = discountedPrice;
 
-  factory Dish.fromJson(Map<String, dynamic> json) => Dish(
-      id: json['id'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      name: json['name'],
-      description: json['description'],
-      regularPrice: json['regular_price'],
-      discountedPrice: json['discounted_price'],
-      image: json['image'],
-      categoryId: json['category_id'],
-      enabled: json['enabled'] == 1 ? true : false,
-      displayOrder: json['display_order'],
-      units: json['units']);
+  factory Dish.fromJson(dynamic json) {
+    final map = json as Map<String, dynamic>;
+    return Dish(
+        id: map['id'],
+        createdAt: DateTime.parse(map['created_at']),
+        updatedAt: DateTime.parse(map['updated_at']),
+        name: map['name'],
+        description: map['description'],
+        regularPrice: map['regular_price'],
+        discountedPrice: map['discounted_price'],
+        image: map['image'],
+        categoryId: map['category_id'],
+        enabled: map['enabled'] == 1 ? true : false,
+        displayOrder: map['display_order'],
+        units: map['units']);
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

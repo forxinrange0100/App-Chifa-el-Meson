@@ -21,20 +21,21 @@ class OrderSummaryProvider extends ChangeNotifier {
   DeliveryDetails _details;
 
   OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
-      : _details =
-            PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
-  
+      : _details = PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
+
   DeliveryDetails get details => _details;
   PaymentResult get orderResult => _orderResult;
 
-  Future<void> setOrderSummary(
-      String fullName, String email, String phoneNumber, String paymentType) async {
+  void setOrderSummary(String fullName, String email, String phoneNumber, String paymentType) async {
     _orderSummary = OrderSummary(
         details: _details,
-        userDetails: UserDetails(
-            fullName: fullName, email: email, phoneNumber: phoneNumber),
+        userDetails: UserDetails(fullName: fullName, email: email, phoneNumber: phoneNumber),
         shoppingCart: _shoppingCartProvider.shoppingCart,
         paymentType: paymentType);
+    notifyListeners();
+  }
+
+  Future<void> postOrder() async {
     _orderResult = await fetchOrder(_orderSummary);
     notifyListeners();
   }
