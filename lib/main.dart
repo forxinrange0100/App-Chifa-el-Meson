@@ -1,28 +1,32 @@
-import 'package:delivera/pages/home_page.dart';
-import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
-import 'package:delivera/provider/data_provider.dart';
-import 'package:delivera/provider/delivery_details_provider.dart';
-import 'package:delivera/provider/dish_categories_provider.dart';
-import 'package:delivera/provider/dishes_provider.dart';
-import 'package:delivera/provider/invoice_provider.dart';
-import 'package:delivera/provider/order_summary_provider.dart';
-import 'package:delivera/provider/payment_provider.dart';
-import 'package:delivera/provider/restaurant_info_provider.dart';
-import 'package:delivera/provider/scroll_controller_provider.dart';
-import 'package:delivera/provider/shift_provider.dart';
-import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'dart:io' show Directory, HttpClient;
+import 'package:delivera/model/order_model.dart' show Order;
+import 'package:delivera/pages/home_page.dart' show HomePage;
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
+import 'package:delivera/provider/data_provider.dart' show DataProvider;
+import 'package:delivera/provider/delivery_details_provider.dart' show DeliveryDetailsProvider;
+import 'package:delivera/provider/dish_categories_provider.dart' show DishCategoriesProvider;
+import 'package:delivera/provider/dishes_provider.dart' show DishesProvider;
+import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
+import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
+import 'package:delivera/provider/payment_provider.dart' show PaymentProvider;
+import 'package:delivera/provider/restaurant_info_provider.dart' show RestaurantInfoProvider;
+import 'package:delivera/provider/scroll_controller_provider.dart' show ScrollControllerProvider;
+import 'package:delivera/provider/shift_provider.dart' show ShiftProvider;
+import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
+import 'package:hive/hive.dart' show Hive;
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
-import 'dart:io' as io;
 
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
+  Hive.defaultDirectory = Directory.current.path;
+  Hive.registerAdapter('Order', Order.fromJson);
   if (kDebugMode) {
-    io.HttpClient.enableTimelineLogging = true;
+    HttpClient.enableTimelineLogging = true;
   }
   runApp(const MyApp());
 }

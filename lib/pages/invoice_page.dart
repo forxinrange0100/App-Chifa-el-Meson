@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:delivera/model/order_model.dart' show Order;
 import 'package:delivera/pages/home_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/invoice_provider.dart';
@@ -14,7 +14,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class InvoicePage extends StatefulWidget {
-  const InvoicePage({super.key});
+  final Order? order;
+
+  const InvoicePage({super.key, this.order});
 
   @override
   State<InvoicePage> createState() => _InvoicePageState();
@@ -22,19 +24,33 @@ class InvoicePage extends StatefulWidget {
 
 class _InvoicePageState extends State<InvoicePage> {
   bool _reloading = false;
+  String? _errorMessage;
+
   Future<bool> getOrder() async {
     try {
-      await context.read<InvoiceProvider>().getOrder();
+      if (widget.order == null) {
+        await context.read<InvoiceProvider>().getOrder();
+        // ignore: use_build_context_synchronously
+        context.read<InvoiceProvider>().storeOrder();
+      } else {
+        context.read<InvoiceProvider>().setOrder(widget.order!);
+      }
+
       return true;
     } catch (e, stackTrace) {
       log("Error in invoice_page, getOrder: ${e.toString()}");
       log("Stack trace: $stackTrace");
+      setState(() {
+        _errorMessage = e.toString();
+      });
       return false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final invoiceProvider = context.watch<InvoiceProvider>();
+
     return FutureBuilder<bool>(
       future: getOrder(),
       builder: (context, snapshot) {
@@ -51,16 +67,13 @@ class _InvoicePageState extends State<InvoicePage> {
                   ),
                   Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Text(
-                        "Estamos cargando la boleta para ti, espera un momento...",
-                        textAlign: TextAlign.center),
+                    child: Text("Estamos cargando la boleta para ti, espera un momento...", textAlign: TextAlign.center),
                   )
                 ],
               ),
             ),
           );
-        } else if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.data == true) {
+        } else if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
           return _reloading
               ? const Scaffold(
                   backgroundColor: Colors.white,
@@ -75,9 +88,7 @@ class _InvoicePageState extends State<InvoicePage> {
                       ),
                       Padding(
                         padding: EdgeInsets.all(20.0),
-                        child: Text(
-                            "Estamos cargando la boleta para ti, espera un momento...",
-                            textAlign: TextAlign.center),
+                        child: Text("Estamos cargando la boleta para ti, espera un momento...", textAlign: TextAlign.center),
                       )
                     ],
                   ),
@@ -107,9 +118,7 @@ class _InvoicePageState extends State<InvoicePage> {
                       centerTitle: true,
                       leading: IconButton(
                           onPressed: () {
-                            context
-                                .read<BottomNavigationBarProvider>()
-                                .showHome();
+                            context.read<BottomNavigationBarProvider>().showHome();
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
@@ -123,8 +132,7 @@ class _InvoicePageState extends State<InvoicePage> {
                             );
                           },
                           icon: const Icon(Icons.arrow_back, color: Colors.black)),
-                      title: const Text("BOLETA",
-                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      title: const Text("BOLETA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                       actions: [
                         IconButton(
                             onPressed: () async {
@@ -151,56 +159,38 @@ class _InvoicePageState extends State<InvoicePage> {
                               padding: const EdgeInsets.all(5.0),
                               child: ElevatedButton(
                                   onPressed: () async {
-                                    context
-                                        .read<InvoiceProvider>()
-                                        .setIseGettingInvoice(true);
+                                    invoiceProvider.setIsGettingInvoice(true);
 
-                                    final pdfDocument =
-                                        await generateInvoicePdf(
-                                      context
-                                          .read<InvoiceProvider>()
-                                          .order,
-                                      context
-                                          .read<RestaurantInfoProvider>()
-                                          .restaurantInfo,
+                                    final order = invoiceProvider.order;
+                                    final pdfDocument = await generateInvoicePdf(
+                                      order,
+                                      context.read<RestaurantInfoProvider>().restaurantInfo,
                                     );
                                     if (!context.mounted) return;
-                                    final order = context
-                                        .read<InvoiceProvider>()
-                                        .order;
                                     final pdfBytes = await pdfDocument.save();
-                                    final directory =
-                                        await getTemporaryDirectory();
-                                    final tempFile = File(
-                                        '${directory.path}/orden-${order.publicId}-${order.timestamp.toIso8601String()}.pdf');
+                                    final directory = await getTemporaryDirectory();
+                                    final tempFile = File('${directory.path}/orden-${order.publicId}-${order.timestamp.toIso8601String()}.pdf');
                                     await tempFile.writeAsBytes(pdfBytes);
                                     OpenFilex.open(tempFile.path);
                                     if (!context.mounted) {
                                       return;
                                     }
-                                    context
-                                        .read<InvoiceProvider>()
-                                        .setIseGettingInvoice(false);
+                                    invoiceProvider.setIsGettingInvoice(false);
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const Text("Descargar boleta"),
-                                      context
-                                              .watch<InvoiceProvider>()
-                                              .isGettingInvoice
+                                      invoiceProvider.isGettingInvoice
                                           ? const Padding(
-                                              padding:
-                                                  EdgeInsets.only(left: 8.0),
+                                              padding: EdgeInsets.only(left: 8.0),
                                               child: SizedBox(
                                                 height: 20,
                                                 width: 20,
                                                 child: Center(
-                                                  child:
-                                                      CircularProgressIndicator(
+                                                  child: CircularProgressIndicator(
                                                     color: Colors.blue,
-                                                    backgroundColor:
-                                                        Colors.grey,
+                                                    backgroundColor: Colors.grey,
                                                   ),
                                                 ),
                                               ),
@@ -213,16 +203,10 @@ class _InvoicePageState extends State<InvoicePage> {
                               padding: const EdgeInsets.all(5.0),
                               child: ElevatedButton(
                                   style: ButtonStyle(
-                                      backgroundColor:
-                                          WidgetStatePropertyAll<Color>(
-                                              Colors.grey.shade400),
-                                      foregroundColor:
-                                          const WidgetStatePropertyAll<Color>(
-                                              Colors.black)),
+                                      backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
+                                      foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black)),
                                   onPressed: () {
-                                    context
-                                        .read<BottomNavigationBarProvider>()
-                                        .showHome();
+                                    context.read<BottomNavigationBarProvider>().showHome();
                                     Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
@@ -242,10 +226,10 @@ class _InvoicePageState extends State<InvoicePage> {
                   ),
                 );
         } else {
-          return const Scaffold(
+          return Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              child: Text("Error"),
+              child: Text("Error: $_errorMessage"),
             ),
           );
         }
