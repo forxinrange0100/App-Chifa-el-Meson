@@ -11,11 +11,13 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def globalProperties = new Properties()
+globalProperties.load(new FileInputStream(rootProject.file("global.properties")))
+
 android {
     namespace = "com.example.delivera"
-    compileSdk = flutter.compileSdkVersion
-    // ndkVersion = flutter.ndkVersion
-    ndkVersion = '29.0.13599879'
+    compileSdk = globalProperties['flutter.compileSdkVersion']?.toInteger() ?: flutter.compileSdkVersion
+    ndkVersion = globalProperties['flutter.ndkVersion'] ?: flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -31,10 +33,10 @@ android {
         applicationId = "com.delivera.delivera"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = globalProperties['flutter.minSdkVersion']?.toInteger() ?: flutter.minSdkVersion
+        targetSdk = globalProperties['flutter.targetSdkVersion']?.toInteger() ?: flutter.targetSdkVersion
+        versionCode = globalProperties['flutter.versionCode']?.toInteger() ?: flutter.versionCode
+        versionName = globalProperties['flutter.versionName'] ?: flutter.versionName
     }
 
     signingConfigs {
