@@ -1,1 +1,1 @@
-enum BottomNavigationBarEnum { home, shoppingCar }
+enum BottomNavigationBarEnum { home, shoppingCar, history }

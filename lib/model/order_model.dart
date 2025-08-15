@@ -9,7 +9,7 @@ class Order {
   final DateTime timestamp;
   final String deliveryType;
   final int deliveryCost;
-  final String status;
+  String status;
   final String paymentStatus;
   final PaymentStatusStyle paymentStatusStyle;
   final String paymentType;
@@ -53,6 +53,40 @@ class Order {
       clientEmail: '',
       clientName: '',
       orderProducts: []);
+
+  // Factory constructor to create an Order with some default values
+  factory Order.some({
+    int id = 0,
+    int publicId= 0,
+    int subtotal= 0,
+    int total= 0,
+    DateTime? timestamp,
+    String deliveryType = '',
+    int deliveryCost = 0,
+    String status = '',
+    String paymentStatus = '',
+    String paymentType = '',
+    String clientAddress = '',
+    String clientPhone = '',
+    String clientEmail = '',
+    String clientName = '',
+    List<OrderProduct> orderProducts = const [],
+  }) => Order(
+      id: id,
+      publicId: publicId,
+      subtotal: subtotal,
+      total: total,
+      timestamp: timestamp ?? DateTime.now(),
+      deliveryType: deliveryType,
+      deliveryCost: deliveryCost,
+      status: status,
+      paymentStatus: paymentStatus,
+      paymentType: paymentType,
+      clientAddress: clientAddress,
+      clientPhone: clientPhone,
+      clientEmail: clientEmail,
+      clientName: clientName,
+      orderProducts: orderProducts);
 
   factory Order.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;

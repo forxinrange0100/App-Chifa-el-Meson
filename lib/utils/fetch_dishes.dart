@@ -13,10 +13,10 @@ Future<Dishes> fetchDishes() async {
       // log("Fetch Dishes: ${response.body}");
       // headers
       log("Fetch Dishes headers: ${response.headers}");
-      log("Decoded response: ${json.decode(utf8.decode(response.bodyBytes))}");
-      log("bodyBytes: ${utf8.decode(response.bodyBytes)}");
-      log("JsonDecode : ${jsonDecode(response.body)}");
-      log("Response body: ${response.body}");
+      // log("Decoded response: ${json.decode(utf8.decode(response.bodyBytes))}");
+      // log("bodyBytes: ${utf8.decode(response.bodyBytes)}");
+      // log("JsonDecode : ${jsonDecode(response.body)}");
+      // log("Response body: ${response.body}");
       log("Response body decode: ${json.decode(response.body)}");
       log("Fetch Dishes length: ${response.body.length}");
       final result = json.decode(response.body);

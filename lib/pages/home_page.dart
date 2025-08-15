@@ -1,6 +1,7 @@
 import 'package:delivera/enum/bottom_navigation_bar_enum.dart';
-import 'package:delivera/pages/home_info_page.dart';
-import 'package:delivera/pages/shopping_cart_page.dart';
+import 'package:delivera/pages/home_info_page.dart' show HomeInfoPage;
+import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
+import 'package:delivera/pages/history_page.dart' show HistoryPage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/data_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
@@ -49,6 +50,7 @@ class _HomePageState extends State<HomePage> {
     final List<Widget> pages = [
       const HomeInfoPage(),
       const ShoppingCartPage(),
+      const HistoryPage(),
     ];
 
     return FutureBuilder<bool>(
@@ -113,15 +115,16 @@ class _HomePageState extends State<HomePage> {
                         bottomNavigationBar: BottomNavigationBar(
                           currentIndex: bottomNavigationProvider.index,
                           onTap: (int index) async {
-                            if (index == BottomNavigationBarEnum.shoppingCar.index) {
-                              await context.read<ShiftProvider>().updateIsOpen();
+                            final BottomNavigationBarEnum bottomNavigationBarEnum = BottomNavigationBarEnum.values[index];
+                            if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar) {
+                              context.read<ShiftProvider>().isOpen;
                               if (!context.mounted) return;
                               if (!context.read<ShiftProvider>().isOpen) {
                                 shiftIsCloseToast();
                                 return;
                               }
                             }
-                            bottomNavigationProvider.setIndex(index);
+                            bottomNavigationProvider.setIndex(bottomNavigationBarEnum);
                           },
                           items: [
                             const BottomNavigationBarItem(
@@ -129,34 +132,12 @@ class _HomePageState extends State<HomePage> {
                               label: "Inicio",
                             ),
                             BottomNavigationBarItem(
-                              icon: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  const Icon(Icons.shopping_cart),
-                                  Positioned(
-                                    right: 0,
-                                    top: 0,
-                                    child: CircleAvatar(
-                                      radius: 8,
-                                      backgroundColor: Colors.black,
-                                      child: CircleAvatar(
-                                        radius: 7,
-                                        backgroundColor: Colors.white,
-                                        child: Center(
-                                          child: Text(
-                                            context.watch<ShoppingCartProvider>().length.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 9,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              icon: CartIconWidget(),
                               label: "Carrito",
+                            ),
+                            const BottomNavigationBarItem(
+                              icon: Icon(Icons.history),
+                              label: "Historial",
                             )
                           ],
                         ),
@@ -186,6 +167,43 @@ class _HomePageState extends State<HomePage> {
           );
         }
       },
+    );
+  }
+}
+
+class CartIconWidget extends StatelessWidget {
+  const CartIconWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        const Icon(Icons.shopping_cart),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: CircleAvatar(
+            radius: 8,
+            backgroundColor: Colors.black,
+            child: CircleAvatar(
+              radius: 7,
+              backgroundColor: Colors.white,
+              child: Center(
+                child: Text(
+                  context.watch<ShoppingCartProvider>().length.toString(),
+                  style: const TextStyle(
+                    fontSize: 9,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

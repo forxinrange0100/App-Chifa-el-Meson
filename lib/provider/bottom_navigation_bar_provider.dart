@@ -9,13 +9,19 @@ class BottomNavigationBarProvider extends ChangeNotifier {
   int get index => _bottomNavigationBarStatus.index;
   bool get isLoading => _isLoading;
 
-  void setIndex(int index) {
+  void setIndex(BottomNavigationBarEnum bottomNavigationBarEnum) {
     _isLoading = true;
     notifyListeners();
-    if (index == BottomNavigationBarEnum.home.index) {
-      showHome();
-    } else if (index == BottomNavigationBarEnum.shoppingCar.index) {
-      showShoppingCar();
+    switch (bottomNavigationBarEnum) {
+      case BottomNavigationBarEnum.home:
+        showHome();
+        break;
+      case BottomNavigationBarEnum.shoppingCar:
+        showShoppingCar();
+        break;
+      case BottomNavigationBarEnum.history:
+        showHistory();
+        break;
     }
   }
 
@@ -27,6 +33,12 @@ class BottomNavigationBarProvider extends ChangeNotifier {
 
   void showShoppingCar() {
     _bottomNavigationBarStatus = BottomNavigationBarEnum.shoppingCar;
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void showHistory() {
+    _bottomNavigationBarStatus = BottomNavigationBarEnum.history;
     _isLoading = false;
     notifyListeners();
   }
