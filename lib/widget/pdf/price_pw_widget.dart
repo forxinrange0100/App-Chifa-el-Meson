@@ -1,6 +1,6 @@
+import 'package:delivera/utils/format_price.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:intl/intl.dart';
 
 class PricePWWidget extends pw.StatelessWidget {
   final int price;
@@ -24,7 +24,7 @@ class PricePWWidget extends pw.StatelessWidget {
   @override
   pw.Widget build(pw.Context context) {
     return pw.Text(
-      "$prefix\$${NumberFormat.decimalPattern('es').format(price)}$postfix",
+      formatPrice(price),
       style: pw.TextStyle(
         color: color,
         fontSize: fontSize,

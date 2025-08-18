@@ -1,8 +1,26 @@
 import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/model/payment_status_style_model.dart';
 
+enum StatusEnum {
+  pending('Pendiente'),
+  completed('Completado'),
+  cancelled('Cancelado'),
+  unknown('Desconocido');
+
+  final String label;
+  const StatusEnum(this.label);
+
+  static StatusEnum fromName(String name) {
+    if (name.isEmpty) return StatusEnum.unknown;
+    return StatusEnum.values.firstWhere(
+      (e) => e.name.toLowerCase() == name.toLowerCase(),
+      orElse: () => StatusEnum.unknown,
+    );
+  }
+}
+
 class Order {
-  final int id;
+  final int _id;
   final int publicId;
   final int subtotal;
   final int total;
@@ -20,7 +38,7 @@ class Order {
   final List<OrderProduct> orderProducts;
 
   Order(
-      {required this.id,
+      {required int id,
       required this.publicId,
       required this.subtotal,
       required this.total,
@@ -35,7 +53,8 @@ class Order {
       required this.clientEmail,
       required this.clientName,
       required this.orderProducts})
-      : paymentStatusStyle = PaymentStatusStyle(paymentStatus);
+      : paymentStatusStyle = PaymentStatusStyle(paymentStatus), 
+        _id = id;
 
   factory Order.empty() => Order(
       id: 0,
@@ -109,7 +128,7 @@ class Order {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
+        'id': _id,
         'public_id': publicId,
         'subtotal': subtotal,
         'total': total,

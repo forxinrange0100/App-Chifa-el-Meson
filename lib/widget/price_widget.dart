@@ -1,5 +1,5 @@
+import 'package:delivera/utils/format_price.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class PriceWidget extends StatelessWidget {
   final int price;
@@ -23,7 +23,7 @@ class PriceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      "$prefix\$${NumberFormat.decimalPattern('es').format(price)}$postfix",
+      formatPrice(price),
       style: TextStyle(
           color: color,
           fontSize: fontSize,

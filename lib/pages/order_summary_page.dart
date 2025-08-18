@@ -170,7 +170,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery
+                            side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch
                                 ? const BorderSide(color: Colors.black, width: 1)
                                 : BorderSide.none,
                           ),
@@ -189,7 +189,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       onPressed: () {
                         _deliveryDetailsProvider.dispatchEnabled == false
                             ? errorOrderSummary("El envío a domicilio no está disponible en este momento.")
-                            : _deliveryDetailsProvider.setDeliveryDetailEnum(DeliveryDetailEnum.homeDelivery);
+                            : _deliveryDetailsProvider.setDeliveryDetailEnum(DeliveryDetailEnum.dispatch);
                         // Don't set the OrderSummaryProvider delivery details here
                       },
                       child: const Column(
@@ -203,8 +203,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             ),
             switch (_deliveryDetailsProvider.deliveryDetailEnum) {
               DeliveryDetailEnum.pickup => _deliveryPickupSelected(context),
-              DeliveryDetailEnum.homeDelivery => _deliveryDispatchSelected(context),
-              null => Padding(
+              DeliveryDetailEnum.dispatch => _deliveryDispatchSelected(context),
+              _ => Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     "Por favor, seleccione un método de entrega.",
@@ -608,7 +608,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     }
 
     // Check if the delivery method 'homeDelivery' (dispatch) is selected
-    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery){
+    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch){
       // Check if dispatch is enabled
       if(_deliveryDetailsProvider.dispatchEnabled == false) {
         errorOrderSummary("El envío a domicilio no está disponible en este momento.");
@@ -645,7 +645,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     }
 
     // if the delivery method is homeDelivery, set the delivery address
-    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.homeDelivery) {
+    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
       _orderSummaryProvider.setDeliveryAddress(_textEditingControllerAddress.text);
     }
 

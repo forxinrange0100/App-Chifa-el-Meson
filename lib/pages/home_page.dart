@@ -117,8 +117,6 @@ class _HomePageState extends State<HomePage> {
                           onTap: (int index) async {
                             final BottomNavigationBarEnum bottomNavigationBarEnum = BottomNavigationBarEnum.values[index];
                             if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar) {
-                              context.read<ShiftProvider>().isOpen;
-                              if (!context.mounted) return;
                               if (!context.read<ShiftProvider>().isOpen) {
                                 shiftIsCloseToast();
                                 return;
