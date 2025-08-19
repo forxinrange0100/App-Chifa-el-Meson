@@ -32,60 +32,78 @@ class HistoryPage extends StatelessWidget {
           "Historial",
         ),
       ),
-      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Toca un pedido para ver más detalles'),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(8.0),
-            itemExtent: 70,
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              final order = orders[index];
-              if (order == null) return const SizedBox.shrink();
-              return _orderItem(order);
-            },
-          ),
-        )
-      ]),
+      body: orders.isEmpty
+          ? Center(
+              child: Text(
+                "No tienes pedidos aún",
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              ),
+            )
+          : _buildOrderList(orders),
     );
+  }
+
+  Column _buildOrderList(List<Order?> orders) {
+    return Column(children: [
+      Container(
+        width: double.infinity,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          border: BoxBorder.fromLTRB(bottom: BorderSide(color: Colors.grey[300]!)),
+        ),
+        child: Text(
+          'Toca un pedido para ver más detalles',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
+      ),
+      Expanded(
+        child: ListView.separated(
+          padding: const EdgeInsets.all(8.0),
+          // itemExtent: 70,
+          itemCount: orders.length,
+          itemBuilder: (context, index) => _orderItem(orders[index]!),
+          separatorBuilder: (context, index) => Divider(color: Colors.grey[500]),
+        ),
+      )
+    ]);
   }
 
   Widget _orderItem(Order order) {
     final [String date, String time] = formatDateTime(order.timestamp).split(', ');
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Table(
-        children: [
-          TableRow(
-            children: [
-              Text(
-                'Pedido #${order.publicId}',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                date,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-            ],
+    return Table(
+      children: [
+        TableRow(children: [
+          Text(
+            'Pedido #${order.publicId}',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          TableRow(children: [
-            Text(
-              formatPrice(order.total),
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              time,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-          ]),
-          TableRow(children: [
-            Text(
-              StatusEnum.fromName(order.status).label,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            Row(
-                children: switch (DeliveryDetailEnum.fromName(order.deliveryType)) {
+          Text(
+            date,
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
+            textAlign: TextAlign.end,
+          ),
+        ]),
+        TableRow(children: [
+          Text(
+            formatPrice(order.total),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            time,
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
+            textAlign: TextAlign.end,
+          ),
+        ]),
+        TableRow(children: [
+          Text(
+            StatusEnum.fromName(order.status).label,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: switch (DeliveryDetailEnum.fromName(order.deliveryType)) {
               DeliveryDetailEnum.pickup => [
                   Icon(Icons.store, size: 16),
                   SizedBox(width: 4),
@@ -94,23 +112,25 @@ class HistoryPage extends StatelessWidget {
               DeliveryDetailEnum.dispatch => [
                   Icon(Icons.motorcycle, size: 16),
                   SizedBox(width: 4),
-                  Text(
-                    "Domicilio",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  )
+                  Text("Domicilio", style: TextStyle(fontSize: 14, color: Colors.grey))
                 ],
               _ => [],
-            })
-          ])
-        ],
-      ),
+            },
+          )
+        ])
+      ],
     );
   }
 
   void addFakeOrders() {
     final ordersBox = Hive.box<Order>(name: 'orders');
-    for (int i = 0; i < 10; i++) {
-      var order = Order.some(publicId: i, status: StatusEnum.pending.name, deliveryType: DeliveryDetailEnum.pickup.name);
+    const from = 1001;
+    const to = 1010;
+    final status = StatusEnum.pending.name;
+    final deliveryType = DeliveryDetailEnum.dispatch.name;
+    const total = 20000;
+    for (int i = from; i < to + 1; i++) {
+      var order = Order.some(publicId: i, status: status, deliveryType: deliveryType, total: total);
       ordersBox.put((order.publicId).toString(), order);
     }
   }
