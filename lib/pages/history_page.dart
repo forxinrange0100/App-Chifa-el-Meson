@@ -2,7 +2,6 @@ import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order, StatusEnum;
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
-import 'package:delivera/widget/pdf/price_pw_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart' show Hive;
 
@@ -72,53 +71,100 @@ class HistoryPage extends StatelessWidget {
   Widget _orderItem(Order order) {
     final [String date, String time] = formatDateTime(order.timestamp).split(', ');
 
-    return Table(
-      children: [
-        TableRow(children: [
-          Text(
-            'Pedido #${order.publicId}',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return SizedBox(
+      height: 70,
+      child: Row(
+        children: [
+          Expanded(
+            child: Table(
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                TableRow(children: [
+                  Text(
+                    'Pedido #${order.publicId}',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    date,
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.end,
+                  ),
+                ]),
+                TableRow(children: [
+                  Text(
+                    formatPrice(order.total),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  Text(
+                    time,
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    textAlign: TextAlign.end,
+                  ),
+                ]),
+                TableRow(children: [
+                  orderStatusChip(order.status),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: switch (DeliveryDetailEnum.fromName(order.deliveryType)) {
+                      DeliveryDetailEnum.pickup => [
+                          Icon(Icons.store, size: 16),
+                          SizedBox(width: 4),
+                          Text("Recoger", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
+                        ],
+                      DeliveryDetailEnum.dispatch => [
+                          Icon(Icons.motorcycle, size: 16),
+                          SizedBox(width: 4),
+                          Text("Domicilio", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
+                        ],
+                      _ => [],
+                    },
+                  )
+                ])
+              ],
+            ),
           ),
-          Text(
-            date,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-            textAlign: TextAlign.end,
+          VerticalDivider(color: const Color.fromARGB(255, 0, 0, 0), ),
+          SizedBox(width: 120,)
+        ],
+      ),
+    );
+  }
+
+  Widget orderStatusChip(String statusName) {
+    StatusEnum status = StatusEnum.fromName(statusName);
+
+    final Color color = switch (status) {
+      StatusEnum.pending => Colors.orange,
+      StatusEnum.completed => Colors.green,
+      StatusEnum.cancelled => Colors.red,
+      _ => Colors.grey,
+    };
+
+    const double alpha = .15;
+    final Color backgroundColor = switch (status) {
+      StatusEnum.pending => Colors.orange.withValues(alpha: alpha),
+      StatusEnum.completed => Colors.green.withValues(alpha: alpha),
+      StatusEnum.cancelled => Colors.red.withValues(alpha: alpha),
+      _ => Colors.grey.withValues(alpha: alpha),
+    };
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(15)),
+        constraints: BoxConstraints.tightFor(width: 100),
+        margin: EdgeInsets.symmetric(vertical: 5),
+        child: Text(
+          status.label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: color,
           ),
-        ]),
-        TableRow(children: [
-          Text(
-            formatPrice(order.total),
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            time,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-            textAlign: TextAlign.end,
-          ),
-        ]),
-        TableRow(children: [
-          Text(
-            StatusEnum.fromName(order.status).label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: switch (DeliveryDetailEnum.fromName(order.deliveryType)) {
-              DeliveryDetailEnum.pickup => [
-                  Icon(Icons.store, size: 16),
-                  SizedBox(width: 4),
-                  Text("Recoger", style: TextStyle(fontSize: 14, color: Colors.grey))
-                ],
-              DeliveryDetailEnum.dispatch => [
-                  Icon(Icons.motorcycle, size: 16),
-                  SizedBox(width: 4),
-                  Text("Domicilio", style: TextStyle(fontSize: 14, color: Colors.grey))
-                ],
-              _ => [],
-            },
-          )
-        ])
-      ],
+        ),
+      ),
     );
   }
 
