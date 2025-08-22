@@ -1,5 +1,6 @@
 import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order, StatusEnum;
+import 'package:delivera/utils/date_time_chile.dart';
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ordersBox = Hive.box<Order>(name: 'orders');
     final List<Order?> orders = ordersBox.getAll(ordersBox.keys.toList());
-    addFakeOrders();
+    // addFakeOrders();
     for (var order in orders) {
       if (order == null) continue;
       // Aquí puedes procesar cada order como desees
@@ -58,24 +59,29 @@ class HistoryPage extends StatelessWidget {
       ),
       Expanded(
         child: ListView.separated(
-          padding: const EdgeInsets.all(8.0),
           // itemExtent: 70,
           itemCount: orders.length,
           itemBuilder: (context, index) => _orderItem(orders[index]!),
-          separatorBuilder: (context, index) => Divider(color: Colors.grey[500]),
+          separatorBuilder: (context, index) => Divider(
+            color: Color.fromARGB(255, 0, 0, 0),
+            thickness: 1,
+            height: 0,
+          ),
         ),
       )
     ]);
   }
 
   Widget _orderItem(Order order) {
-    final [String date, String time] = formatDateTime(order.timestamp).split(', ');
+    final [String date, String time] = formatDateTime(dateTimeChile(order.timestamp)).split(', ');
+    final DeliveryDetailEnum deliveryType = DeliveryDetailEnum.fromName(order.deliveryType);
+    final StatusEnum status = StatusEnum.fromName(order.status);
 
-    return SizedBox(
-      height: 70,
-      child: Row(
-        children: [
-          Expanded(
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
             child: Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
@@ -102,10 +108,10 @@ class HistoryPage extends StatelessWidget {
                   ),
                 ]),
                 TableRow(children: [
-                  orderStatusChip(order.status),
+                  orderStatusChip(status),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: switch (DeliveryDetailEnum.fromName(order.deliveryType)) {
+                    children: switch (deliveryType) {
                       DeliveryDetailEnum.pickup => [
                           Icon(Icons.store, size: 16),
                           SizedBox(width: 4),
@@ -123,16 +129,19 @@ class HistoryPage extends StatelessWidget {
               ],
             ),
           ),
-          VerticalDivider(color: const Color.fromARGB(255, 0, 0, 0), ),
-          SizedBox(width: 120,)
-        ],
-      ),
+        ),
+        // VerticalDivider(color: const Color.fromARGB(255, 0, 0, 0), thickness: 1, ),
+        Container(
+          height: 70,
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(border: BoxBorder.fromLTRB(left: BorderSide())),
+          child: status == StatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
+        ),
+      ],
     );
   }
 
-  Widget orderStatusChip(String statusName) {
-    StatusEnum status = StatusEnum.fromName(statusName);
-
+  Widget orderStatusChip(StatusEnum status) {
     final Color color = switch (status) {
       StatusEnum.pending => Colors.orange,
       StatusEnum.completed => Colors.green,

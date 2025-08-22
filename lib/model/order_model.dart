@@ -53,7 +53,7 @@ class Order {
       required this.clientEmail,
       required this.clientName,
       required this.orderProducts})
-      : paymentStatusStyle = PaymentStatusStyle(paymentStatus), 
+      : paymentStatusStyle = PaymentStatusStyle(paymentStatus),
         _id = id;
 
   factory Order.empty() => Order(
@@ -76,9 +76,9 @@ class Order {
   // Factory constructor to create an Order with some default values
   factory Order.some({
     int id = 0,
-    int publicId= 0,
-    int subtotal= 0,
-    int total= 0,
+    int publicId = 0,
+    int subtotal = 0,
+    int total = 0,
     DateTime? timestamp,
     String deliveryType = '',
     int deliveryCost = 0,
@@ -90,41 +90,44 @@ class Order {
     String clientEmail = '',
     String clientName = '',
     List<OrderProduct> orderProducts = const [],
-  }) => Order(
-      id: id,
-      publicId: publicId,
-      subtotal: subtotal,
-      total: total,
-      timestamp: timestamp ?? DateTime.now(),
-      deliveryType: deliveryType,
-      deliveryCost: deliveryCost,
-      status: status,
-      paymentStatus: paymentStatus,
-      paymentType: paymentType,
-      clientAddress: clientAddress,
-      clientPhone: clientPhone,
-      clientEmail: clientEmail,
-      clientName: clientName,
-      orderProducts: orderProducts);
+  }) =>
+      Order(
+        id: id,
+        publicId: publicId,
+        subtotal: subtotal,
+        total: total,
+        timestamp: timestamp ?? DateTime.now(),
+        deliveryType: deliveryType,
+        deliveryCost: deliveryCost,
+        status: status,
+        paymentStatus: paymentStatus,
+        paymentType: paymentType,
+        clientAddress: clientAddress,
+        clientPhone: clientPhone,
+        clientEmail: clientEmail,
+        clientName: clientName,
+        orderProducts: orderProducts,
+      );
 
   factory Order.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
     return Order(
-        id: map['id'] as int,
-        publicId: map['public_id'] as int,
-        subtotal: map['subtotal'] as int,
-        total: map['total'] as int,
-        timestamp: DateTime.parse(map['timestamp']),
-        deliveryType: map['delivery_type'] as String,
-        deliveryCost: map['delivery_cost'] as int,
-        status: map['status'] as String,
-        paymentStatus: map['payment_status'] as String,
-        paymentType: map['payment_type'] as String,
-        clientAddress: map['client_address'] as String,
-        clientPhone: map['client_phone'] as String,
-        clientEmail: map['client_email'] as String,
-        clientName: map['client_name'] as String,
-        orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))));
+      id: map['id'] as int,
+      publicId: map['public_id'] as int,
+      subtotal: map['subtotal'] as int,
+      total: map['total'] as int,
+      timestamp: DateTime.parse(map['timestamp']),
+      deliveryType: map['delivery_type'] as String,
+      deliveryCost: map['delivery_cost'] as int,
+      status: map['status'] as String,
+      paymentStatus: map['payment_status'] as String,
+      paymentType: map['payment_type'] as String,
+      clientAddress: map['client_address'] as String,
+      clientPhone: map['client_phone'] as String,
+      clientEmail: map['client_email'] as String,
+      clientName: map['client_name'] as String,
+      orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))),
+    );
   }
 
   Map<String, dynamic> toJson() => {
