@@ -3,6 +3,7 @@ import 'package:delivera/enum/input_status_enum.dart';
 import 'package:delivera/model/input_status_model.dart';
 import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
+import 'package:delivera/model/user_box_model.dart' show UserBox;
 import 'package:delivera/pages/payment_page.dart';
 import 'package:delivera/provider/delivery_details_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart';
@@ -14,6 +15,7 @@ import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart' show Hive;
 import 'package:provider/provider.dart';
 
 import '../constants/payment_types_constant.dart' show PaymentType, paymentTypes;
@@ -26,6 +28,9 @@ class OrderSummaryPage extends StatefulWidget {
 }
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
+  final userBox = Hive.box(name: 'user');
+  late final UserBox lastInputs;
+
   // Input status for address
   final InputStatus _inputStatusAddress =
       InputStatus(errorMessage: "Dirección debería tener al menos 5 caracteres", isValid: (String value) => (value.length > 4));
@@ -91,7 +96,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     super.initState();
     // Llama al método update() del provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
-        _deliveryDetailsProvider.update();
+      _deliveryDetailsProvider.update();
+      // Si userBox no está vacio, inicializar los campos name, email y phone con los valores guardados
+      if (userBox.isNotEmpty) {
+        lastInputs = UserBox.fromBox(userBox);
+        _textEditingControllerFullName.text = lastInputs.name;
+        _textEditingControllerEmail.text = lastInputs.email;
+        _textEditingControllerPhoneNumber.text = lastInputs.phone;
+      }
     });
   }
 
@@ -175,16 +187,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                                 : BorderSide.none,
                           ),
                         ),
-                        backgroundColor: WidgetStatePropertyAll<Color>(
-                          _deliveryDetailsProvider.dispatchEnabled == false
-                              ? Colors.grey.shade100
-                              : Colors.white,
-                        ),
-                        foregroundColor: WidgetStatePropertyAll<Color>(
-                          _deliveryDetailsProvider.dispatchEnabled == false
-                              ? Colors.grey.shade600
-                              : Colors.black,
-                        ),
+                        backgroundColor:
+                            WidgetStatePropertyAll<Color>(_deliveryDetailsProvider.dispatchEnabled == false ? Colors.grey.shade100 : Colors.white),
+                        foregroundColor:
+                            WidgetStatePropertyAll<Color>(_deliveryDetailsProvider.dispatchEnabled == false ? Colors.grey.shade600 : Colors.black),
                       ),
                       onPressed: () {
                         _deliveryDetailsProvider.dispatchEnabled == false
@@ -476,16 +482,20 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   child: ListView(
                     children: _deliveryDetailsProvider.deliveryZones.zones.map((zone) {
                       return ElevatedButton(
-                          style: const ButtonStyle(
-                              foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
-                              backgroundColor: WidgetStatePropertyAll<Color>(Colors.white)),
-                          onPressed: () {
-                            _orderSummaryProvider.setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [Text(zone.name), PriceWidget(price: zone.price)],
-                          ));
+                        style: const ButtonStyle(
+                            foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
+                            backgroundColor: WidgetStatePropertyAll<Color>(Colors.white)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [Text(zone.name), PriceWidget(price: zone.price)],
+                        ),
+                        onPressed: () {
+                          _orderSummaryProvider.setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
+                          if (userBox.isNotEmpty && lastInputs.deliveryZoneId == zone.id) {
+                            _textEditingControllerAddress.text = lastInputs.deliveryAddress!;
+                          }
+                        },
+                      );
                     }).toList(),
                   ),
                 ),
@@ -580,7 +590,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
   Future<void> _handleSubmit(BuildContext context) async {
     // Check if the form is already submitting
-    if (_isSubmitting) { 
+    if (_isSubmitting) {
       serverErrorToast("Ya se está procesando su pedido. Por favor, espere.");
       return;
     }
@@ -588,7 +598,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     // Update the shift status before proceeding
     await context.read<ShiftProvider>().updateIsOpen();
     // Check if the context is still mounted before navigating (the user might have navigated away)
-    if (!context.mounted) return; 
+    if (!context.mounted) return;
 
     // Verify if the shift is open
     if (!context.read<ShiftProvider>().isOpen) {
@@ -608,9 +618,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     }
 
     // Check if the delivery method 'homeDelivery' (dispatch) is selected
-    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch){
+    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
       // Check if dispatch is enabled
-      if(_deliveryDetailsProvider.dispatchEnabled == false) {
+      if (_deliveryDetailsProvider.dispatchEnabled == false) {
         errorOrderSummary("El envío a domicilio no está disponible en este momento.");
         _deliveryDetailsProvider.clearDeliveryDetailEnum(notify: true);
         _orderSummaryProvider.clearDeliveryDetails();
@@ -618,7 +628,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       }
 
       // Check if the zone is selected
-      if (_orderSummaryProvider.details is ! HomeDelivery) {
+      if (_orderSummaryProvider.details is! HomeDelivery) {
         errorOrderSummary("Zona de envío no seleccionada.");
         return;
       }
@@ -655,7 +665,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     });
 
     // Set the order summary with the user inputs
-    _orderSummaryProvider.setOrderSummary(_textEditingControllerFullName.text, _textEditingControllerEmail.text, _textEditingControllerPhoneNumber.text, _paymentType);
+    _orderSummaryProvider.setOrderSummary(
+      _textEditingControllerFullName.text,
+      _textEditingControllerEmail.text,
+      _textEditingControllerPhoneNumber.text,
+      _paymentType,
+    );
+
     try {
       // Post the order
       await _orderSummaryProvider.postOrder();

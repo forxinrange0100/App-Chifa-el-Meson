@@ -15,6 +15,7 @@ class DeliveryDetailsProvider extends ChangeNotifier {
   DeliveryZones get deliveryZones => _deliveryZones;
   bool? get dispatchEnabled => _dispatchEnabled;
 
+  /// Actualiza las zonas de envio disponibles y si el tipo de envio "Dispatch" está disponible
   Future<void> update() async {
     _deliveryZones = await fetchDeliveryZones();
     _dispatchEnabled = await fetchDispatchEnabled();
