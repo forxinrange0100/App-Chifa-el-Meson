@@ -10,10 +10,10 @@ Future<PaymentResult> fetchOrder(OrderSummary orderSummary) async {
   try {
     final body = jsonEncode({
       "delivery_type":
-          (orderSummary.details is HomeDelivery) ? "dispatch" : "pickup",
+          (orderSummary.deliveryDetails is Dispatch) ? "dispatch" : "pickup",
       "payment_type": orderSummary.paymentType,
-      "dispatch_zone_id": (orderSummary.details is HomeDelivery)
-          ? (orderSummary.details as HomeDelivery).zone.id
+      "dispatch_zone_id": (orderSummary.deliveryDetails is Dispatch)
+          ? (orderSummary.deliveryDetails as Dispatch).zone.id
           : null,
       "order_products": orderSummary.shoppingCart.cartItems.map((cartItem) {
         return {
@@ -26,8 +26,8 @@ Future<PaymentResult> fetchOrder(OrderSummary orderSummary) async {
         "name": orderSummary.userDetails.fullName,
         "email": orderSummary.userDetails.email,
         "phone": orderSummary.userDetails.phoneNumber,
-        "address": (orderSummary.details is HomeDelivery)
-            ? (orderSummary.details as HomeDelivery).address
+        "address": (orderSummary.deliveryDetails is Dispatch)
+            ? (orderSummary.deliveryDetails as Dispatch).address
             : null,
       },
     });

@@ -4,7 +4,7 @@ import 'package:delivera/model/payment_status_style_model.dart';
 enum StatusEnum {
   pending('Pendiente'),
   completed('Completado'),
-  cancelled('Cancelado'),
+  canceled('Cancelado'),
   unknown('Desconocido');
 
   final String label;
@@ -126,7 +126,8 @@ class Order {
       clientPhone: map['client_phone'] as String,
       clientEmail: map['client_email'] as String,
       clientName: map['client_name'] as String,
-      orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))),
+      // orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))),
+      orderProducts: [],
     );
   }
 
@@ -145,6 +146,7 @@ class Order {
         'client_phone': clientPhone,
         'client_email': clientEmail,
         'client_name': clientName,
-        'order_products': List<dynamic>.from(orderProducts.map((orderProduct) => orderProduct.toJson)),
+        // 'order_products': List<dynamic>.from(orderProducts.map((orderProduct) => orderProduct.toJson)),
+        'order_products': [],
       };
 }

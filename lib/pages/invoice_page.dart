@@ -16,48 +16,28 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class InvoicePage extends StatefulWidget {
-  final Order? order;
+  final Order? _order;
 
-  const InvoicePage({super.key, this.order});
+  const InvoicePage({super.key, order}) : _order = order;
 
   @override
   State<InvoicePage> createState() => _InvoicePageState();
 }
 
 class _InvoicePageState extends State<InvoicePage> {
+  Future<bool>? _isOrderFetched;
   bool _reloading = false;
   String? _errorMessage;
+  late InvoiceProvider _invoiceProvider;
 
-  Future<bool> getOrder() async {
+  Future<bool> _getOrder() async {
     try {
-      if (widget.order == null) {
+      if (widget._order == null) {
         await context.read<InvoiceProvider>().getOrder();
         // ignore_for_file: use_build_context_synchronously
-        context.read<InvoiceProvider>().storeOrder();
-        final Order order = context.read<InvoiceProvider>().order;
-        final DeliveryDetails deliveryDetails = context.read<InvoiceProvider>().deliveryDetails;
-        final userBox = Hive.box(name: 'user');
-        userBox.putAll({
-          'name': order.clientName,
-          'email': order.clientEmail,
-          'phone': order.clientPhone,
-        });
-
-        if (deliveryDetails is HomeDelivery) {
-          userBox.putAll({
-            'deliveryZoneId': deliveryDetails.zone.id,
-            'deliveryAddress': deliveryDetails.address,
-          });
-        } else {
-          userBox.putAll({
-            'deliveryZoneId': null,
-            'deliveryAddress': null,
-          });
-        }
-
-        userBox.close();
+        // context.read<InvoiceProvider>().storeOrder();
       } else {
-        context.read<InvoiceProvider>().setOrder(widget.order!);
+        context.read<InvoiceProvider>().setOrder(widget._order!);
       }
 
       return true;
@@ -72,64 +52,31 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _isOrderFetched = _getOrder();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final invoiceProvider = context.watch<InvoiceProvider>();
 
     return FutureBuilder<bool>(
-      future: getOrder(),
+      future: _isOrderFetched,
       builder: (context, snapshot) {
+        _invoiceProvider = context.watch<InvoiceProvider>();
+
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: Colors.blue,
-                    backgroundColor: Colors.grey,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Text("Estamos cargando la boleta para ti, espera un momento...", textAlign: TextAlign.center),
-                  )
-                ],
-              ),
-            ),
-          );
+          log('ConnectionState: waiting');
+          return _loadingScreen();
         } else if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
+          log('ConnectionState: done');
           return _reloading
-              ? const Scaffold(
-                  backgroundColor: Colors.white,
-                  body: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.blue,
-                          backgroundColor: Colors.grey,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: Text("Estamos cargando la boleta para ti, espera un momento...", textAlign: TextAlign.center),
-                      )
-                    ],
-                  ),
-                )
+              ? _loadingScreen()
               : PopScope(
                   canPop: false,
                   onPopInvokedWithResult: (didPop, _) {
                     if (!didPop) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return const HomePage();
-                          },
-                        ),
-                        (route) => false,
-                      );
+                      _navigateHome(context);
                     }
                   },
                   child: Scaffold(
@@ -143,17 +90,7 @@ class _InvoicePageState extends State<InvoicePage> {
                       leading: IconButton(
                           onPressed: () {
                             context.read<BottomNavigationBarProvider>().showHome();
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return const HomePage();
-                                },
-                              ),
-                              (route) {
-                                return false;
-                              },
-                            );
+                            _navigateHome(context);
                           },
                           icon: const Icon(Icons.arrow_back, color: Colors.black)),
                       title: const Text("BOLETA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -163,7 +100,7 @@ class _InvoicePageState extends State<InvoicePage> {
                               setState(() {
                                 _reloading = true;
                               });
-                              await getOrder();
+                              await _getOrder();
                               setState(() {
                                 _reloading = false;
                               });
@@ -182,46 +119,29 @@ class _InvoicePageState extends State<InvoicePage> {
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: ElevatedButton(
-                                  onPressed: () async {
-                                    invoiceProvider.setIsGettingInvoice(true);
-
-                                    final order = invoiceProvider.order;
-                                    final pdfDocument = await generateInvoicePdf(
-                                      order,
-                                      context.read<RestaurantInfoProvider>().restaurantInfo,
-                                    );
-                                    if (!context.mounted) return;
-                                    final pdfBytes = await pdfDocument.save();
-                                    final directory = await getTemporaryDirectory();
-                                    final tempFile = File('${directory.path}/orden-${order.publicId}-${order.timestamp.toIso8601String()}.pdf');
-                                    await tempFile.writeAsBytes(pdfBytes);
-                                    OpenFilex.open(tempFile.path);
-                                    if (!context.mounted) {
-                                      return;
-                                    }
-                                    invoiceProvider.setIsGettingInvoice(false);
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text("Descargar boleta"),
-                                      invoiceProvider.isGettingInvoice
-                                          ? const Padding(
-                                              padding: EdgeInsets.only(left: 8.0),
-                                              child: SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child: Center(
-                                                  child: CircularProgressIndicator(
-                                                    color: Colors.blue,
-                                                    backgroundColor: Colors.grey,
-                                                  ),
+                                onPressed: () => _downloadInvoice(),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text("Descargar boleta"),
+                                    _invoiceProvider.isDownloadingInvoice
+                                        ? const Padding(
+                                            padding: EdgeInsets.only(left: 8.0),
+                                            child: SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: Center(
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.blue,
+                                                  backgroundColor: Colors.grey,
                                                 ),
                                               ),
-                                            )
-                                          : const SizedBox()
-                                    ],
-                                  )),
+                                            ),
+                                          )
+                                        : const SizedBox()
+                                  ],
+                                ),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(5.0),
@@ -231,15 +151,7 @@ class _InvoicePageState extends State<InvoicePage> {
                                       foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black)),
                                   onPressed: () {
                                     context.read<BottomNavigationBarProvider>().showHome();
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          return const HomePage();
-                                        },
-                                      ),
-                                      (route) => false,
-                                    );
+                                    _navigateHome(context);
                                   },
                                   child: const Text("Volver a la tienda")),
                             )
@@ -259,5 +171,56 @@ class _InvoicePageState extends State<InvoicePage> {
         }
       },
     );
+  }
+
+  void _navigateHome(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+      (route) => false,
+    );
+  }
+
+  Scaffold _loadingScreen() {
+    return const Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: Colors.blue,
+              backgroundColor: Colors.grey,
+            ),
+            Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text("Estamos cargando la boleta para ti, espera un momento...", textAlign: TextAlign.center),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _downloadInvoice() async {
+    _invoiceProvider.setIsDownloadingInvoice(true);
+
+    final order = _invoiceProvider.order;
+    final pdfDocument = await generateInvoicePdf(
+      order,
+      context.read<RestaurantInfoProvider>().restaurantInfo,
+    );
+    if (!context.mounted) return;
+    final pdfBytes = await pdfDocument.save();
+    final directory = await getTemporaryDirectory();
+    final tempFile = File('${directory.path}/orden-${order.publicId}-${order.timestamp.toIso8601String()}.pdf');
+    await tempFile.writeAsBytes(pdfBytes);
+    OpenFilex.open(tempFile.path);
+    if (!context.mounted) {
+      return;
+    }
+    _invoiceProvider.setIsDownloadingInvoice(false);
   }
 }

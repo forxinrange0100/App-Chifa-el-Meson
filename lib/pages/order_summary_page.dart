@@ -346,8 +346,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Costo de Envío"),
-                (_orderSummaryProvider.details is HomeDelivery)
-                    ? PriceWidget(price: (_orderSummaryProvider.details as HomeDelivery).zone.price)
+                (_orderSummaryProvider.deliveryDetails is Dispatch)
+                    ? PriceWidget(price: (_orderSummaryProvider.deliveryDetails as Dispatch).zone.price)
                     : const PriceWidget(price: 0)
               ],
             ),
@@ -357,7 +357,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               children: [
                 const Text("TOTAL"),
                 PriceWidget(
-                    price: _orderSummaryProvider.details.cost +
+                    price: _orderSummaryProvider.deliveryDetails.cost +
                         context.watch<ShoppingCartProvider>().subtotal -
                         context.watch<ShoppingCartProvider>().discount)
               ],
@@ -441,7 +441,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 "Zona de envío:",
                 style: _titleStyle,
               ),
-              (_orderSummaryProvider.details is HomeDelivery)
+              (_orderSummaryProvider.deliveryDetails is Dispatch)
                   ? TextButton.icon(
                       icon: const Icon(
                         FontAwesomeIcons.marker,
@@ -457,7 +457,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   : const SizedBox()
             ],
           ),
-          (_orderSummaryProvider.details is HomeDelivery)
+          (_orderSummaryProvider.deliveryDetails is Dispatch)
               ? Card(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -469,10 +469,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          (_orderSummaryProvider.details as HomeDelivery).zone.name,
+                          (_orderSummaryProvider.deliveryDetails as Dispatch).zone.name,
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
-                        PriceWidget(price: (_orderSummaryProvider.details as HomeDelivery).zone.price, fontWeight: FontWeight.w500),
+                        PriceWidget(price: (_orderSummaryProvider.deliveryDetails as Dispatch).zone.price, fontWeight: FontWeight.w500),
                       ],
                     ),
                   ),
@@ -490,7 +490,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           children: [Text(zone.name), PriceWidget(price: zone.price)],
                         ),
                         onPressed: () {
-                          _orderSummaryProvider.setDeliveryDetailsHomeDelivery(HomeDelivery(address: "", zone: zone));
+                          _orderSummaryProvider.setDeliveryDetailsDispatch(Dispatch(address: "", zone: zone));
                           if (userBox.isNotEmpty && lastInputs.deliveryZoneId == zone.id) {
                             _textEditingControllerAddress.text = lastInputs.deliveryAddress!;
                           }
@@ -499,7 +499,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                     }).toList(),
                   ),
                 ),
-          (_orderSummaryProvider.details is HomeDelivery)
+          (_orderSummaryProvider.deliveryDetails is Dispatch)
               ? Padding(
                   padding: const EdgeInsets.only(top: 12.0),
                   child: Column(
@@ -617,7 +617,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       return;
     }
 
-    // Check if the delivery method 'homeDelivery' (dispatch) is selected
+    // Check if the delivery method 'Dispatch' is selected
     if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
       // Check if dispatch is enabled
       if (_deliveryDetailsProvider.dispatchEnabled == false) {
@@ -628,7 +628,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       }
 
       // Check if the zone is selected
-      if (_orderSummaryProvider.details is! HomeDelivery) {
+      if (_orderSummaryProvider.deliveryDetails is! Dispatch) {
         errorOrderSummary("Zona de envío no seleccionada.");
         return;
       }
@@ -654,7 +654,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       return;
     }
 
-    // if the delivery method is homeDelivery, set the delivery address
+    // if the delivery method is 'Dispatch', set the delivery address
     if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
       _orderSummaryProvider.setDeliveryAddress(_textEditingControllerAddress.text);
     }
@@ -686,6 +686,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     }
     if (!context.mounted) return;
 
+    // Save input data locally
+    _orderSummaryProvider.storeUserData();
+
     // If the order result has a payment URL, navigate to the PaymentPage
     if (_orderSummaryProvider.orderResult.paymentData != null) {
       final PaymentData paymentData = _orderSummaryProvider.orderResult.paymentData!;
@@ -705,4 +708,5 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       _isSubmitting = false;
     });
   }
+
 }

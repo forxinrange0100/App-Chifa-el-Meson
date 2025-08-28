@@ -7,18 +7,21 @@ import 'package:hive/hive.dart' show Hive;
 
 class InvoiceProvider extends ChangeNotifier {
   final OrderSummaryProvider _orderSummaryProvider;
-  bool _isGettingInvoice = false;
-  DeliveryDetails get deliveryDetails => _orderSummaryProvider.details;
-
+  bool _isDownloadingInvoice = false;
   Order _order = Order.empty();
 
+  DeliveryDetails get deliveryDetails => _orderSummaryProvider.deliveryDetails;
+  bool get isDownloadingInvoice => _isDownloadingInvoice;
   Order get order => _order;
-  bool get isGettingInvoice => _isGettingInvoice;
 
   InvoiceProvider(this._orderSummaryProvider);
 
   Future<void> getOrder() async {
-    _order = await fetchOrderFull(_orderSummaryProvider.orderResult.publicId);
+    try {
+      _order = await fetchOrderFull(_orderSummaryProvider.orderResult.publicId);
+    } catch (_) {
+      rethrow;
+    }
     notifyListeners();
   }
 
@@ -29,12 +32,13 @@ class InvoiceProvider extends ChangeNotifier {
 
   void storeOrder() {
     // Store order in Hive
-    Hive.box(name: 'orders').put(_order.publicId.toString(), _order);
-    Hive.box(name: 'orders').close();
+    final orderBox = Hive.box<Order>(name:'orders');
+    orderBox.put((_order.publicId).toString(), _order);
+    orderBox.close();
   }
 
-  void setIsGettingInvoice(bool value) {
-    _isGettingInvoice = value;
+  void setIsDownloadingInvoice(bool value) {
+    _isDownloadingInvoice = value;
     notifyListeners();
   }
 }

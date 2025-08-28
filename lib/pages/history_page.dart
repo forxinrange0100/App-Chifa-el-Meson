@@ -1,10 +1,13 @@
 import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order, StatusEnum;
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/utils/date_time_chile.dart';
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart' show FontAwesomeIcons;
 import 'package:hive/hive.dart' show Hive;
+import 'package:provider/provider.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -29,16 +32,31 @@ class HistoryPage extends StatelessWidget {
         centerTitle: true,
         titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
         title: const Text(
-          "Historial",
+          "HISTORIAL",
         ),
       ),
       body: orders.isEmpty
           ? Center(
-              child: Text(
-                "No tienes pedidos aún",
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-              ),
-            )
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  FontAwesomeIcons.clipboardList,
+                  size: 60,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 50),
+                  child: const Text("No hay pedidos anteriores", style: TextStyle(fontSize: 20)),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(FontAwesomeIcons.cartShopping),
+                  label: const Text("Ir a comprar"),
+                  onPressed: () {
+                    context.read<BottomNavigationBarProvider>().showHome();
+                  },
+                )
+              ],
+            ))
           : _buildOrderList(orders),
     );
   }
@@ -145,7 +163,7 @@ class HistoryPage extends StatelessWidget {
     final Color color = switch (status) {
       StatusEnum.pending => Colors.orange,
       StatusEnum.completed => Colors.green,
-      StatusEnum.cancelled => Colors.red,
+      StatusEnum.canceled => Colors.red,
       _ => Colors.grey,
     };
 
@@ -153,7 +171,7 @@ class HistoryPage extends StatelessWidget {
     final Color backgroundColor = switch (status) {
       StatusEnum.pending => Colors.orange.withValues(alpha: alpha),
       StatusEnum.completed => Colors.green.withValues(alpha: alpha),
-      StatusEnum.cancelled => Colors.red.withValues(alpha: alpha),
+      StatusEnum.canceled => Colors.red.withValues(alpha: alpha),
       _ => Colors.grey.withValues(alpha: alpha),
     };
 

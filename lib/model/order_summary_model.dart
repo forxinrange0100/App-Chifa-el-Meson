@@ -3,15 +3,17 @@ import 'package:delivera/model/shopping_cart_model.dart';
 import 'package:delivera/model/user_details_model.dart';
 
 class OrderSummary {
-  DeliveryDetails details;
+  DeliveryDetails deliveryDetails;
   UserDetails userDetails;
   ShoppingCart shoppingCart;
   String paymentType;
-  OrderSummary(
-      {required this.details,
-      required this.userDetails,
-      required this.shoppingCart,
-      required this.paymentType});
+  OrderSummary({required this.deliveryDetails, required this.userDetails, required this.shoppingCart, required this.paymentType});
+
+  factory OrderSummary.empty() => OrderSummary(
+      deliveryDetails: PickUp(address: ""),
+      userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
+      shoppingCart: ShoppingCart(),
+      paymentType: "");
 }
 
 abstract class DeliveryDetails {
@@ -23,10 +25,10 @@ class PickUp extends DeliveryDetails {
   PickUp({required this.address});
 }
 
-class HomeDelivery extends DeliveryDetails {
+class Dispatch extends DeliveryDetails {
   String address;
   final DeliveryZone zone;
-  HomeDelivery({required this.address, required this.zone});
+  Dispatch({required this.address, required this.zone});
   @override
   int get cost => zone.price;
 }

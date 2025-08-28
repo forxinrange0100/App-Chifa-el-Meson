@@ -1,0 +1,28 @@
+
+
+import 'package:delivera/model/order_model.dart' show Order;
+import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
+import 'package:hive/hive.dart' show Hive;
+import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
+  Hive.registerAdapter('Order', Order.fromJson);
+  readAll();
+}
+
+void readAll() {
+  final ordersBox = Hive.box<Order>(name: 'orders');
+  final List<Order?> orders = ordersBox.getAll(ordersBox.keys.toList());
+  for (var order in orders) {
+    if (order == null) continue;
+    // Aquí puedes procesar cada order como desees
+    print(order.toJson());
+  }
+}
+
+void deleteAll() {
+  final ordersBox = Hive.box<Order>(name: 'orders');
+  ordersBox.clear();
+}

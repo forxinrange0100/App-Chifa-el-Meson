@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' show log;
 import 'package:delivera/environment.dart';
 import 'package:delivera/errors/errors.dart';
 import 'package:delivera/model/dish_model.dart';
@@ -62,7 +63,7 @@ Future<Order> fetchOrderFull(int publicId) async {
           note: note));
     }
 
-    return Order(
+    Order order= Order(
         id: id,
         publicId: publicId,
         subtotal: subtotal,
@@ -78,6 +79,11 @@ Future<Order> fetchOrderFull(int publicId) async {
         clientEmail: clientEmail,
         clientName: clientName,
         orderProducts: orderProducts);
+
+    log('Order: ${order.toJson()}');
+    log('Es orden?: ${order.runtimeType}');
+
+    return order;
   } catch (e) {
     rethrow;
   }

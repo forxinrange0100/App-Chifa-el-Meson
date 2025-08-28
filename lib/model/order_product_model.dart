@@ -8,7 +8,11 @@ class OrderProduct {
 
   factory OrderProduct.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
-    return OrderProduct(product: Dish.fromJson(map['product']), quantity: map['quantity'], note: map['note']);
+    return OrderProduct(
+      product: Dish.fromJson(map['product']),
+      quantity: map['quantity'],
+      note: map['note'] ?? '',
+    );
   }
 
   Map<String, dynamic> toJson() => {
