@@ -66,12 +66,7 @@ class PaymentPageState extends State<PaymentPage> {
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.contains('/order/')) {
               log('Navigating to invoice page: ${request.url}');
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const InvoicePage(),
-                ),
-              );
+              _navigateInvoice(context);
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
@@ -87,7 +82,6 @@ class PaymentPageState extends State<PaymentPage> {
             <form action="${widget.uri.toString()}" method="POST">
               <input type="hidden" name="token_ws" value="${widget.token}"/>
             </form>
-            <p>Redirigiendo a Transbank...</p>
           </body>
         </html>
       ''';
@@ -102,17 +96,6 @@ class PaymentPageState extends State<PaymentPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              // Navigate to InvoicePage when payment is done or canceled
-              builder: (context) => const InvoicePage(),
-            ),
-          );
-        }
-      },
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
@@ -138,6 +121,17 @@ class PaymentPageState extends State<PaymentPage> {
           ],
         ),
       ),
+    );
+  }
+
+  void _navigateInvoice(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        // Navigate to InvoicePage when payment is done or canceled
+        builder: (context) => const InvoicePage(),
+      ),
+      (route) => false,
     );
   }
 }

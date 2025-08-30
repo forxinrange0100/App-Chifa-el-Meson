@@ -83,7 +83,7 @@ class OrderSummaryProvider extends ChangeNotifier {
         'deliveryZoneId': (_deliveryDetails as Dispatch).zone.id,
         'deliveryAddress': (_deliveryDetails as Dispatch).address,
       });
-    } else {
+    } else if (userBox.get('deliveryZoneId') == null) {
       userBox.putAll({
         'deliveryZoneId': null,
         'deliveryAddress': null,

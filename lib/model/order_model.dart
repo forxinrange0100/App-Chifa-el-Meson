@@ -19,6 +19,7 @@ enum StatusEnum {
   }
 }
 
+/// Represents an order that's retrieved from the server
 class Order {
   final int _id;
   final int publicId;
@@ -56,6 +57,7 @@ class Order {
       : paymentStatusStyle = PaymentStatusStyle(paymentStatus),
         _id = id;
 
+  /// Factory constructor to create an Order with default values
   factory Order.empty() => Order(
       id: 0,
       publicId: 0,
@@ -73,7 +75,7 @@ class Order {
       clientName: '',
       orderProducts: []);
 
-  // Factory constructor to create an Order with some default values
+  /// Factory constructor to create an Order with values for some attributes, and the rest with default values
   factory Order.some({
     int id = 0,
     int publicId = 0,
@@ -109,6 +111,7 @@ class Order {
         orderProducts: orderProducts,
       );
 
+  /// Factory constructor to create an Order from a JSON
   factory Order.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
     return Order(
@@ -126,11 +129,11 @@ class Order {
       clientPhone: map['client_phone'] as String,
       clientEmail: map['client_email'] as String,
       clientName: map['client_name'] as String,
-      // orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))),
-      orderProducts: [],
+      orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))),
     );
   }
 
+  /// Converts an Order to a JSON Map
   Map<String, dynamic> toJson() => {
         'id': _id,
         'public_id': publicId,
@@ -146,7 +149,6 @@ class Order {
         'client_phone': clientPhone,
         'client_email': clientEmail,
         'client_name': clientName,
-        // 'order_products': List<dynamic>.from(orderProducts.map((orderProduct) => orderProduct.toJson)),
-        'order_products': [],
+        'order_products': orderProducts.map((orderProduct) => orderProduct.toJson()).toList(),
       };
 }

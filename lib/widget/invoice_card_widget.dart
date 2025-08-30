@@ -1,3 +1,4 @@
+import 'package:delivera/enum/delivery_detail_enum.dart' show DeliveryDetailEnum;
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/utils/format_date_time.dart';
@@ -12,8 +13,8 @@ class InvoiceCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final invoiceProvider = context.watch<InvoiceProvider>();
-    final restaurantInfoProvider = context.watch<RestaurantInfoProvider>();
+    final InvoiceProvider invoiceProvider = context.watch<InvoiceProvider>();
+    final RestaurantInfoProvider restaurantInfoProvider = context.watch<RestaurantInfoProvider>();
 
     return Expanded(
       child: ListView(
@@ -91,8 +92,7 @@ class InvoiceCardWidget extends StatelessWidget {
                             ),
                             Text(
                               "Pago: ${invoiceProvider.order.paymentStatusStyle.label}",
-                              style: TextStyle(
-                                  color: invoiceProvider.order.paymentStatusStyle.color, fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(color: invoiceProvider.order.paymentStatusStyle.color, fontWeight: FontWeight.bold, fontSize: 15),
                             )
                           ],
                         ),
@@ -117,19 +117,20 @@ class InvoiceCardWidget extends StatelessWidget {
                             Text("Cliente: ${invoiceProvider.order.clientName}")
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              FontAwesomeIcons.locationDot,
-                              size: 15,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text("Dirección: ${invoiceProvider.order.clientAddress}")
-                          ],
-                        ),
+                        if (invoiceProvider.order.deliveryType == DeliveryDetailEnum.dispatch.name)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                FontAwesomeIcons.locationDot,
+                                size: 15,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text("Dirección: ${invoiceProvider.order.clientAddress}")
+                            ],
+                          ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

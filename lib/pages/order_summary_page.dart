@@ -103,6 +103,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         _textEditingControllerFullName.text = lastInputs.name;
         _textEditingControllerEmail.text = lastInputs.email;
         _textEditingControllerPhoneNumber.text = lastInputs.phone;
+        // Verificar validez de los inputs
+        _inputStatusFullName.verify(_textEditingControllerFullName.text);
+        _inputStatusEmail.verify(_textEditingControllerEmail.text);
+        _inputStatusPhoneNumber.verify(_textEditingControllerPhoneNumber.text);
       }
     });
   }
@@ -493,6 +497,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           _orderSummaryProvider.setDeliveryDetailsDispatch(Dispatch(address: "", zone: zone));
                           if (userBox.isNotEmpty && lastInputs.deliveryZoneId == zone.id) {
                             _textEditingControllerAddress.text = lastInputs.deliveryAddress!;
+                            _inputStatusAddress.verify(_textEditingControllerAddress.text);
                           }
                         },
                       );

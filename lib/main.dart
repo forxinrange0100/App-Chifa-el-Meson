@@ -1,5 +1,11 @@
-import 'dart:io' show HttpClient;
+import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
+import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
+import 'package:hive/hive.dart' show Hive;
 import 'package:delivera/model/order_model.dart' show Order;
+import 'model/order_product_model.dart' show OrderProduct;
+import 'model/dish_model.dart' show Dish;
+import 'package:flutter/foundation.dart' show kDebugMode;
+import 'dart:io' show HttpClient;
 import 'package:delivera/pages/home_page.dart' show HomePage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/provider/data_provider.dart' show DataProvider;
@@ -13,11 +19,7 @@ import 'package:delivera/provider/restaurant_info_provider.dart' show Restaurant
 import 'package:delivera/provider/scroll_controller_provider.dart' show ScrollControllerProvider;
 import 'package:delivera/provider/shift_provider.dart' show ShiftProvider;
 import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
-import 'package:hive/hive.dart' show Hive;
-import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
@@ -26,6 +28,7 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
   Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
   Hive.registerAdapter('Order', Order.fromJson);
+  // Para evitar un error en la herramienta Network mientras se debuggea
   if (kDebugMode) {
     HttpClient.enableTimelineLogging = true;
   }

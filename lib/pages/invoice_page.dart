@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:delivera/model/order_model.dart' show Order;
-import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/pages/home_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/invoice_provider.dart';
@@ -10,7 +9,6 @@ import 'package:delivera/utils/pdf/generate_invoice_pdf.dart';
 import 'package:delivera/widget/invoice_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hive/hive.dart' show Hive;
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -34,8 +32,8 @@ class _InvoicePageState extends State<InvoicePage> {
     try {
       if (widget._order == null) {
         await context.read<InvoiceProvider>().getOrder();
-        // ignore_for_file: use_build_context_synchronously
-        // context.read<InvoiceProvider>().storeOrder();
+        // ignore: use_build_context_synchronously
+        context.read<InvoiceProvider>().storeOrder();
       } else {
         context.read<InvoiceProvider>().setOrder(widget._order!);
       }
