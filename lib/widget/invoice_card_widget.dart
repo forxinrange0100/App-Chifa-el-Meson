@@ -71,7 +71,7 @@ class InvoiceCardWidget extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(formatDateTime(invoiceProvider.order.timestamp))
+                      Text(formatDateTime(invoiceProvider.order.timestampChile))
                     ],
                   ),
                   Padding(

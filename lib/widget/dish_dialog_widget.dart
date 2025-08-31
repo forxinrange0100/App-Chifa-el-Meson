@@ -205,7 +205,7 @@ class _DishDialogState extends State<DishDialog> {
               return;
             }
             if (!context.read<ShiftProvider>().isOpen) {
-              shiftIsCloseToast();
+              shiftClosedToast();
               return;
             }
             context

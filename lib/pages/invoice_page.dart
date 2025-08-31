@@ -52,12 +52,14 @@ class _InvoicePageState extends State<InvoicePage> {
   @override
   void initState() {
     super.initState();
-    _isOrderFetched = _getOrder();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isOrderFetched = _getOrder();
+      setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder<bool>(
       future: _isOrderFetched,
       builder: (context, snapshot) {
@@ -71,7 +73,7 @@ class _InvoicePageState extends State<InvoicePage> {
           return _reloading
               ? _loadingScreen()
               : PopScope(
-                  canPop: false,
+                  canPop: widget._order == null ? false : true,
                   onPopInvokedWithResult: (didPop, _) {
                     if (!didPop) {
                       _navigateHome(context);
@@ -87,8 +89,7 @@ class _InvoicePageState extends State<InvoicePage> {
                       centerTitle: true,
                       leading: IconButton(
                           onPressed: () {
-                            context.read<BottomNavigationBarProvider>().showHome();
-                            _navigateHome(context);
+                            widget._order == null ? _navigateHome(context) : Navigator.pop(context);
                           },
                           icon: const Icon(Icons.arrow_back, color: Colors.black)),
                       title: const Text("BOLETA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -151,7 +152,7 @@ class _InvoicePageState extends State<InvoicePage> {
                                     context.read<BottomNavigationBarProvider>().showHome();
                                     _navigateHome(context);
                                   },
-                                  child: const Text("Volver a la tienda")),
+                                  child: Text(widget._order == null ? "Volver a la tienda" : "Volver al historial")),
                             )
                           ],
                         )
@@ -172,6 +173,7 @@ class _InvoicePageState extends State<InvoicePage> {
   }
 
   void _navigateHome(BuildContext context) {
+    context.read<BottomNavigationBarProvider>().showHome();
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
@@ -213,7 +215,7 @@ class _InvoicePageState extends State<InvoicePage> {
     if (!context.mounted) return;
     final pdfBytes = await pdfDocument.save();
     final directory = await getTemporaryDirectory();
-    final tempFile = File('${directory.path}/orden-${order.publicId}-${order.timestamp.toIso8601String()}.pdf');
+    final tempFile = File('${directory.path}/orden-${order.publicId}-${order.timestampChile.toIso8601String()}.pdf');
     await tempFile.writeAsBytes(pdfBytes);
     OpenFilex.open(tempFile.path);
     if (!context.mounted) {

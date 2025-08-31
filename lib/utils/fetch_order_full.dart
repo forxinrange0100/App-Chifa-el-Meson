@@ -5,7 +5,6 @@ import 'package:delivera/errors/errors.dart';
 import 'package:delivera/model/dish_model.dart';
 import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/model/order_model.dart';
-import 'package:delivera/utils/date_time_chile.dart';
 import 'package:http/http.dart' as http;
 
 Future<Order> fetchOrderFull(int publicId) async {
@@ -22,7 +21,7 @@ Future<Order> fetchOrderFull(int publicId) async {
     final int id = result['order']['id'];
     final int subtotal = result['order']['subtotal'];
     final int total = result['order']['total'];
-    final DateTime timestamp = dateTimeChile(DateTime.parse(result['order']['timestamp']));
+    final DateTime timestamp = DateTime.parse(result['order']['timestamp']);
     final String deliveryType = result['order']['delivery_type'];
     final int deliveryCost = result['order']['delivery_cost'];
     final String status = result['order']['status'];

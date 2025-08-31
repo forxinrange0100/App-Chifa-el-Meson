@@ -22,7 +22,7 @@ void closeAppToast() {
   );
 }
 
-void shiftIsCloseToast() {
+void shiftClosedToast() {
   toastification.show(
     icon: const Icon(FontAwesomeIcons.solidCircleCheck),
     title: const Text('Restaurant Cerrado'),

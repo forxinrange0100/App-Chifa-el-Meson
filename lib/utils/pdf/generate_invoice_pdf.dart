@@ -59,7 +59,7 @@ Future<pw.Document> generateInvoicePdf(Order order, RestaurantInfo restaurantInf
                     ),
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.center,
-                      children: [pw.Image(clock, height: 15), pw.SizedBox(width: 10), pw.Text(formatDateTime(order.timestamp))],
+                      children: [pw.Image(clock, height: 15), pw.SizedBox(width: 10), pw.Text(formatDateTime(order.timestampChile))],
                     ),
                     pw.Padding(
                         padding: const pw.EdgeInsets.symmetric(vertical: 8.0),

@@ -1,5 +1,6 @@
 import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/model/payment_status_style_model.dart';
+import 'package:delivera/utils/date_time_chile.dart';
 
 enum StatusEnum {
   pending('Pendiente'),
@@ -37,6 +38,7 @@ class Order {
   final String clientEmail;
   final String clientName;
   final List<OrderProduct> orderProducts;
+  DateTime get timestampChile => dateTimeChile(timestamp);
 
   Order(
       {required int id,

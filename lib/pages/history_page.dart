@@ -1,7 +1,7 @@
 import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order, StatusEnum;
+import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
-import 'package:delivera/utils/date_time_chile.dart';
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,7 @@ class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ordersBox = Hive.box<Order>(name: 'orders');
-    final List<Order?> orders = ordersBox.getAll(ordersBox.keys.toList());
+    final List<Order?> orders = ordersBox.getAll(ordersBox.keys).reversed.toList();
     // addFakeOrders();
     for (var order in orders) {
       if (order == null) continue;
@@ -79,7 +79,7 @@ class HistoryPage extends StatelessWidget {
         child: ListView.separated(
           // itemExtent: 70,
           itemCount: orders.length,
-          itemBuilder: (context, index) => _orderItem(orders[index]!),
+          itemBuilder: (context, index) => _orderItem(context, orders[index]!),
           separatorBuilder: (context, index) => Divider(
             color: Color.fromARGB(255, 0, 0, 0),
             thickness: 1,
@@ -90,72 +90,77 @@ class HistoryPage extends StatelessWidget {
     ]);
   }
 
-  Widget _orderItem(Order order) {
-    final [String date, String time] = formatDateTime(dateTimeChile(order.timestamp)).split(', ');
+  Widget _orderItem(BuildContext context, Order order) {
+    final [String date, String time] = formatDateTime(order.timestampChile).split(', ');
     final DeliveryDetailEnum deliveryType = DeliveryDetailEnum.fromName(order.deliveryType);
     final StatusEnum status = StatusEnum.fromName(order.status);
 
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
-            child: Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                TableRow(children: [
-                  Text(
-                    'Pedido #${order.publicId}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    date,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    textAlign: TextAlign.end,
-                  ),
-                ]),
-                TableRow(children: [
-                  Text(
-                    formatPrice(order.total),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    time,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    textAlign: TextAlign.end,
-                  ),
-                ]),
-                TableRow(children: [
-                  orderStatusChip(status),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: switch (deliveryType) {
-                      DeliveryDetailEnum.pickup => [
-                          Icon(Icons.store, size: 16),
-                          SizedBox(width: 4),
-                          Text("Recoger", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
-                        ],
-                      DeliveryDetailEnum.dispatch => [
-                          Icon(Icons.motorcycle, size: 16),
-                          SizedBox(width: 4),
-                          Text("Domicilio", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
-                        ],
-                      _ => [],
-                    },
-                  )
-                ])
-              ],
+    return TextButton(
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => InvoicePage(order: order)));
+      },
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: [
+                  TableRow(children: [
+                    Text(
+                      'Pedido #${order.publicId}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      date,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      textAlign: TextAlign.end,
+                    ),
+                  ]),
+                  TableRow(children: [
+                    Text(
+                      formatPrice(order.total),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    Text(
+                      time,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      textAlign: TextAlign.end,
+                    ),
+                  ]),
+                  TableRow(children: [
+                    orderStatusChip(status),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: switch (deliveryType) {
+                        DeliveryDetailEnum.pickup => [
+                            Icon(Icons.store, size: 16),
+                            SizedBox(width: 4),
+                            Text("Recoger", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
+                          ],
+                        DeliveryDetailEnum.dispatch => [
+                            Icon(Icons.motorcycle, size: 16),
+                            SizedBox(width: 4),
+                            Text("Domicilio", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
+                          ],
+                        _ => [],
+                      },
+                    )
+                  ])
+                ],
+              ),
             ),
           ),
-        ),
-        // VerticalDivider(color: const Color.fromARGB(255, 0, 0, 0), thickness: 1, ),
-        Container(
-          height: 70,
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(border: BoxBorder.fromLTRB(left: BorderSide())),
-          child: status == StatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
-        ),
-      ],
+          // VerticalDivider(color: const Color.fromARGB(255, 0, 0, 0), thickness: 1, ),
+          Container(
+            height: 70,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(border: BoxBorder.fromLTRB(left: BorderSide())),
+            child: status == StatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
+          ),
+        ],
+      ),
     );
   }
 

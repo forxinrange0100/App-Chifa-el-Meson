@@ -20,8 +20,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<bool> _data = Future.value(false);
+  late Future<bool>? _data;
   late DataProvider _dataProvider;
+  final List<Widget> pages = const [
+    HomeInfoPage(),
+    ShoppingCartPage(),
+    HistoryPage(),
+  ];
 
   Future<bool> _getData() async {
     await context.read<DataProvider>().getData();
@@ -33,30 +38,26 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // Quitar splash despues de 3 segundos o al cargar los datos
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && context.read<DataProvider>().done) {
-        FlutterNativeSplash.remove();
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Quitar splash despues de 3 segundos o al cargar los datos
+      Future.delayed(const Duration(seconds: 3), () async {
+        if (mounted && context.read<DataProvider>().done) {
+          FlutterNativeSplash.remove();
+        }
+      });
+      _data = _getData();
+      setState(() {});
     });
-    _data = _getData();
   }
-
 
   @override
   Widget build(BuildContext context) {
     DateTime? lastPressedAt;
     _dataProvider = context.watch<DataProvider>();
-    final List<Widget> pages = [
-      const HomeInfoPage(),
-      const ShoppingCartPage(),
-      const HistoryPage(),
-    ];
 
     return FutureBuilder<bool>(
       future: _data,
       builder: (context, snapshot) {
-        
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             backgroundColor: Colors.white,
@@ -81,7 +82,7 @@ class _HomePageState extends State<HomePage> {
             canPop: false,
             onPopInvokedWithResult: (didPop, _) {
               if (!didPop) {
-                if (context.read<BottomNavigationBarProvider>().index == BottomNavigationBarEnum.shoppingCar.index) {
+                if (context.read<BottomNavigationBarProvider>().index != BottomNavigationBarEnum.home.index) {
                   context.read<BottomNavigationBarProvider>().showHome();
                   return;
                 }
@@ -116,11 +117,9 @@ class _HomePageState extends State<HomePage> {
                           currentIndex: bottomNavigationProvider.index,
                           onTap: (int index) async {
                             final BottomNavigationBarEnum bottomNavigationBarEnum = BottomNavigationBarEnum.values[index];
-                            if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar) {
-                              if (!context.read<ShiftProvider>().isOpen) {
-                                shiftIsCloseToast();
+                            if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar && !context.read<ShiftProvider>().isOpen) {
+                                shiftClosedToast();
                                 return;
-                              }
                             }
                             bottomNavigationProvider.setIndex(bottomNavigationBarEnum);
                           },
