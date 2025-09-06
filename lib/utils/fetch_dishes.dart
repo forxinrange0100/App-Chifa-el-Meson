@@ -23,19 +23,7 @@ Future<Dishes> fetchDishes() async {
       final products = result['products'];
       List<Dish> dishes = [];
       for (var product in products) {
-        dishes.add(Dish(
-            id: product['id'],
-            createdAt: DateTime.parse(product['created_at']),
-            updatedAt: DateTime.parse(product['updated_at']),
-            name: product['name'],
-            description: product['description'],
-            regularPrice: product['regular_price'],
-            discountedPrice: product['discounted_price'],
-            image: "${Urls.apiUrl}/storage/${product['image']}",
-            categoryId: product['category_id'] ?? 0,
-            enabled: product['enabled'] == 1 ? true : false,
-            displayOrder: product['display_order'],
-            units: product['units']));
+        dishes.add(Dish.fromJson(product));
       }
       return Dishes(dishes: dishes);
     } else {

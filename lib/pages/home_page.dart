@@ -7,6 +7,7 @@ import 'package:delivera/provider/data_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
+import 'package:delivera/widget/loading_screen_widget.dart' show LoadingScreenWidget;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -20,13 +21,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<bool>? _data;
+  Future<bool>? _data;
   late DataProvider _dataProvider;
-  final List<Widget> pages = const [
-    HomeInfoPage(),
-    ShoppingCartPage(),
-    HistoryPage(),
-  ];
 
   Future<bool> _getData() async {
     await context.read<DataProvider>().getData();
@@ -59,24 +55,7 @@ class _HomePageState extends State<HomePage> {
       future: _data,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    color: Colors.blue,
-                    backgroundColor: Colors.grey,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Text("Estamos cargando todo para ti, espera un momento...", textAlign: TextAlign.center),
-                  )
-                ],
-              ),
-            ),
-          );
+          return LoadingScreenWidget();
         } else if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
           return PopScope(
             canPop: false,
@@ -99,48 +78,7 @@ class _HomePageState extends State<HomePage> {
               }
             },
             child: _dataProvider.done && _dataProvider.errorMessage.isEmpty
-                ? Consumer<BottomNavigationBarProvider>(
-                    builder: (context, bottomNavigationProvider, child) {
-                      return Scaffold(
-                        resizeToAvoidBottomInset: false,
-                        backgroundColor: Colors.white,
-                        body: Stack(
-                          children: [
-                            pages[bottomNavigationProvider.index],
-                            if (bottomNavigationProvider.isLoading)
-                              const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                          ],
-                        ),
-                        bottomNavigationBar: BottomNavigationBar(
-                          currentIndex: bottomNavigationProvider.index,
-                          onTap: (int index) async {
-                            final BottomNavigationBarEnum bottomNavigationBarEnum = BottomNavigationBarEnum.values[index];
-                            if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar && !context.read<ShiftProvider>().isOpen) {
-                                shiftClosedToast();
-                                return;
-                            }
-                            bottomNavigationProvider.setIndex(bottomNavigationBarEnum);
-                          },
-                          items: [
-                            const BottomNavigationBarItem(
-                              icon: Icon(Icons.home),
-                              label: "Inicio",
-                            ),
-                            BottomNavigationBarItem(
-                              icon: CartIconWidget(),
-                              label: "Carrito",
-                            ),
-                            const BottomNavigationBarItem(
-                              icon: Icon(Icons.history),
-                              label: "Historial",
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  )
+                ? _HomeBuilder()
                 : !_dataProvider.done
                     ? const Scaffold(
                         backgroundColor: Colors.white,
@@ -168,10 +106,64 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class CartIconWidget extends StatelessWidget {
-  const CartIconWidget({
-    super.key,
-  });
+class _HomeBuilder extends StatelessWidget {
+  const _HomeBuilder();
+
+  final List<Widget> pages = const [
+    HomeInfoPage(),
+    ShoppingCartPage(),
+    HistoryPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<BottomNavigationBarProvider>(
+      builder: (context, bottomNavigationProvider, child) {
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              pages[bottomNavigationProvider.index],
+              if (bottomNavigationProvider.isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: bottomNavigationProvider.index,
+            onTap: (int index) async {
+              final BottomNavigationBarEnum bottomNavigationBarEnum = BottomNavigationBarEnum.values[index];
+              if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar && !context.read<ShiftProvider>().isOpen) {
+                shiftClosedToast();
+                return;
+              }
+              bottomNavigationProvider.setIndex(bottomNavigationBarEnum);
+            },
+            items: [
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: "Inicio",
+              ),
+              BottomNavigationBarItem(
+                icon: _CartIconWidget(),
+                label: "Carrito",
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.history),
+                label: "Historial",
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CartIconWidget extends StatelessWidget {
+  const _CartIconWidget();
 
   @override
   Widget build(BuildContext context) {

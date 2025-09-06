@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:delivera/model/dish_model.dart' show Dish;
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
@@ -9,26 +12,37 @@ import 'package:delivera/widget/expandable_text_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart' show Hive;
 import 'package:provider/provider.dart';
+
+import '../model/order_model.dart' show Order;
 
 class HomeInfoPage extends StatelessWidget {
   const HomeInfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final ordersBox = Hive.box<Order>(name: 'orders');
+    final Order? lastOrder = ordersBox.get(ordersBox.keys.last);
+
     return CustomScrollView(
       controller: context.watch<ScrollControllerProvider>().scrollController,
       slivers: [
         SliverToBoxAdapter(
           child: _buildHeaderRestaurantInfo(context),
         ),
+        if (lastOrder != null)
+          SliverToBoxAdapter(
+            child: _ShowLastOrder(lastOrder),
+          ),
         SliverAppBar(
           pinned: true,
           floating: false,
           primary: false,
+          expandedHeight: 50,
+          collapsedHeight: 70,
           backgroundColor: Colors.white,
           shadowColor: Colors.black,
-          collapsedHeight: 80,
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
             title: _buildCategories(context),
@@ -149,7 +163,7 @@ class HomeInfoPage extends StatelessWidget {
     return Row(
       spacing: 5,
       children: [
-        Icon(icon, color: color ?? Colors.white,),
+        Icon(icon, color: color ?? Colors.white),
         Expanded(
             child: Text(
           text.trim(),
@@ -232,7 +246,7 @@ class HomeInfoPage extends StatelessWidget {
                                           color: Colors.white,
                                           width: double.infinity,
                                           child: ElevatedButton(
-                                            style: cardItemStyle(),
+                                            style: _cardItemStyle(),
                                             onPressed: () {
                                               showDialog(
                                                 context: context,
@@ -290,8 +304,7 @@ class HomeInfoPage extends StatelessWidget {
                                                         ),
                                                       ),
                                                       CachedNetworkImage(
-                                                        imageUrl:
-                                                            dish.image.endsWith("null") ? "https://chifaelmeson.cl/img/default.webp" : dish.image,
+                                                        imageUrl: dish.imageUrl,
                                                         width: 170,
                                                         fit: BoxFit.cover,
                                                         placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
@@ -341,7 +354,7 @@ class HomeInfoPage extends StatelessWidget {
     );
   }
 
-  ButtonStyle cardItemStyle() {
+  ButtonStyle _cardItemStyle() {
     return const ButtonStyle(
       backgroundColor: WidgetStatePropertyAll(Colors.white),
       foregroundColor: WidgetStatePropertyAll(Colors.black),
@@ -350,6 +363,83 @@ class HomeInfoPage extends StatelessWidget {
           borderRadius: BorderRadius.zero,
         ),
       ),
+    );
+  }
+}
+
+class _ShowLastOrder extends StatelessWidget {
+  final Order _order;
+  const _ShowLastOrder(Order order) : _order = order;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ElevatedButton.icon(
+        onPressed: () => _lastOrderModal(context),
+        style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.black)),
+        iconAlignment: IconAlignment.end,
+        icon: const Icon(Icons.open_in_new, color: Colors.white),
+        label: Text('Ver último pedido', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
+  Future<void> _lastOrderModal(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          insetPadding: EdgeInsets.symmetric(horizontal: 20),
+          titlePadding: const EdgeInsets.only(top: 20),
+          contentPadding: const EdgeInsets.all(10),
+          actionsPadding: const EdgeInsets.all(0),
+          title: Center(child: const Text('ÚLTIMA ORDEN')),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                ListBody(
+                  children: _order.orderProducts.map((orderProduct) {
+                    return Row(
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: orderProduct.product.imageUrl,
+                          width: 50,
+                          height: 50,
+                          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) => const Icon(Icons.error),
+                        ),
+                        Expanded(child: Text(orderProduct.product.name)),
+                        VerticalDivider(),
+                        Text('x${orderProduct.quantity}'),
+                        VerticalDivider(),
+                        Text(orderProduct.formattedTotalPrice),
+                      ],
+                    );
+                  }).toList(),
+                ),
+                const Divider(
+                  thickness: 1,
+                  color: Colors.black,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('Subtotal: ${_order.formattedSubtotal}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cerrar'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text("Volver a pedir"),
+              onPressed: () {},
+            ),
+          ],
+        );
+      },
     );
   }
 }

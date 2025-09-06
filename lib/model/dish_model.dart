@@ -1,3 +1,7 @@
+import 'package:delivera/environment.dart' show Urls;
+import 'package:delivera/utils/conversions.dart';
+import '../utils/format_price.dart' show formatPrice;
+
 class Dish {
   final int id;
   final DateTime createdAt;
@@ -5,14 +9,22 @@ class Dish {
   final String name;
   final String description;
   final int regularPrice;
-  final int? _discountedPrice;
-  final String image;
-  final int categoryId;
-  final bool enabled;
+  late final int discountedPrice;
+  final String? image;
+  late final int categoryId;
+  late final bool enabled;
   final int displayOrder;
   final int units;
 
-  int get discountedPrice => _discountedPrice ?? 0;
+  int get price => discountedPrice != 0 ? discountedPrice : regularPrice;
+
+  String get formattedPrice => formatPrice(price);
+
+  String get formattedDiscountedPrice => formatPrice(discountedPrice);
+
+  String get formattedRegularPrice => formatPrice(regularPrice);
+
+  String get imageUrl => image == null || image!.endsWith('null') ? 'https://chifaelmeson.cl/img/default.webp' : "${Urls.apiUrl}/storage/$image";
 
   Dish(
       {required this.id,
@@ -22,12 +34,14 @@ class Dish {
       required this.description,
       required this.regularPrice,
       int? discountedPrice,
-      required this.image,
-      required this.categoryId,
-      required this.enabled,
+      this.image,
+      int? categoryId,
+      required int enabled,
       required this.displayOrder,
       required this.units})
-      : _discountedPrice = discountedPrice;
+      : discountedPrice = discountedPrice ?? 0,
+        categoryId = categoryId ?? 0,
+        enabled = intToBool(enabled);
 
   factory Dish.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
@@ -41,7 +55,7 @@ class Dish {
         discountedPrice: map['discounted_price'],
         image: map['image'],
         categoryId: map['category_id'],
-        enabled: map['enabled'] == 1 ? true : false,
+        enabled: map['enabled'],
         displayOrder: map['display_order'],
         units: map['units']);
   }
@@ -56,7 +70,7 @@ class Dish {
         'discounted_price': discountedPrice,
         'image': image,
         'category_id': categoryId,
-        'enabled': enabled ? 1 : 0,
+        'enabled': boolToInt(enabled),
         'display_order': displayOrder,
         'units': units
       };

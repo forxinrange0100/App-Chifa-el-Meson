@@ -31,16 +31,13 @@ class _DishDialogState extends State<DishDialog> {
           height: 600,
           width: 400,
           child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
             child: Scrollbar(
               thumbVisibility: true,
               child: ListView(
                 children: [
                   CachedNetworkImage(
-                    imageUrl: widget.dish.image.endsWith("null")
-                                ? "https://chifaelmeson.cl/img/default.webp"
-                                : widget.dish.image,
+                    imageUrl: widget.dish.imageUrl,
                     height: 300,
                     fit: BoxFit.cover,
                   ),
@@ -56,10 +53,7 @@ class _DishDialogState extends State<DishDialog> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     "Ahorras un ${((1 - (widget.dish.discountedPrice / widget.dish.regularPrice)) * 100).toStringAsFixed(0)}%",
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               )
@@ -68,8 +62,7 @@ class _DishDialogState extends State<DishDialog> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             widget.dish.name,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ),
                         ExpandableText(
@@ -81,17 +74,11 @@ class _DishDialogState extends State<DishDialog> {
                             child: widget.dish.discountedPrice != 0
                                 ? Row(
                                     children: [
-                                      PriceWidget(
-                                          price: widget.dish.discountedPrice,
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.bold),
+                                      PriceWidget(price: widget.dish.discountedPrice, fontSize: 25, fontWeight: FontWeight.bold),
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      PriceWidget(
-                                          price: widget.dish.regularPrice,
-                                          textDecoration:
-                                              TextDecoration.lineThrough)
+                                      PriceWidget(price: widget.dish.regularPrice, textDecoration: TextDecoration.lineThrough)
                                     ],
                                   )
                                 : PriceWidget(
@@ -100,14 +87,10 @@ class _DishDialogState extends State<DishDialog> {
                                     fontSize: 25,
                                   )),
                         const Divider(),
-                        const Text("Cantidad",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        const Text("Cantidad", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                         Center(
                           child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(10)),
+                            decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -121,8 +104,7 @@ class _DishDialogState extends State<DishDialog> {
                                     child: const Text("-")),
                                 Text(
                                   _counter.toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 TextButton(
                                     onPressed: () {
@@ -136,18 +118,14 @@ class _DishDialogState extends State<DishDialog> {
                           ),
                         ),
                         const Divider(),
-                        const Text("Notas",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        const Text("Notas", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                         TextField(
                           controller: _notesController,
                           maxLines: 3,
                           decoration: InputDecoration(
                             hintText: "Escribe aquí tus notas...",
                             border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.black,
-                                  style: BorderStyle.solid),
+                              borderSide: const BorderSide(color: Colors.black, style: BorderStyle.solid),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -169,8 +147,7 @@ class _DishDialogState extends State<DishDialog> {
         ),
         Container(
           decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -198,8 +175,7 @@ class _DishDialogState extends State<DishDialog> {
       actionsPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       actions: [
         ElevatedButton(
-          style: const ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll<Color>(Colors.green)),
+          style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll<Color>(Colors.green)),
           onPressed: () async {
             if (!context.mounted) {
               return;
@@ -208,9 +184,7 @@ class _DishDialogState extends State<DishDialog> {
               shiftClosedToast();
               return;
             }
-            context
-                .read<ShoppingCartProvider>()
-                .addCardItem(widget.dish, _counter, _notesController.text);
+            context.read<ShoppingCartProvider>().addCardItem(widget.dish, _counter, _notesController.text);
             addingCartItemToast();
             Navigator.of(context).pop();
           },
@@ -218,17 +192,12 @@ class _DishDialogState extends State<DishDialog> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               PriceWidget(
-                price: widget.dish.discountedPrice != 0
-                    ? _counter * widget.dish.discountedPrice
-                    : _counter * widget.dish.regularPrice,
+                price: widget.dish.price * _counter,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-              const Text(
-                "AGREGAR",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              const Text("AGREGAR", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ],
           ),
         ),

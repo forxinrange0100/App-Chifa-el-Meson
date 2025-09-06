@@ -7,6 +7,7 @@ import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/utils/pdf/generate_invoice_pdf.dart';
 import 'package:delivera/widget/invoice_card_widget.dart';
+import 'package:delivera/widget/loading_screen_widget.dart' show LoadingScreenWidget;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:open_filex/open_filex.dart';
@@ -67,11 +68,11 @@ class _InvoicePageState extends State<InvoicePage> {
 
         if (snapshot.connectionState == ConnectionState.waiting) {
           log('ConnectionState: waiting');
-          return _loadingScreen();
+          return LoadingScreenWidget();
         } else if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
           log('ConnectionState: done');
           return _reloading
-              ? _loadingScreen()
+              ? LoadingScreenWidget()
               : PopScope(
                   canPop: widget._order == null ? false : true,
                   onPopInvokedWithResult: (didPop, _) {
@@ -180,27 +181,6 @@ class _InvoicePageState extends State<InvoicePage> {
         builder: (context) => const HomePage(),
       ),
       (route) => false,
-    );
-  }
-
-  Scaffold _loadingScreen() {
-    return const Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              color: Colors.blue,
-              backgroundColor: Colors.grey,
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text("Estamos cargando la boleta para ti, espera un momento...", textAlign: TextAlign.center),
-            )
-          ],
-        ),
-      ),
     );
   }
 
