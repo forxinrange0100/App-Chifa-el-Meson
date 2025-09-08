@@ -14,114 +14,131 @@ class ShoppingCartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ShoppingCartProvider>(
       builder: (context, shoppingCartProvider, child) {
-        return shoppingCartProvider.length > 0
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
+        if (shoppingCartProvider.length > 0) {
+          return Scaffold(
+            appBar: AppBar(
+              surfaceTintColor: Colors.white,
+              backgroundColor: Colors.white,
+              shadowColor: Colors.black,
+              elevation: 2,
+              leading: IconButton(
+                onPressed: () => context.read<BottomNavigationBarProvider>().showHome(),
+                icon: const Icon(FontAwesomeIcons.arrowLeft, color: Colors.black),
+              ),
+              centerTitle: true,
+              title: const Text(
+                "CARRITO",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+            body: Column(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.68,
+                  ),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    separatorBuilder: (context, index) => const Divider(
+                      height: 0,
+                      thickness: 2,
+                    ),
+                    itemCount: shoppingCartProvider.shoppingCart.cartItems.length,
+                    itemBuilder: (context, index) => CartItemWidget(cartItem: shoppingCartProvider.shoppingCart.cartItems[index]),
+                  ),
+                ),
+                Expanded(child: Container(color: Colors.grey.shade300)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppBar(
-                        surfaceTintColor: Colors.white,
-                        backgroundColor: Colors.white,
-                        shadowColor: Colors.black,
-                        elevation: 2,
-                        leading: IconButton(
-                            onPressed: () {
-                              context
-                                  .read<BottomNavigationBarProvider>()
-                                  .showHome();
-                            },
-                            icon: const Icon(FontAwesomeIcons.arrowLeft, color: Colors.black,)),
-                        centerTitle: true,
-                        title: const Text(
-                          "CARRITO",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                      TextButton.icon(
+                        onPressed: () => shoppingCartProvider.cleanShoppingCart(),
+                        label: Text('Vaciar carrito', style: TextStyle(color: Colors.red.shade700, fontSize: 16)),
+                        icon: Icon(
+                          FontAwesomeIcons.trash,
+                          color: Colors.red.shade700,
+                          size: 16,
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.all(0),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          minimumSize: Size(double.infinity, 32),
                         ),
                       ),
-                    ],
-                  ),
-                  Expanded(
-                    child: ListView(
-                      children: shoppingCartProvider.cardItems.map((cartItem) {
-                        return CartItemWidget(cartItem: cartItem);
-                      }).toList(),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        right: 8.0, left: 8.0, bottom: 8.0),
-                    child: Column(
-                      children: [
-                        const Divider(),
-                        Row(
+                      const Divider(
+                        height: 0,
+                        thickness: 1,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
                               "Subtotal",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 20),
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
                             ),
                             PriceWidget(
-                              price: shoppingCartProvider
-                                  .shoppingCart.shoppingCartDiscountedPrice,
+                              price: shoppingCartProvider.shoppingCart.discountedPrice,
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
                             )
                           ],
                         ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(
-                                builder: (context) {
-                                  return const OrderSummaryPage();
-                                },
-                              ));
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return const OrderSummaryPage();
                             },
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Realizar pedido",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Icon(FontAwesomeIcons.arrowRight)
-                              ],
-                            ))
-                      ],
-                    ),
-                  )
-                ],
-              )
-            : Center(
-                child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    FontAwesomeIcons.boxOpen,
-                    size: 60,
+                          ));
+                        },
+                        iconAlignment: IconAlignment.end,
+                        icon: const Icon(FontAwesomeIcons.arrowRight),
+                        label: SizedBox(
+                          width: double.infinity,
+                          child: const Text(
+                            "Realizar pedido",
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                  const Text(
-                    "No hay productos en el carrito",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<BottomNavigationBarProvider>().showHome();
-                    },
-                    icon: const Icon(FontAwesomeIcons.cartShopping),
-                    label: const Text("Ir a comprar"),
-                  )
-                ],
-              ));
+                )
+              ],
+            ),
+          );
+        } else {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  FontAwesomeIcons.boxOpen,
+                  size: 60,
+                ),
+                const Text(
+                  "No hay productos en el carrito",
+                  style: TextStyle(fontSize: 20),
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    context.read<BottomNavigationBarProvider>().showHome();
+                  },
+                  icon: const Icon(FontAwesomeIcons.cartShopping),
+                  label: const Text("Ir a comprar"),
+                )
+              ],
+            ),
+          );
+        }
       },
     );
   }

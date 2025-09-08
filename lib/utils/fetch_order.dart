@@ -19,7 +19,7 @@ Future<PaymentResult> fetchOrder(OrderSummary orderSummary) async {
         return {
           "product_id": cartItem.dish.id,
           "quantity": cartItem.quantity,
-          "product_note": cartItem.preferenceNote,
+          "product_note": cartItem.notes,
         };
       }).toList(),
       "client": {

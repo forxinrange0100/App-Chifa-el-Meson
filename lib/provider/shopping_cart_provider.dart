@@ -4,27 +4,33 @@ import 'package:delivera/model/shopping_cart_model.dart';
 import 'package:flutter/material.dart';
 
 class ShoppingCartProvider extends ChangeNotifier {
-  ShoppingCart _cardItems = ShoppingCart();
+  ShoppingCart _shoppingCart = ShoppingCart();
+
+  ShoppingCart get shoppingCart => _shoppingCart;
 
   ShoppingCartProvider();
 
-  int get length => _cardItems.cartItems.length;
-  List<CartItem> get cardItems => _cardItems.cartItems;
-  ShoppingCart get shoppingCart => _cardItems;
+  /// Number of items in the cart
+  int get length => _shoppingCart.cartItems.length;
+  /// List of all cart items
+  List<CartItem> get cartItems => _shoppingCart.cartItems;
+  /// Total price of the cart without discounts
+  int get subtotal => _shoppingCart.regularPrice;
+  /// Total price of the cart with discounts applied
+  int get discount => _shoppingCart.regularPrice - _shoppingCart.discountedPrice;
 
-  int get subtotal => _cardItems.shoppingCartRegularPrice;
-  int get discount =>
-      _cardItems.shoppingCartRegularPrice -
-      _cardItems.shoppingCartDiscountedPrice;
-
-  void addCardItem(Dish dish, int quantity, String preferenceNote) {
-    _cardItems.cartItems.add(CartItem(
-        dish: dish, quantity: quantity, preferenceNote: preferenceNote));
+  void addCartItem(Dish dish, int quantity, String preferenceNote) {
+    _shoppingCart.cartItems.add(CartItem(dish: dish, quantity: quantity, notes: preferenceNote));
     notifyListeners();
   }
 
-  void removeCardItem(String id) {
-    _cardItems.cartItems = _cardItems.cartItems.where((cartItem) {
+  void addCartItems(List<CartItem> items) {
+    _shoppingCart.cartItems.addAll(items);
+    notifyListeners();
+  }
+
+  void removeCartItem(String id) {
+    _shoppingCart.cartItems = _shoppingCart.cartItems.where((cartItem) {
       return cartItem.id != id;
     }).toList();
     notifyListeners();
@@ -42,9 +48,9 @@ class ShoppingCartProvider extends ChangeNotifier {
   }
 
   void setPreference(String id, String preference) {
-    _cardItems.cartItems = _cardItems.cartItems.map((cartItem) {
+    _shoppingCart.cartItems = _shoppingCart.cartItems.map((cartItem) {
       if (cartItem.id == id) {
-        cartItem.preferenceNote = preference;
+        cartItem.notes = preference;
       }
       return cartItem;
     }).toList();
@@ -52,7 +58,7 @@ class ShoppingCartProvider extends ChangeNotifier {
   }
 
   void cleanShoppingCart() {
-    _cardItems = ShoppingCart();
+    _shoppingCart = ShoppingCart();
     notifyListeners();
   }
 }

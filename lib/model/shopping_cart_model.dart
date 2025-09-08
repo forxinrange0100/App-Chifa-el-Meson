@@ -2,15 +2,13 @@ import 'package:delivera/model/cart_item_model.dart';
 
 class ShoppingCart {
   List<CartItem> cartItems = [];
-  ShoppingCart();
-  int get shoppingCartRegularPrice => cartItems.fold(
-      0, (total, cartItem) => total + cartItem.cartItemRegularPrice);
 
-  int get shoppingCartDiscountedPrice => cartItems.fold(
-      0,
-      (total, cartItem) =>
-          total +
-          (cartItem.cartItemDisccountedPrice != 0
-              ? cartItem.cartItemDisccountedPrice
-              : cartItem.cartItemRegularPrice));
+  /// Total price of the cart without discount
+  int get regularPrice => cartItems.fold(0, (total, cartItem) => total + cartItem.regularPrice);
+
+  /// Total price of the cart with discount applied, if any
+  int get discountedPrice => cartItems.fold(
+      0, (total, cartItem) => total + (cartItem.discountedPrice != 0 ? cartItem.discountedPrice : cartItem.regularPrice));
+  
+  ShoppingCart();
 }

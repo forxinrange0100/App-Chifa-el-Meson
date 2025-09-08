@@ -2,8 +2,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNa
 import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 import 'package:hive/hive.dart' show Hive;
 import 'package:delivera/model/order_model.dart' show Order;
-import 'model/order_product_model.dart' show OrderProduct;
-import 'model/dish_model.dart' show Dish;
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'dart:io' show HttpClient;
 import 'package:delivera/pages/home_page.dart' show HomePage;

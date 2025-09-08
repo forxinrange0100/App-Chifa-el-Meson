@@ -16,9 +16,9 @@ class _NoteDialogState extends State<NoteDialog> {
 
   @override
   Widget build(BuildContext context) {
-    _notesController.text = widget.cartItem.preferenceNote.isEmpty
+    _notesController.text = widget.cartItem.notes.isEmpty
         ? ""
-        : widget.cartItem.preferenceNote;
+        : widget.cartItem.notes;
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: EdgeInsets.zero,

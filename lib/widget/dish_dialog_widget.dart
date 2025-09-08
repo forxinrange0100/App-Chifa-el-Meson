@@ -66,7 +66,7 @@ class _DishDialogState extends State<DishDialog> {
                           ),
                         ),
                         ExpandableText(
-                          text: widget.dish.description,
+                          widget.dish.description,
                           message: "Ver más",
                         ),
                         Padding(
@@ -184,7 +184,7 @@ class _DishDialogState extends State<DishDialog> {
               shiftClosedToast();
               return;
             }
-            context.read<ShoppingCartProvider>().addCardItem(widget.dish, _counter, _notesController.text);
+            context.read<ShoppingCartProvider>().addCartItem(widget.dish, _counter, _notesController.text);
             addingCartItemToast();
             Navigator.of(context).pop();
           },

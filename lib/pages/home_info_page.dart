@@ -1,12 +1,14 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:delivera/model/cart_item_model.dart' show CartItem;
 import 'package:delivera/model/dish_model.dart' show Dish;
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/scroll_controller_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:delivera/widget/dish_dialog_widget.dart';
 import 'package:delivera/widget/expandable_text_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
@@ -151,7 +153,7 @@ class HomeInfoPage extends StatelessWidget {
                 "Descripción:",
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
-              ExpandableText(text: description)
+              ExpandableText(description)
             ],
           ),
         )
@@ -277,10 +279,10 @@ class HomeInfoPage extends StatelessWidget {
                                                                   fontSize: 20, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
                                                             ),
                                                             ExpandableText(
-                                                              text: dish.description,
+                                                              dish.description,
                                                               maxLines: 3,
                                                               enabled: false,
-                                                              color: Colors.grey,
+                                                              style: TextStyle(color:Colors.grey),
                                                             ),
                                                             Center(
                                                                 child: dish.discountedPrice != 0
@@ -385,6 +387,8 @@ class _ShowLastOrder extends StatelessWidget {
   }
 
   Future<void> _lastOrderModal(BuildContext context) {
+    final Order order = _order;
+
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -398,7 +402,7 @@ class _ShowLastOrder extends StatelessWidget {
             child: Column(
               children: [
                 ListBody(
-                  children: _order.orderProducts.map((orderProduct) {
+                  children: order.orderProducts.map((orderProduct) {
                     return Row(
                       children: [
                         CachedNetworkImage(
@@ -423,7 +427,7 @@ class _ShowLastOrder extends StatelessWidget {
                 ),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: Text('Subtotal: ${_order.formattedSubtotal}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('Subtotal: ${order.formattedSubtotal}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -435,7 +439,15 @@ class _ShowLastOrder extends StatelessWidget {
             ),
             TextButton(
               child: const Text("Volver a pedir"),
-              onPressed: () {},
+              onPressed: () {
+                final List<CartItem> cartItems = order.orderProducts
+                    .map((orderProduct) => CartItem(dish: orderProduct.product, quantity: orderProduct.quantity, notes: ''))
+                    .toList();
+                context.read<ShoppingCartProvider>().cleanShoppingCart();
+                context.read<ShoppingCartProvider>().addCartItems(cartItems);
+                // Mostrar notificacion de que se ha añadido al carrito
+                Navigator.of(context).pop();
+              },
             ),
           ],
         );
