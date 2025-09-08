@@ -1,3 +1,4 @@
+import 'package:delivera/firebase_options.dart';
 import 'package:delivera/pages/home_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/data_provider.dart';
@@ -11,6 +12,9 @@ import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/scroll_controller_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/services/firebase_messaging_service.dart';
+import 'package:delivera/services/local_notifications_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
@@ -19,7 +23,17 @@ import 'package:toastification/toastification.dart';
 import 'dart:io' as io;
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final localNotificationsService = LocalNotificationsService.instance();
+  await localNotificationsService.init();
+
+  final firebaseMessagingService = FirebaseMessagingService.instance();
+  await firebaseMessagingService.init(localNotificationsService: localNotificationsService);
+  
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
   if (kDebugMode) {
     io.HttpClient.enableTimelineLogging = true;
