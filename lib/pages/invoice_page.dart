@@ -150,6 +150,10 @@ class _InvoicePageState extends State<InvoicePage> {
                                       backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
                                       foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black)),
                                   onPressed: () {
+                                    if (widget._order != null) {
+                                      Navigator.pop(context);
+                                      return;
+                                    }
                                     context.read<BottomNavigationBarProvider>().showHome();
                                     _navigateHome(context);
                                   },

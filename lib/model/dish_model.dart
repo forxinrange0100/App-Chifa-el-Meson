@@ -36,15 +36,55 @@ class Dish {
       int? discountedPrice,
       this.image,
       int? categoryId,
-      required int enabled,
+      required this.enabled,
       required this.displayOrder,
-      required this.units})
+      int? units})
       : discountedPrice = discountedPrice ?? 0,
         categoryId = categoryId ?? 0,
-        enabled = intToBool(enabled);
+        units = units ?? 0;
+
+  Dish copyWith({
+    int? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? name,
+    String? description,
+    int? regularPrice,
+    int? discountedPrice,
+    String? image,
+    int? categoryId,
+    bool? enabled,
+    int? displayOrder,
+    int? units,
+  }) {
+    return Dish(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      regularPrice: regularPrice ?? this.regularPrice,
+      discountedPrice: discountedPrice ?? this.discountedPrice,
+      image: image ?? this.image,
+      categoryId: categoryId ?? this.categoryId,
+      enabled: enabled ?? this.enabled,
+      displayOrder: displayOrder ?? this.displayOrder,
+      units: units ?? this.units,
+    );
+  }
 
   factory Dish.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
+    map['created_at'] = map['createdAt'] ?? DateTime.now().toString();
+    map['updated_at'] = map['updatedAt'] ?? DateTime.now().toString();
+    if (map['enabled'] is bool) {
+      // Ya está bien, no hacer nada
+    } else if (map['enabled'] is int) {
+      map['enabled'] = intToBool(map['enabled']);
+    } else {
+      map['enabled'] = true;
+    }
+    
     return Dish(
         id: map['id'],
         createdAt: DateTime.parse(map['created_at']),

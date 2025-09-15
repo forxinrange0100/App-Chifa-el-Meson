@@ -22,15 +22,16 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
-  Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
-  Hive.registerAdapter('Order', Order.fromJson);
+  final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   // Para evitar un error en la herramienta Network mientras se debuggea
   if (kDebugMode) {
     HttpClient.enableTimelineLogging = true;
   }
   runApp(const MyApp());
+
+  Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
+  Hive.registerAdapter('Order', Order.fromJson);
 }
 
 class MyApp extends StatelessWidget {
@@ -38,57 +39,58 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => BottomNavigationBarProvider()),
-          ChangeNotifierProvider(create: (_) => RestaurantInfoProvider()),
-          ChangeNotifierProvider(create: (_) => DishesProvider()),
-          ChangeNotifierProvider(create: (_) => DishCategoriesProvider()),
-          ChangeNotifierProvider(create: (_) => ScrollControllerProvider()),
-          ChangeNotifierProvider(create: (_) => ShoppingCartProvider()),
-          ChangeNotifierProvider(create: (_) => DeliveryDetailsProvider()),
-          ChangeNotifierProvider(create: (_) => ShiftProvider()),
-          ChangeNotifierProvider(create: (_) => PaymentProvider()),
-          ChangeNotifierProvider(
-              create: (context) => OrderSummaryProvider(
-                    context.read<RestaurantInfoProvider>(),
-                    context.read<ShoppingCartProvider>(),
-                  )),
-          ChangeNotifierProvider(
-              create: (context) =>
-                  InvoiceProvider(context.read<OrderSummaryProvider>())),
-          ChangeNotifierProvider(
-              create: (context) => DataProvider(
-                    context.read<RestaurantInfoProvider>(),
-                    context.read<DishesProvider>(),
-                    context.read<DishCategoriesProvider>(),
-                    context.read<DeliveryDetailsProvider>(),
-                  ))
-        ],
-        child: ToastificationWrapper(
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-              textButtonTheme: const TextButtonThemeData(
-                  style: ButtonStyle(
-                      foregroundColor:
-                          WidgetStatePropertyAll<Color>(Colors.black))),
-              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                  selectedItemColor: Colors.black),
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ElevatedButton.styleFrom(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BottomNavigationBarProvider()),
+        ChangeNotifierProvider(create: (_) => RestaurantInfoProvider()),
+        ChangeNotifierProvider(create: (_) => DishesProvider()),
+        ChangeNotifierProvider(create: (_) => DishCategoriesProvider()),
+        ChangeNotifierProvider(create: (_) => ScrollControllerProvider()),
+        ChangeNotifierProvider(create: (_) => ShoppingCartProvider()),
+        ChangeNotifierProvider(create: (_) => DeliveryDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => ShiftProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
+        ChangeNotifierProvider(
+          create: (context) => OrderSummaryProvider(
+            context.read<RestaurantInfoProvider>(),
+            context.read<ShoppingCartProvider>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => InvoiceProvider(
+            context.read<OrderSummaryProvider>(),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => DataProvider(
+            context.read<RestaurantInfoProvider>(),
+            context.read<DishesProvider>(),
+            context.read<DishCategoriesProvider>(),
+            context.read<DeliveryDetailsProvider>(),
+          ),
+        )
+      ],
+      child: ToastificationWrapper(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+            textButtonTheme: const TextButtonThemeData(
+              style: ButtonStyle(foregroundColor: WidgetStatePropertyAll<Color>(Colors.black)),
+            ),
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(selectedItemColor: Colors.black),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-              )),
-              useMaterial3: false,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              ),
             ),
-            home: const HomePage(),
+            useMaterial3: false,
           ),
-        ));
+          home: const HomePage(),
+        ),
+      ),
+    );
   }
 }

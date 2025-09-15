@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Quitar splash despues de 3 segundos o al cargar los datos
       Future.delayed(const Duration(seconds: 3), () async {
-        if (mounted && context.read<DataProvider>().done) {
+        if (mounted) {
           FlutterNativeSplash.remove();
         }
       });

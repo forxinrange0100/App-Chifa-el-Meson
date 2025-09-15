@@ -46,6 +46,18 @@ void addingCartItemToast() {
   );
 }
 
+void addingCartItemsToast() {
+  toastification.show(
+    icon: const Icon(FontAwesomeIcons.solidCircleCheck),
+    title: const Text('Productos agregados al carrito'),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.success,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
+    autoCloseDuration: const Duration(seconds: 5),
+  );
+}
+
 void errorOrderSummary(String error) {
   toastification.show(
     icon: const Icon(FontAwesomeIcons.circleXmark),

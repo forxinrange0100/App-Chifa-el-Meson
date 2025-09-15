@@ -73,7 +73,8 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                     Table(
                       columnWidths: {
                         0: FixedColumnWidth(imageWidth),
-                        1: const FlexColumnWidth(),
+                        1: const FixedColumnWidth(10),
+                        2: const FlexColumnWidth(),
                       },
                       children: [
                         TableRow(
@@ -86,6 +87,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                                 fit: BoxFit.cover,
                               ),
                             ),
+                            const SizedBox(),
                             SizedBox(
                               height: imageWidth,
                               child: Column(
@@ -158,6 +160,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                                 style: const TextStyle(decoration: TextDecoration.underline),
                               ),
                             ),
+                            const SizedBox(),
                             _counterWidget(shoppingCartProvider),
                           ],
                         ),

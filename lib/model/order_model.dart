@@ -1,3 +1,4 @@
+import 'package:delivera/model/dish_model.dart' show Dish;
 import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/model/payment_status_style_model.dart';
 import 'package:delivera/utils/date_time_chile.dart';
@@ -25,20 +26,20 @@ enum StatusEnum {
 class Order {
   final int _id;
   final int publicId;
-  final int subtotal;
-  final int total;
+  int subtotal;
+  int total;
   final DateTime timestamp;
   final String deliveryType;
   final int deliveryCost;
   String status;
-  final String paymentStatus;
+  String paymentStatus;
   final PaymentStatusStyle paymentStatusStyle;
   final String paymentType;
   final String clientAddress;
   final String clientPhone;
   final String clientEmail;
   final String clientName;
-  final List<OrderProduct> orderProducts;
+  List<OrderProduct> orderProducts;
   DateTime get timestampChile => dateTimeChile(timestamp);
 
   String get formattedSubtotal => formatPrice(subtotal);
@@ -78,32 +79,32 @@ class Order {
       clientPhone: '',
       clientEmail: '',
       clientName: '',
-      orderProducts: []);
+      orderProducts: const []);
 
   /// Factory constructor to create an Order with values for some attributes, and the rest with default values
   factory Order.some({
-    int id = 0,
-    int publicId = 0,
-    int subtotal = 0,
-    int total = 0,
+    int? id,
+    int? publicId,
+    int? subtotal,
+    int? total,
     DateTime? timestamp,
-    String deliveryType = '',
-    int deliveryCost = 0,
-    String status = '',
-    String paymentStatus = '',
-    String paymentType = '',
-    String clientAddress = '',
-    String clientPhone = '',
-    String clientEmail = '',
-    String clientName = '',
-    List<OrderProduct> orderProducts = const [],
+    String? deliveryType,
+    int? deliveryCost,
+    String? status,
+    String? paymentStatus,
+    String? paymentType,
+    String? clientAddress,
+    String? clientPhone,
+    String? clientEmail,
+    String? clientName,
+    List<OrderProduct>? orderProducts,
   }) =>
-      Order(
+      Order.empty().copyWith(
         id: id,
         publicId: publicId,
         subtotal: subtotal,
         total: total,
-        timestamp: timestamp ?? DateTime.now(),
+        timestamp: timestamp,
         deliveryType: deliveryType,
         deliveryCost: deliveryCost,
         status: status,
@@ -115,6 +116,78 @@ class Order {
         clientName: clientName,
         orderProducts: orderProducts,
       );
+
+  Order copyWith({
+    int? id,
+    int? publicId,
+    int? subtotal,
+    int? total,
+    DateTime? timestamp,
+    String? deliveryType,
+    int? deliveryCost,
+    String? status,
+    String? paymentStatus,
+    String? paymentType,
+    String? clientAddress,
+    String? clientPhone,
+    String? clientEmail,
+    String? clientName,
+    List<OrderProduct>? orderProducts,
+  }) =>
+      Order(
+        id: id ?? _id,
+        publicId: publicId ?? this.publicId,
+        subtotal: subtotal ?? this.subtotal,
+        total: total ?? this.total,
+        timestamp: timestamp ?? this.timestamp,
+        deliveryType: deliveryType ?? this.deliveryType,
+        deliveryCost: deliveryCost ?? this.deliveryCost,
+        status: status ?? this.status,
+        paymentStatus: paymentStatus ?? this.paymentStatus,
+        paymentType: paymentType ?? this.paymentType,
+        clientAddress: clientAddress ?? this.clientAddress,
+        clientPhone: clientPhone ?? this.clientPhone,
+        clientEmail: clientEmail ?? this.clientEmail,
+        clientName: clientName ?? this.clientName,
+        orderProducts: orderProducts ?? this.orderProducts,
+      );
+
+  /// Remplaza los datos de los productos existentes en orderProducts con otros orderProducts (segun su id).
+  /// Añade los que no estaban antes, y desactiva los que no se encuentren ahora
+  void updateProducts(List<Dish> updatedProducts, {bool clearNotes = false}) {
+    // Busca los productos a actualizar
+    final List<OrderProduct> updatedOrderProducts = orderProducts.map((orderProduct) {
+      // Obtiene el indice del producto en la lista
+      int foundIndex = updatedProducts.indexWhere((p) => p.id == orderProduct.product.id);
+      // Si no se encuentra el producto, lo desactiva
+      if (foundIndex == -1) {
+        return orderProduct.copyWith(
+          product: orderProduct.product.copyWith(enabled: false),
+          note: clearNotes ? '' : null,
+        );
+      }
+      // Si se encuentra el producto, crea un nuevo OrderProduct con el producto actualizado
+      final updatedOrderProduct = OrderProduct(
+        product: updatedProducts.elementAt(foundIndex),
+        quantity: orderProduct.quantity,
+        note: orderProduct.note,
+      );
+      // Remueve el producto de la lista para reducir la busqueda
+      updatedProducts.removeAt(foundIndex);
+      return updatedOrderProduct;
+    }).toList();
+
+    orderProducts = updatedOrderProducts;
+  }
+
+  // Actualiza subtotal y total segun los OrderProducts que estan activados
+  void updateTotals() {
+    subtotal = orderProducts.fold(0, (prev, orderProduct) {
+      return prev + (orderProduct.product.enabled ? orderProduct.totalPrice : 0);
+    });
+
+    total = subtotal + deliveryCost;
+  }
 
   /// Factory constructor to create an Order from a JSON
   factory Order.fromJson(dynamic json) {

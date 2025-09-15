@@ -1,10 +1,12 @@
 import 'package:delivera/pages/order_summary_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
+import 'package:delivera/provider/shift_provider.dart' show ShiftProvider;
 import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/toast/toast.dart' show shiftClosedToast;
 import 'package:delivera/widget/cart_item_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart' show FontAwesomeIcons, FaIcon;
 import 'package:provider/provider.dart';
 
 class ShoppingCartPage extends StatelessWidget {
@@ -89,12 +91,18 @@ class ShoppingCartPage extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (context) {
-                              return const OrderSummaryPage();
-                            },
-                          ));
+                        onPressed: () async {
+                          // Check if the shift is open before navigating to the order summary page
+                          await context.read<ShiftProvider>().updateIsOpen();
+                          if (!context.mounted) return;
+                          if (!context.read<ShiftProvider>().isOpen) {
+                            shiftClosedToast();
+                            return;
+                          }
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const OrderSummaryPage()),
+                          );
                         },
                         iconAlignment: IconAlignment.end,
                         icon: const Icon(FontAwesomeIcons.arrowRight),
@@ -117,23 +125,20 @@ class ShoppingCartPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                FaIcon(
                   FontAwesomeIcons.boxOpen,
                   size: 60,
                 ),
-                const Text(
-                  "No hay productos en el carrito",
-                  style: TextStyle(fontSize: 20),
-                ),
-                const SizedBox(
-                  height: 50,
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 50),
+                  child: const Text("No hay productos en el carrito", style: TextStyle(fontSize: 20)),
                 ),
                 ElevatedButton.icon(
+                  icon: const Icon(FontAwesomeIcons.cartShopping),
+                  label: const Text("Ir a comprar"),
                   onPressed: () {
                     context.read<BottomNavigationBarProvider>().showHome();
                   },
-                  icon: const Icon(FontAwesomeIcons.cartShopping),
-                  label: const Text("Ir a comprar"),
                 )
               ],
             ),

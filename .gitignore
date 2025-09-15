@@ -69,3 +69,4 @@ android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
 ios/Runner/Assets.xcassets/AppIcon.appiconset/*.png
 ios/Runner/Assets.xcassets/LaunchImage.imageset/*.png
 ios/Runner/Assets.xcassets/BrandingImage.imageset/*.png
+.vscode/settings.json

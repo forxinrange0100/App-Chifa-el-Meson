@@ -11,6 +11,18 @@ class OrderProduct {
 
   OrderProduct({required this.product, required this.quantity, required this.note});
 
+  OrderProduct copyWith({
+    Dish? product,
+    int? quantity,
+    String? note,
+  }) {
+    return OrderProduct(
+      product: product ?? this.product,
+      quantity: quantity ?? this.quantity,
+      note: note ?? this.note,
+    );
+  }
+
   factory OrderProduct.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
     return OrderProduct(

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order, StatusEnum;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
@@ -5,7 +6,7 @@ import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show Bott
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart' show FontAwesomeIcons;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart' show FontAwesomeIcons, FaIcon;
 import 'package:hive/hive.dart' show Hive;
 import 'package:provider/provider.dart';
 
@@ -16,49 +17,50 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ordersBox = Hive.box<Order>(name: 'orders');
     final List<Order?> orders = ordersBox.getAll(ordersBox.keys).reversed.toList();
+    ordersBox.close();
     // addFakeOrders();
     for (var order in orders) {
       if (order == null) continue;
       // Aquí puedes procesar cada order como desees
-      print(order.toJson());
+      log(order.toJson().toString());
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
-        shadowColor: Colors.black,
-        elevation: 2,
-        centerTitle: true,
-        titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
-        title: const Text(
-          "HISTORIAL",
-        ),
-      ),
-      body: orders.isEmpty
-          ? Center(
-              child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  FontAwesomeIcons.clipboardList,
-                  size: 60,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 50),
-                  child: const Text("No hay pedidos anteriores", style: TextStyle(fontSize: 20)),
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(FontAwesomeIcons.cartShopping),
-                  label: const Text("Ir a comprar"),
-                  onPressed: () {
-                    context.read<BottomNavigationBarProvider>().showHome();
-                  },
-                )
-              ],
-            ))
-          : _buildOrderList(orders),
-    );
+    return orders.isEmpty
+        ? Center(
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const FaIcon(
+                FontAwesomeIcons.clipboardList,
+                size: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 50),
+                child: const Text("No hay pedidos anteriores", style: TextStyle(fontSize: 20)),
+              ),
+              ElevatedButton.icon(
+                icon: const FaIcon(FontAwesomeIcons.cartShopping),
+                label: const Text("Ir a comprar"),
+                onPressed: () {
+                  context.read<BottomNavigationBarProvider>().showHome();
+                },
+              )
+            ],
+          ))
+        : Scaffold(
+            appBar: AppBar(
+              surfaceTintColor: Colors.white,
+              backgroundColor: Colors.white,
+              shadowColor: Colors.black,
+              elevation: 2,
+              centerTitle: true,
+              titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+              title: const Text(
+                "HISTORIAL",
+              ),
+            ),
+            body: _buildOrderList(orders),
+          );
   }
 
   Column _buildOrderList(List<Order?> orders) {
@@ -157,7 +159,8 @@ class HistoryPage extends StatelessWidget {
             height: 70,
             padding: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(border: BoxBorder.fromLTRB(left: BorderSide())),
-            child: status == StatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
+            child: Icon(Icons.receipt_long_outlined),
+            // child: status == StatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
           ),
         ],
       ),

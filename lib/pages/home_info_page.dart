@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivera/model/cart_item_model.dart' show CartItem;
 import 'package:delivera/model/dish_model.dart' show Dish;
+import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/scroll_controller_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
+import 'package:delivera/toast/toast.dart' show addingCartItemsToast;
 import 'package:delivera/widget/dish_dialog_widget.dart';
 import 'package:delivera/widget/expandable_text_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
@@ -25,7 +27,8 @@ class HomeInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ordersBox = Hive.box<Order>(name: 'orders');
-    final Order? lastOrder = ordersBox.get(ordersBox.keys.last);
+    final List<String> ordersBoxKeys = ordersBox.keys;
+    final Order? lastOrder = ordersBoxKeys.isEmpty ? null : ordersBox.get(ordersBoxKeys.last);
 
     return CustomScrollView(
       controller: context.watch<ScrollControllerProvider>().scrollController,
@@ -185,9 +188,11 @@ class HomeInfoPage extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemCount: dishCategoriesProvider.dishCategories.categories.length,
             itemBuilder: (context, index) {
+              final category = dishCategoriesProvider.dishCategories.categories[index];
+
               return TextButton(
                 onPressed: () {
-                  final context = dishCategoriesProvider.dishCategories.categories[index].categoryKey.currentContext;
+                  final context = category.categoryKey.currentContext;
                   if (context != null) {
                     Scrollable.ensureVisible(
                       context,
@@ -198,7 +203,7 @@ class HomeInfoPage extends StatelessWidget {
                   }
                 },
                 child: Text(
-                  dishCategoriesProvider.dishCategories.categories[index].name,
+                  category.name,
                   style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                 ),
               );
@@ -282,7 +287,7 @@ class HomeInfoPage extends StatelessWidget {
                                                               dish.description,
                                                               maxLines: 3,
                                                               enabled: false,
-                                                              style: TextStyle(color:Colors.grey),
+                                                              style: TextStyle(color: Colors.grey),
                                                             ),
                                                             Center(
                                                                 child: dish.discountedPrice != 0
@@ -387,69 +392,116 @@ class _ShowLastOrder extends StatelessWidget {
   }
 
   Future<void> _lastOrderModal(BuildContext context) {
-    final Order order = _order;
+    final List<Dish> newProducts = context.read<DishesProvider>().dishes.dishes.toList();
+    _order.updateProducts(newProducts, clearNotes: true);
+    _order.updateTotals();
+    final textButtonStyle = TextButton.styleFrom(
+      padding: const EdgeInsets.all(8),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      minimumSize: Size(0, 0),
+      maximumSize: Size(double.infinity, 32),
+    );
 
     return showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          insetPadding: EdgeInsets.symmetric(horizontal: 20),
-          titlePadding: const EdgeInsets.only(top: 20),
-          contentPadding: const EdgeInsets.all(10),
-          actionsPadding: const EdgeInsets.all(0),
-          title: Center(child: const Text('ÚLTIMA ORDEN')),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                ListBody(
-                  children: order.orderProducts.map((orderProduct) {
-                    return Row(
-                      children: [
-                        CachedNetworkImage(
-                          imageUrl: orderProduct.product.imageUrl,
-                          width: 50,
-                          height: 50,
-                          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                          errorWidget: (context, url, error) => const Icon(Icons.error),
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final maxHeight = constraints.maxHeight * 0.7;
+                final itemCount = _order.orderProducts.length;
+
+                return ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: maxHeight),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text('Última orden', style: Theme.of(context).textTheme.titleLarge),
+                      ),
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: itemCount,
+                          separatorBuilder: (_, __) => Divider(height: 5),
+                          itemBuilder: (context, index) {
+                            final orderProduct = _order.orderProducts[index];
+                            return Row(
+                              spacing: 8,
+                              children: [
+                                CachedNetworkImage(
+                                  imageUrl: orderProduct.product.imageUrl,
+                                  width: 50,
+                                  height: 50,
+                                  placeholder: (_, __) => CircularProgressIndicator(),
+                                  errorWidget: (_, __, ___) => Icon(Icons.error),
+                                ),
+                                Expanded(
+                                  child: ExpandableText(
+                                    orderProduct.product.name,
+                                    enabled: false,
+                                    maxLines: 3,
+                                  ),
+                                ),
+                                Text('x${orderProduct.quantity}'),
+                                Text(orderProduct.formattedTotalPrice),
+                              ],
+                            );
+                          },
                         ),
-                        Expanded(child: Text(orderProduct.product.name)),
-                        VerticalDivider(),
-                        Text('x${orderProduct.quantity}'),
-                        VerticalDivider(),
-                        Text(orderProduct.formattedTotalPrice),
-                      ],
-                    );
-                  }).toList(),
-                ),
-                const Divider(
-                  thickness: 1,
-                  color: Colors.black,
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text('Subtotal: ${order.formattedSubtotal}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cerrar'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text("Volver a pedir"),
-              onPressed: () {
-                final List<CartItem> cartItems = order.orderProducts
-                    .map((orderProduct) => CartItem(dish: orderProduct.product, quantity: orderProduct.quantity, notes: ''))
-                    .toList();
-                context.read<ShoppingCartProvider>().cleanShoppingCart();
-                context.read<ShoppingCartProvider>().addCartItems(cartItems);
-                // Mostrar notificacion de que se ha añadido al carrito
-                Navigator.of(context).pop();
+                      ),
+                      SizedBox(height: 8),
+                      const Divider(color: Colors.black, height: 0),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 4, bottom: 8.0),
+                          child: Text(
+                            'Subtotal: ${_order.formattedSubtotal}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        spacing: 8,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: textButtonStyle,
+                            child: Text(
+                              'Cerrar',
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              final cartItems = _order.orderProducts
+                                  .map((op) => CartItem(
+                                        dish: op.product,
+                                        quantity: op.quantity,
+                                        notes: '',
+                                      ))
+                                  .toList();
+                              context.read<ShoppingCartProvider>().cleanShoppingCart();
+                              context.read<ShoppingCartProvider>().addCartItems(cartItems);
+                              addingCartItemsToast();
+                              Navigator.pop(context);
+                            },
+                            style: textButtonStyle,
+                            child: Text('Volver a pedir'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
-          ],
+          ),
         );
       },
     );
