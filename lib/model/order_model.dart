@@ -43,6 +43,7 @@ class Order {
   DateTime get timestampChile => dateTimeChile(timestamp);
 
   String get formattedSubtotal => formatPrice(subtotal);
+  List<OrderProduct> get enabledProducts => orderProducts.where((orderProduct) => orderProduct.enabled).toList();
 
   Order(
       {required int id,
@@ -183,7 +184,7 @@ class Order {
   // Actualiza subtotal y total segun los OrderProducts que estan activados
   void updateTotals() {
     subtotal = orderProducts.fold(0, (prev, orderProduct) {
-      return prev + (orderProduct.product.enabled ? orderProduct.totalPrice : 0);
+      return prev + (orderProduct.enabled ? orderProduct.totalPrice : 0);
     });
 
     total = subtotal + deliveryCost;

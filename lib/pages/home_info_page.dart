@@ -412,7 +412,7 @@ class _ShowLastOrder extends StatelessWidget {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final maxHeight = constraints.maxHeight * 0.7;
-                final itemCount = _order.orderProducts.length;
+                final itemCount = _order.enabledProducts.length;
 
                 return ConstrainedBox(
                   constraints: BoxConstraints(maxHeight: maxHeight),
@@ -429,7 +429,7 @@ class _ShowLastOrder extends StatelessWidget {
                           itemCount: itemCount,
                           separatorBuilder: (_, __) => Divider(height: 5),
                           itemBuilder: (context, index) {
-                            final orderProduct = _order.orderProducts[index];
+                            final orderProduct = _order.enabledProducts[index];
                             return Row(
                               spacing: 8,
                               children: [
@@ -479,7 +479,7 @@ class _ShowLastOrder extends StatelessWidget {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              final cartItems = _order.orderProducts
+                              final cartItems = _order.enabledProducts
                                   .map((op) => CartItem(
                                         dish: op.product,
                                         quantity: op.quantity,

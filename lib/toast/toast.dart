@@ -2,11 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 
-void closeAppToast() {
+void successToast(String message, {Icon? icon}) {
   toastification.show(
-    icon: const Icon(FontAwesomeIcons.triangleExclamation),
-    title: const Text(
-      'Si presionas nuevamente hacia atrás, se cerrará la aplicación',
+    icon: icon ?? const Icon(FontAwesomeIcons.solidCircleCheck),
+    title: Text(message),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.success,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
+    autoCloseDuration: const Duration(seconds: 3),
+  );
+}
+
+void errorToast(String message, {Icon? icon}) {
+  toastification.show(
+    icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
+    title: Text(message),
+    style: ToastificationStyle.flat,
+    type: ToastificationType.error,
+    showProgressBar: true,
+    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
+    autoCloseDuration: const Duration(seconds: 5),
+  );
+}
+
+void warningToast(String message, {Icon? icon}) {
+  toastification.show(
+    icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
+    title: Text(
+      message,
       overflow: TextOverflow.ellipsis,
       maxLines: 2,
       style: TextStyle(
@@ -22,91 +46,41 @@ void closeAppToast() {
   );
 }
 
+void closeAppToast() {
+  warningToast('Si presionas nuevamente hacia atrás, se cerrará la aplicación');
+}
+
 void shiftClosedToast() {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.solidCircleCheck),
-    title: const Text('Restaurant Cerrado'),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.error,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
+  errorToast('Restaurant cerrado');
 }
 
 void addingCartItemToast() {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.solidCircleCheck),
-    title: const Text('Producto añadido al carrito'),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.success,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
+  successToast('Producto añadido al carrito');
 }
 
 void addingCartItemsToast() {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.solidCircleCheck),
-    title: const Text('Productos agregados al carrito'),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.success,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
+  successToast('Productos agregados al carrito');
+}
+
+void cleanCartToast() {
+  successToast('Carrito vaciado');
 }
 
 void errorOrderSummary(String error) {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.circleXmark),
-    title: const Text("Faltan campos"),
-    description: Text(error),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.error,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
+  errorToast('Faltan campos', icon: const Icon(FontAwesomeIcons.circleXmark));
 }
 
 void savedInvoice() {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.file),
-    title: const Text("Boleta guardada"),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.success,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
+  successToast('Boleta guardada', icon: const Icon(FontAwesomeIcons.file));
 }
 
 void unsavedInvoice() {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.file),
-    title: const Text("Boleta no guardada"),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.error,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
+  errorToast('Boleta no guardada', icon: const Icon(FontAwesomeIcons.file));
 }
 
 // Toast for server error
 void serverErrorToast(String error) {
-  toastification.show(
-    icon: const Icon(FontAwesomeIcons.triangleExclamation),
-    title: const Text("Error del servidor"),
-    description: Text(error),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.error,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
-    autoCloseDuration: const Duration(seconds: 5),
-  );
+  errorToast('Error del servidor');
 }
 
 // void storageNotGranted() {

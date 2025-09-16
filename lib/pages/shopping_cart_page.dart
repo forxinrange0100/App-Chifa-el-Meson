@@ -2,7 +2,7 @@ import 'package:delivera/pages/order_summary_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/shift_provider.dart' show ShiftProvider;
 import 'package:delivera/provider/shopping_cart_provider.dart';
-import 'package:delivera/toast/toast.dart' show shiftClosedToast;
+import 'package:delivera/toast/toast.dart' show cleanCartToast, shiftClosedToast;
 import 'package:delivera/widget/cart_item_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +56,7 @@ class ShoppingCartPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextButton.icon(
-                        onPressed: () => shoppingCartProvider.cleanShoppingCart(),
+                        onPressed: () => cleanCartDialog(context),
                         label: Text('Vaciar carrito', style: TextStyle(color: Colors.red.shade700, fontSize: 16)),
                         icon: Icon(
                           FontAwesomeIcons.trash,
@@ -144,6 +144,62 @@ class ShoppingCartPage extends StatelessWidget {
             ),
           );
         }
+      },
+    );
+  }
+
+  Future<void> cleanCartDialog(BuildContext context) {
+    final textButtonStyle = TextButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      minimumSize: Size(0, 0),
+      maximumSize: Size(double.infinity, 32),
+    );
+
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          child: Padding(
+            padding: const EdgeInsets.all(6.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsetsGeometry.only(top: 10, bottom: 5),
+                  child: Text(
+                    '¿Desea vaciar el carrito?',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Divider(height: 10, thickness: 1,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  spacing: 10,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: textButtonStyle,
+                      child: const Text("Cancelar"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<ShoppingCartProvider>().cleanShoppingCart();
+                        cleanCartToast();
+                        Navigator.pop(context);
+                      },
+                      style: textButtonStyle.merge(ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Colors.redAccent.shade700),
+                      )),
+                      child: const Text("Vaciar"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }

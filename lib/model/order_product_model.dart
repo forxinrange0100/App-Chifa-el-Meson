@@ -9,6 +9,8 @@ class OrderProduct {
   int get totalPrice => product.price * quantity;
   String get formattedTotalPrice => formatPrice(totalPrice);
 
+  bool get enabled => product.enabled;
+
   OrderProduct({required this.product, required this.quantity, required this.note});
 
   OrderProduct copyWith({
