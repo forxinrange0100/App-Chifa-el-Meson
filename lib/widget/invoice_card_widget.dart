@@ -220,7 +220,7 @@ class InvoiceCardWidget extends StatelessWidget {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Center(
-                                        child: PriceWidget(price: orderProduct.product.regularPrice * orderProduct.quantity),
+                                        child: PriceWidget(price: orderProduct.totalPrice),
                                       ),
                                     ),
                                   ],

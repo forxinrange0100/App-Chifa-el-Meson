@@ -31,12 +31,12 @@ class _InvoicePageState extends State<InvoicePage> {
 
   Future<bool> _getOrder() async {
     try {
+      final invoiceProvider = context.read<InvoiceProvider>();
       if (widget._order == null) {
-        await context.read<InvoiceProvider>().getOrder();
-        // ignore: use_build_context_synchronously
-        context.read<InvoiceProvider>().storeOrder();
+        await invoiceProvider.getOrder();
+        invoiceProvider.storeOrder();
       } else {
-        context.read<InvoiceProvider>().setOrder(widget._order!);
+        invoiceProvider.setOrder(widget._order!);
       }
 
       return true;
