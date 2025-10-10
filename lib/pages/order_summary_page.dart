@@ -369,28 +369,18 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
             const Divider(),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                   onPressed: () => _handleSubmit(context),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Finalizar Pago",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      _isSubmitting
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.blue,
-                                  backgroundColor: Colors.grey,
-                                ),
-                              ),
-                            )
-                          : const Icon(FontAwesomeIcons.arrowRight)
-                    ],
+                  iconAlignment: IconAlignment.end,
+                  icon: _isSubmitting
+                      ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 24, height: 24))
+                      : const Icon(FontAwesomeIcons.arrowRight),
+                  label: SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      "Finalizar Pago",
+                      style: TextStyle(fontSize: 20),
+                    ),
                   )),
             )
           ],
@@ -600,118 +590,133 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       return;
     }
 
-    // Update the shift status before proceeding
-    await context.read<ShiftProvider>().updateIsOpen();
-    // Check if the context is still mounted before navigating (the user might have navigated away)
-    if (!context.mounted) return;
-
-    // Verify if the shift is open
-    if (!context.read<ShiftProvider>().isOpen) {
-      errorOrderSummary("El turno ha cerrado. Por favor, intente más tarde.");
-      return;
-    }
-
-    // Update the delivery details before proceeding
-    await _deliveryDetailsProvider.update();
-    if (!context.mounted) return;
-
-    // Check if a delivery method is selected
-    if (_deliveryDetailsProvider.deliveryDetailEnum == null) {
-      // Handle the case where no delivery method is selected
-      errorOrderSummary("Método de entrega no seleccionado.");
-      return;
-    }
-
-    // Check if the delivery method 'Dispatch' is selected
-    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
-      // Check if dispatch is enabled
-      if (_deliveryDetailsProvider.dispatchEnabled == false) {
-        errorOrderSummary("El envío a domicilio no está disponible en este momento.");
-        _deliveryDetailsProvider.clearDeliveryDetailEnum(notify: true);
-        _orderSummaryProvider.clearDeliveryDetails();
-        return;
-      }
-
-      // Check if the zone is selected
-      if (_orderSummaryProvider.deliveryDetails is! Dispatch) {
-        errorOrderSummary("Zona de envío no seleccionada.");
-        return;
-      }
-
-      // Check if the address is valid
-      if (_inputStatusAddress.status != InputStatusEnum.valid) {
-        errorOrderSummary(_inputStatusAddress.errorMessage);
-        return;
-      }
-    }
-
-    // Validate all input fields
-    if (_inputStatusFullName.status != InputStatusEnum.valid) {
-      errorOrderSummary(_inputStatusFullName.errorMessage);
-      return;
-    }
-    if (_inputStatusEmail.status != InputStatusEnum.valid) {
-      errorOrderSummary(_inputStatusEmail.errorMessage);
-      return;
-    }
-    if (_inputStatusPhoneNumber.status != InputStatusEnum.valid) {
-      errorOrderSummary(_inputStatusPhoneNumber.errorMessage);
-      return;
-    }
-
-    // if the delivery method is 'Dispatch', set the delivery address
-    if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
-      _orderSummaryProvider.setDeliveryAddress(_textEditingControllerAddress.text);
-    }
-
     // Set is submitting to true to prevent multiple submissions
     setState(() {
       _isSubmitting = true;
     });
 
-    // Set the order summary with the user inputs
-    _orderSummaryProvider.setOrderSummary(
-      _textEditingControllerFullName.text,
-      _textEditingControllerEmail.text,
-      _textEditingControllerPhoneNumber.text,
-      _paymentType,
-    );
+    () async {
+      // Update the shift status before proceeding
+      try {
+        await context.read<ShiftProvider>().updateIsOpen();
+      } catch (e) {
+        if (!context.mounted) return;
+        serverErrorToast("Error al verificar el estado del turno. Por favor, intente más tarde.");
+        return;
+      }
 
-    try {
-      // Post the order
-      await _orderSummaryProvider.postOrder();
-    } catch (e) {
+      // Check if the context is still mounted before navigating (the user might have navigated away)
       if (!context.mounted) return;
-      // If an error occurs, show a toast and set is submitting to false
-      serverErrorToast(e.toString());
-      setState(() {
-        _isSubmitting = false;
-      });
-      return;
-    }
-    if (!context.mounted) return;
 
-    // Save input data locally
-    _orderSummaryProvider.storeUserData();
+      // Verify if the shift is open
+      if (!context.read<ShiftProvider>().isOpen) {
+        errorOrderSummary("El turno ha cerrado. Por favor, intente más tarde.");
+        return;
+      }
 
-    // If the order result has a payment URL, navigate to the PaymentPage
-    if (_orderSummaryProvider.orderResult.paymentData != null) {
-      final PaymentData paymentData = _orderSummaryProvider.orderResult.paymentData!;
-      final url = paymentData.paymentUrl;
-      final paymentType = paymentData.paymentType;
-      final token = paymentData.token;
-      final Uri uri = Uri.parse(url);
-      _orderSummaryProvider.clearPaymentData();
-      Navigator.push(context, MaterialPageRoute(
-        builder: (context) {
-          return PaymentPage(uri: uri, paymentType: paymentType, token: token);
-        },
-      ));
-    }
-    // Set is submitting to false, allowing the user to submit again
-    setState(() {
-      _isSubmitting = false;
+      // Update the delivery details before proceeding
+      try {
+        await _deliveryDetailsProvider.update();
+      } catch (e) {
+        if (!context.mounted) return;
+        serverErrorToast("Error al verificar los detalles de entrega. Por favor, intente más tarde.");
+        return;
+      }
+      if (!context.mounted) return;
+
+      // Check if a delivery method is selected
+      if (_deliveryDetailsProvider.deliveryDetailEnum == null) {
+        // Handle the case where no delivery method is selected
+        errorOrderSummary("Método de entrega no seleccionado.");
+        return;
+      }
+
+      // Check if the delivery method 'Dispatch' is selected
+      if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
+        // Check if dispatch is enabled
+        if (_deliveryDetailsProvider.dispatchEnabled == false) {
+          errorOrderSummary("El envío a domicilio no está disponible en este momento.");
+          _deliveryDetailsProvider.clearDeliveryDetailEnum(notify: true);
+          _orderSummaryProvider.clearDeliveryDetails();
+          return;
+        }
+
+        // Check if the zone is selected
+        if (_orderSummaryProvider.deliveryDetails is! Dispatch) {
+          errorOrderSummary("Zona de envío no seleccionada.");
+          return;
+        }
+
+        // Check if the address is valid
+        if (_inputStatusAddress.status != InputStatusEnum.valid) {
+          errorOrderSummary(_inputStatusAddress.errorMessage);
+          return;
+        }
+      }
+
+      // Validate all input fields
+      if (_inputStatusFullName.status != InputStatusEnum.valid) {
+        errorOrderSummary(_inputStatusFullName.errorMessage);
+        return;
+      }
+      if (_inputStatusEmail.status != InputStatusEnum.valid) {
+        errorOrderSummary(_inputStatusEmail.errorMessage);
+        return;
+      }
+      if (_inputStatusPhoneNumber.status != InputStatusEnum.valid) {
+        errorOrderSummary(_inputStatusPhoneNumber.errorMessage);
+        return;
+      }
+
+      // if the delivery method is 'Dispatch', set the delivery address
+      if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
+        _orderSummaryProvider.setDeliveryAddress(_textEditingControllerAddress.text);
+      }
+
+      // Set the order summary with the user inputs
+      _orderSummaryProvider.setOrderSummary(
+        _textEditingControllerFullName.text,
+        _textEditingControllerEmail.text,
+        _textEditingControllerPhoneNumber.text,
+        _paymentType,
+      );
+
+      try {
+        // Post the order
+        await _orderSummaryProvider.postOrder();
+      } catch (e) {
+        if (!context.mounted) return;
+        // If an error occurs, show a toast and set is submitting to false
+        serverErrorToast(e.toString());
+        return;
+      }
+      if (!context.mounted) return;
+
+      // Save input data locally
+      _orderSummaryProvider.storeUserData();
+
+      // If the order result has a payment URL, navigate to the PaymentPage
+      if (_orderSummaryProvider.orderResult.paymentData != null) {
+        final PaymentData paymentData = _orderSummaryProvider.orderResult.paymentData!;
+        final url = paymentData.paymentUrl;
+        final paymentType = paymentData.paymentType;
+        final token = paymentData.token;
+        final Uri uri = Uri.parse(url);
+        _orderSummaryProvider.clearPaymentData();
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return PaymentPage(uri: uri, paymentType: paymentType, token: token);
+          },
+        ));
+      }
+    }()
+        .whenComplete(() {
+      // Set is submitting to false when the async operation is complete
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     });
   }
-
 }

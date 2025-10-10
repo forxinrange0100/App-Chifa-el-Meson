@@ -1,5 +1,7 @@
 // Test fetch 100 times, saving responses with length < 18207 in a text file
 // http.get(Uri.parse("${Urls.apiUrl}/api/products/${Urls.companyId}"));
+// ignore_for_file: unused_import
+
 import 'dart:developer' show log;
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,7 +30,7 @@ void main() async {
         }
       }
     } catch (e) {
-      print('Error fetching dishes: $e');
+      log('Error fetching dishes: $e');
     }
   }
   log("Finished fetching dishes 1000 times.");

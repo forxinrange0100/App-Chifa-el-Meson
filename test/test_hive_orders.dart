@@ -1,5 +1,6 @@
 
 
+import 'dart:developer';
 import 'package:delivera/model/order_model.dart' show Order;
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:hive/hive.dart' show Hive;
@@ -17,8 +18,7 @@ void readAll() {
   final List<Order?> orders = ordersBox.getAll(ordersBox.keys.toList());
   for (var order in orders) {
     if (order == null) continue;
-    // Aquí puedes procesar cada order como desees
-    print(order.toJson());
+    log(order.toJson().toString());
   }
 }
 

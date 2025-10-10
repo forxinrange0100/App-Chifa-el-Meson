@@ -77,3 +77,14 @@ class FetchOrderFullException implements Exception {
     return 'FetchOrderFullException: $message';
   }
 }
+
+class ConnectionErrorException implements Exception {
+  final String message;
+
+  ConnectionErrorException([this.message = 'Error de conexión, verifique su conexión a internet']);
+
+  @override
+  String toString() {
+    return 'ConnectionErrorException: $message';
+  }
+}

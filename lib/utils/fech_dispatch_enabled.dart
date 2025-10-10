@@ -7,9 +7,7 @@ import 'package:delivera/environment.dart' show Urls;
 import 'package:http/http.dart' as http show get;
 
 Future<bool> fetchDispatchEnabled() async {
-  // TODO: detect conection error and inform
   try {
-    // TODO: implement
     final response = await http.get(Uri.parse("${Urls.apiUrl}/api/configs/dispatch_enabled/${Urls.companyId}"));
     late final result = json.decode(response.body);
     if (result['success'] == true) {

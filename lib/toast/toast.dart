@@ -17,7 +17,8 @@ void successToast(String message, {Icon? icon}) {
 void errorToast(String message, {Icon? icon}) {
   toastification.show(
     icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
-    title: Text(message),
+    title: Text('Error'),
+    description: Text(message),
     style: ToastificationStyle.flat,
     type: ToastificationType.error,
     showProgressBar: true,
@@ -29,7 +30,7 @@ void errorToast(String message, {Icon? icon}) {
 void warningToast(String message, {Icon? icon}) {
   toastification.show(
     icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
-    title: Text(
+    description: Text(
       message,
       overflow: TextOverflow.ellipsis,
       maxLines: 2,
@@ -47,11 +48,11 @@ void warningToast(String message, {Icon? icon}) {
 }
 
 void closeAppToast() {
-  warningToast('Si presionas nuevamente hacia atrás, se cerrará la aplicación');
+  warningToast('Presiona atrás nuevamente para cerrar la aplicación');
 }
 
 void shiftClosedToast() {
-  errorToast('Restaurant cerrado');
+  errorToast('Restaurant cerrado, intente más tarde');
 }
 
 void addingCartItemToast() {
@@ -66,8 +67,8 @@ void cleanCartToast() {
   successToast('Carrito vaciado');
 }
 
-void errorOrderSummary(String error) {
-  errorToast('Faltan campos', icon: const Icon(FontAwesomeIcons.circleXmark));
+void errorOrderSummary([String? error]) {
+  errorToast(error ?? 'Faltan campos', icon: const Icon(FontAwesomeIcons.circleXmark));
 }
 
 void savedInvoice() {
@@ -79,8 +80,8 @@ void unsavedInvoice() {
 }
 
 // Toast for server error
-void serverErrorToast(String error) {
-  errorToast('Error del servidor');
+void serverErrorToast([String? error]) {
+  errorToast(error ?? 'Error del servidor, intente más tarde');
 }
 
 // void storageNotGranted() {

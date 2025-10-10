@@ -49,7 +49,7 @@ Future<PaymentResult> fetchOrder(OrderSummary orderSummary) async {
     if (response.statusCode != 201) {
       // stats code
       log(result['message']);
-      throw FetchOrderException("Failed to fetch order: ${result['message']}");
+      throw FetchOrderException("Ocurrió un error al realizar el pedido: ${result['message']}");
     }
 
     // Create PaymentData type { payment_type, payment_url, token? }

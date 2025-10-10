@@ -5,7 +5,6 @@ import 'package:delivera/environment.dart';
 
 Future<bool> fetchShiftIsPaused() async {
   try {
-    // TODO: implement
     final response = await http.get(Uri.parse("${Urls.apiUrl}/api/shifts/paused/${Urls.companyId}"));
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
