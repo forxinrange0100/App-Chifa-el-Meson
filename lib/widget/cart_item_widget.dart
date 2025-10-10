@@ -47,7 +47,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                 onPressed: (context) {
                   shoppingCartProvider.removeCartItem(widget.cartItem.id);
                 },
-                icon: Icons.delete,
+                icon: FaIcon(FontAwesomeIcons.trashCan, color: Colors.white, size: 20,).icon,
                 label: 'Eliminar',
               ),
             ]),

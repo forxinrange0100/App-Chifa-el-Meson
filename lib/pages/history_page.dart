@@ -17,13 +17,13 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ordersBox = Hive.box<Order>(name: 'orders');
     final List<Order?> orders = ordersBox.getAll(ordersBox.keys).reversed.toList();
+    // final List<Order?> orders = generateFakeOrders();
     ordersBox.close();
     // addFakeOrders();
-    for (var order in orders) {
-      if (order == null) continue;
-      // Aquí puedes procesar cada order como desees
-      log(order.toJson().toString());
-    }
+    // for (var order in orders) {
+    //   if (order == null) continue;
+    //   log(order.toJson().toString());
+    // }
 
     return orders.isEmpty
         ? Center(
@@ -201,6 +201,21 @@ class HistoryPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<Order> generateFakeOrders() {
+    const from = 1001;
+    const to = 1010;
+    final status = StatusEnum.pending.name;
+    final deliveryType = DeliveryDetailEnum.dispatch.name;
+    const total = 20000;
+    List<Order> orders = [];
+
+    for (int i = from; i < to + 1; i++) {
+      var order = Order.some(publicId: i, status: status, deliveryType: deliveryType, total: total);
+      orders.add(order);
+    }
+    return orders;
   }
 
   void addFakeOrders() {

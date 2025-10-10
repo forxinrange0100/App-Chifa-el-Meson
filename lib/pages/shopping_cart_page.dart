@@ -6,6 +6,7 @@ import 'package:delivera/toast/toast.dart' show cleanCartToast, serverErrorToast
 import 'package:delivera/widget/cart_item_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart' show SlidableAutoCloseBehavior;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart' show FontAwesomeIcons, FaIcon;
 import 'package:provider/provider.dart';
 
@@ -27,6 +28,12 @@ class ShoppingCartPage extends StatelessWidget {
                 onPressed: () => context.read<BottomNavigationBarProvider>().showHome(),
                 icon: const Icon(FontAwesomeIcons.arrowLeft, color: Colors.black),
               ),
+              actions: [
+                IconButton(
+                  onPressed: () => cleanCartDialog(context),
+                  icon: const FaIcon(FontAwesomeIcons.solidTrashCan, color: Colors.red),
+                ),
+              ],
               centerTitle: true,
               title: const Text(
                 "CARRITO",
@@ -36,14 +43,16 @@ class ShoppingCartPage extends StatelessWidget {
             backgroundColor: Colors.grey.shade300,
             body: Container(
               color: Colors.white,
-              child: ListView.separated(
-                shrinkWrap: true,
-                separatorBuilder: (context, index) => const Divider(
-                  height: 0,
-                  thickness: 2,
+              child: SlidableAutoCloseBehavior(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index) => const Divider(
+                    height: 0,
+                    thickness: 2,
+                  ),
+                  itemCount: shoppingCartProvider.shoppingCart.cartItems.length,
+                  itemBuilder: (context, index) => CartItemWidget(cartItem: shoppingCartProvider.shoppingCart.cartItems[index]),
                 ),
-                itemCount: shoppingCartProvider.shoppingCart.cartItems.length,
-                itemBuilder: (context, index) => CartItemWidget(cartItem: shoppingCartProvider.shoppingCart.cartItems[index]),
               ),
             ),
             bottomNavigationBar: Container(
@@ -51,33 +60,16 @@ class ShoppingCartPage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
+                  Divider(
+                    height: 2,
+                    thickness: 2,
                     color: Colors.grey.shade300,
-                    height: 5,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextButton.icon(
-                          onPressed: () => cleanCartDialog(context),
-                          label: Text('Vaciar carrito', style: TextStyle(color: Colors.red.shade700, fontSize: 16)),
-                          icon: Icon(
-                            FontAwesomeIcons.trash,
-                            color: Colors.red.shade700,
-                            size: 16,
-                          ),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.all(0),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            minimumSize: Size(double.infinity, 32),
-                          ),
-                        ),
-                        const Divider(
-                          height: 0,
-                          thickness: 1,
-                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
                           child: Row(

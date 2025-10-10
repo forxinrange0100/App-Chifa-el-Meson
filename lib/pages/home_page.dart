@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:delivera/enum/bottom_navigation_bar_enum.dart';
 import 'package:delivera/pages/home_info_page.dart' show HomeInfoPage;
 import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
@@ -122,39 +124,39 @@ class _HomeBuilder extends StatelessWidget {
         return Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.white,
-          body: Stack(
-            children: [
-              pages[bottomNavigationProvider.index],
-              if (bottomNavigationProvider.isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
+          body: pages[bottomNavigationProvider.index],
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
+            ),
+            child: NavigationBar(
+              height: 60,
+              backgroundColor: Colors.white,
+              selectedIndex: bottomNavigationProvider.index,
+              key: bottomNavigationProvider.index != 0 ? null : ValueKey(0),
+              onDestinationSelected: (int index) async {
+                final BottomNavigationBarEnum bottomNavigationBarEnum = BottomNavigationBarEnum.values[index];
+                if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar && !context.read<ShiftProvider>().isOpen) {
+                  shiftClosedToast();
+                  return;
+                }
+                bottomNavigationProvider.setIndex(bottomNavigationBarEnum);
+              },
+              destinations: [
+                const NavigationDestination(
+                  icon: Icon(Icons.home),
+                  label: "Inicio",
                 ),
-            ],
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: bottomNavigationProvider.index,
-            onTap: (int index) async {
-              final BottomNavigationBarEnum bottomNavigationBarEnum = BottomNavigationBarEnum.values[index];
-              if (bottomNavigationBarEnum == BottomNavigationBarEnum.shoppingCar && !context.read<ShiftProvider>().isOpen) {
-                shiftClosedToast();
-                return;
-              }
-              bottomNavigationProvider.setIndex(bottomNavigationBarEnum);
-            },
-            items: [
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: "Inicio",
-              ),
-              BottomNavigationBarItem(
-                icon: _CartIconWidget(),
-                label: "Carrito",
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.history),
-                label: "Historial",
-              )
-            ],
+                NavigationDestination(
+                  icon: _CartIconWidget(),
+                  label: "Carrito",
+                ),
+                const NavigationDestination(
+                  icon: Icon(Icons.history),
+                  label: "Historial",
+                )
+              ],
+            ),
           ),
         );
       },
