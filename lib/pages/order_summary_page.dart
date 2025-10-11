@@ -69,7 +69,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     shape: WidgetStateProperty.all<RoundedRectangleBorder>(
       RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6),
-        side: const BorderSide(color: Colors.black, width: 1),
+        side: const BorderSide(color: Colors.black, width: 1.5),
       ),
     ),
   );
@@ -166,7 +166,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
                             side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.pickup
-                                ? const BorderSide(color: Colors.black, width: 1)
+                                ? const BorderSide(color: Colors.black, width: 1.5)
                                 : BorderSide.none,
                           ),
                         ),
@@ -187,7 +187,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
                             side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch
-                                ? const BorderSide(color: Colors.black, width: 1)
+                                ? const BorderSide(color: Colors.black, width: 1.5)
                                 : BorderSide.none,
                           ),
                         ),
