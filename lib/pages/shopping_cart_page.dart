@@ -17,7 +17,30 @@ class ShoppingCartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ShoppingCartProvider>(
       builder: (context, shoppingCartProvider, child) {
-        if (shoppingCartProvider.length > 0) {
+        if (shoppingCartProvider.length == 0) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const FaIcon(
+                  FontAwesomeIcons.boxOpen,
+                  size: 60,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 10, bottom: 50),
+                  child: Text("No hay productos en el carrito", style: TextStyle(fontSize: 20)),
+                ),
+                ElevatedButton.icon(
+                  icon: const FaIcon(FontAwesomeIcons.cartShopping),
+                  label: const Text("Ir a comprar"),
+                  onPressed: () {
+                    context.read<BottomNavigationBarProvider>().showHome();
+                  },
+                )
+              ],
+            ),
+          );
+        } else {
           return Scaffold(
             appBar: AppBar(
               surfaceTintColor: Colors.white,
@@ -66,92 +89,67 @@ class ShoppingCartPage extends StatelessWidget {
                     color: Colors.grey.shade300,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Subtotal",
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
-                              ),
-                              PriceWidget(
-                                price: shoppingCartProvider.shoppingCart.discountedPrice,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              )
-                            ],
-                          ),
+                        const Text(
+                          "Subtotal",
+                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
                         ),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            // Check if the shift is open before navigating to the order summary page
-                            try {
-                              await context.read<ShiftProvider>().updateIsOpen();
-                            } catch (e) {
-                              if (!context.mounted) return;
-                              serverErrorToast();
-                              return;
-                            }
-
-                            if (!context.mounted) return;
-                            if (!context.read<ShiftProvider>().isOpen) {
-                              shiftClosedToast();
-                              return;
-                            }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const OrderSummaryPage()),
-                            );
-                          },
-                          iconAlignment: IconAlignment.end,
-                          icon: context.watch<ShiftProvider>().isFetching
-                              ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 24, height: 24))
-                              : const Icon(FontAwesomeIcons.arrowRight),
-                          label: SizedBox(
-                            width: double.infinity,
-                            child: const Text(
-                              "Realizar pedido",
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ),
+                        PriceWidget(
+                          price: shoppingCartProvider.shoppingCart.discountedPrice,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
                         )
                       ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: ElevatedButton.icon(
+                      onPressed: () => _proceedToCheckout(context),
+                      iconAlignment: IconAlignment.end,
+                      icon: context.watch<ShiftProvider>().isFetching
+                          ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 24, height: 24))
+                          : const Icon(FontAwesomeIcons.arrowRight),
+                      label: SizedBox(
+                        width: double.infinity,
+                        child: const Text(
+                          "Realizar pedido",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           );
-        } else {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const FaIcon(
-                  FontAwesomeIcons.boxOpen,
-                  size: 60,
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 50),
-                  child: Text("No hay productos en el carrito", style: TextStyle(fontSize: 20)),
-                ),
-                ElevatedButton.icon(
-                  icon: const FaIcon(FontAwesomeIcons.cartShopping),
-                  label: const Text("Ir a comprar"),
-                  onPressed: () {
-                    context.read<BottomNavigationBarProvider>().showHome();
-                  },
-                )
-              ],
-            ),
-          );
         }
       },
+    );
+  }
+
+  void _proceedToCheckout(BuildContext context) async {
+    // Check if the shift is open before navigating to the order summary page
+    try {
+      await context.read<ShiftProvider>().updateIsOpen();
+    } catch (e) {
+      if (!context.mounted) return;
+      serverErrorToast();
+      return;
+    }
+
+    if (!context.mounted) return;
+    if (!context.read<ShiftProvider>().isOpen) {
+      shiftClosedToast();
+      return;
+    }
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const OrderSummaryPage()),
     );
   }
 

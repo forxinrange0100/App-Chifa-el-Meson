@@ -1,4 +1,5 @@
 import 'package:delivera/model/dish_model.dart';
+import 'package:flutter/foundation.dart' show UniqueKey;
 
 class CartItem {
   final String id;
@@ -11,5 +12,5 @@ class CartItem {
   /// Total price of the item with discount applied, if any
   int get discountedPrice => dish.discountedPrice * quantity;
 
-  CartItem({required this.dish, required this.quantity, required this.notes}) : id = DateTime.now().millisecondsSinceEpoch.toString();
+  CartItem({required this.dish, required this.quantity, required this.notes}) : id = UniqueKey().toString();
 }

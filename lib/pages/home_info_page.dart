@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivera/model/cart_item_model.dart' show CartItem;
-import 'package:delivera/model/dish_category_model.dart';
 import 'package:delivera/model/dish_model.dart' show Dish;
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';

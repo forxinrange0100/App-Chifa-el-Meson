@@ -33,13 +33,15 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
         final String discountPercentage =
             (((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0);
 
-        final double itemHeight = MediaQuery.of(context).size.height / 3.7;
         final double imageWidth = MediaQuery.of(context).size.width / 3;
 
         return Slidable(
-            key: Key(widget.cartItem.id),
-            controller: controller,
-            endActionPane: ActionPane(extentRatio: 0.25, motion: const ScrollMotion(), dragDismissible: false, children: [
+          controller: controller,
+          endActionPane: ActionPane(
+            extentRatio: 0.25,
+            motion: const ScrollMotion(),
+            dragDismissible: false,
+            children: [
               SlidableAction(
                 padding: EdgeInsets.zero,
                 backgroundColor: Colors.redAccent.shade700,
@@ -47,129 +49,132 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                 onPressed: (context) {
                   shoppingCartProvider.removeCartItem(widget.cartItem.id);
                 },
-                icon: FaIcon(FontAwesomeIcons.trashCan, color: Colors.white, size: 20,).icon,
+                icon: FaIcon(
+                  FontAwesomeIcons.trashCan,
+                  color: Colors.white,
+                  size: 20,
+                ).icon,
                 label: 'Eliminar',
               ),
-            ]),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints.fromViewConstraints(
-                  ViewConstraints(
-                    maxHeight: itemHeight,
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.cartItem.dish.name.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 2,
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                Table(
+                  columnWidths: {
+                    0: FixedColumnWidth(imageWidth),
+                    1: const FixedColumnWidth(10),
+                    2: const FlexColumnWidth(),
+                  },
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        widget.cartItem.dish.name.toUpperCase(),
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis),
-                        maxLines: 2,
-                      ),
-                    ),
-                    Table(
-                      columnWidths: {
-                        0: FixedColumnWidth(imageWidth),
-                        1: const FixedColumnWidth(10),
-                        2: const FlexColumnWidth(),
-                      },
+                    TableRow(
                       children: [
-                        TableRow(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: CachedNetworkImage(
-                                imageUrl: widget.cartItem.dish.imageUrl,
-                                width: imageWidth,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(),
-                            SizedBox(
-                              height: imageWidth,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: ExpandableText(
-                                        widget.cartItem.dish.description,
-                                        maxLines: 3,
-                                        enabled: false,
-                                      ),
-                                    ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: CachedNetworkImage(
+                            imageUrl: widget.cartItem.dish.imageUrl,
+                            width: imageWidth,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(),
+                        SizedBox(
+                          height: imageWidth,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: ExpandableText(
+                                    widget.cartItem.dish.description,
+                                    maxLines: 3,
+                                    enabled: false,
                                   ),
-                                  widget.cartItem.dish.discountedPrice != 0
-                                      ? Container(
-                                          color: Colors.green,
-                                          child: Text(
-                                            "Ahorras un $discountPercentage% DTO",
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                                          ),
-                                        )
-                                      : const SizedBox(),
-                                  widget.cartItem.dish.discountedPrice != 0
-                                      ? Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            PriceWidget(
-                                              price: widget.cartItem.dish.regularPrice * widget.cartItem.quantity,
-                                              textDecoration: TextDecoration.lineThrough,
-                                            ),
-                                            PriceWidget(
-                                              price: widget.cartItem.dish.discountedPrice * widget.cartItem.quantity,
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ],
-                                        )
-                                      : Column(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            PriceWidget(
-                                              price: widget.cartItem.dish.regularPrice * widget.cartItem.quantity,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 25,
-                                            ),
-                                          ],
-                                        )
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
+                              widget.cartItem.dish.discountedPrice != 0
+                                  ? Container(
+                                      color: Colors.green,
+                                      child: Text(
+                                        "Ahorras un $discountPercentage% DTO",
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                              widget.cartItem.dish.discountedPrice != 0
+                                  ? Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        PriceWidget(
+                                          price: widget.cartItem.dish.regularPrice * widget.cartItem.quantity,
+                                          textDecoration: TextDecoration.lineThrough,
+                                        ),
+                                        PriceWidget(
+                                          price: widget.cartItem.dish.discountedPrice * widget.cartItem.quantity,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        PriceWidget(
+                                          price: widget.cartItem.dish.regularPrice * widget.cartItem.quantity,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25,
+                                        ),
+                                      ],
+                                    )
+                            ],
+                          ),
                         ),
-                        TableRow(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return NoteDialog(cartItem: widget.cartItem);
-                                  },
-                                );
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return NoteDialog(cartItem: widget.cartItem);
                               },
-                              child: Text(
-                                widget.cartItem.notes.isNotEmpty ? "Ver notas" : "Añadir notas",
-                                style: const TextStyle(decoration: TextDecoration.underline),
-                              ),
-                            ),
-                            const SizedBox(),
-                            _counterWidget(shoppingCartProvider),
-                          ],
+                            );
+                          },
+                          child: Text(
+                            widget.cartItem.notes.isNotEmpty ? "Ver notas" : "Añadir notas",
+                            style: const TextStyle(decoration: TextDecoration.underline),
+                          ),
                         ),
+                        const SizedBox(),
+                        _counterWidget(shoppingCartProvider),
                       ],
                     ),
                   ],
                 ),
-              ),
-            ));
+              ],
+            ),
+          ),
+        );
       },
     );
   }
