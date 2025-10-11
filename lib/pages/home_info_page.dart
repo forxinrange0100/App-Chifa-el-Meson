@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivera/model/cart_item_model.dart' show CartItem;
+import 'package:delivera/model/dish_category_model.dart';
 import 'package:delivera/model/dish_model.dart' show Dish;
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';
@@ -31,11 +32,11 @@ class HomeInfoPage extends StatelessWidget {
       controller: context.watch<ScrollControllerProvider>().scrollController,
       slivers: [
         SliverToBoxAdapter(
-          child: _buildHeaderRestaurantInfo(context),
+          child: HeaderWidget(),
         ),
         if (lastOrder != null)
           SliverToBoxAdapter(
-            child: _ShowLastOrder(lastOrder),
+            child: _LastOrderWidget(lastOrder),
           ),
         SliverAppBar(
           pinned: true,
@@ -47,16 +48,23 @@ class HomeInfoPage extends StatelessWidget {
           shadowColor: Colors.black,
           flexibleSpace: FlexibleSpaceBar(
             centerTitle: true,
-            title: _buildCategories(context),
+            title: CategoriesScrollerWidget(),
             titlePadding: EdgeInsets.zero,
           ),
         ),
-        SliverList(delegate: _buildDishes(context))
+        StoreProductsWidget()
       ],
     );
   }
+}
 
-  Column _buildHeaderRestaurantInfo(BuildContext context) {
+class HeaderWidget extends StatelessWidget {
+  const HeaderWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     // Using Consumer to listen to changes in RestaurantInfoProvider
     var restaurantInfoProvider = context.watch<RestaurantInfoProvider>();
     var imageUrl = restaurantInfoProvider.restaurantInfo.heroImage;
@@ -66,6 +74,22 @@ class HomeInfoPage extends StatelessWidget {
     var logoUrl = restaurantInfoProvider.restaurantInfo.logo;
     var name = restaurantInfoProvider.restaurantInfo.name;
     var description = restaurantInfoProvider.restaurantInfo.description;
+
+    Row buildIconInfo({required IconData icon, required String text, Color? color}) {
+      return Row(
+        spacing: 5,
+        children: [
+          Icon(icon, color: color ?? Colors.white),
+          Expanded(
+            child: Text(
+              text.trim(),
+              style: const TextStyle(color: Colors.white, overflow: TextOverflow.fade),
+              maxLines: 2,
+            ),
+          ),
+        ],
+      );
+    }
 
     return Column(
       children: [
@@ -119,12 +143,12 @@ class HomeInfoPage extends StatelessWidget {
                       child: Column(
                         spacing: 5,
                         children: [
-                          _showRowIconInfo(icon: FontAwesomeIcons.locationDot, text: address),
-                          _showRowIconInfo(icon: FontAwesomeIcons.phone, text: phone),
-                          _showRowIconInfo(icon: FontAwesomeIcons.solidClock, text: schedule),
+                          buildIconInfo(icon: FontAwesomeIcons.locationDot, text: address),
+                          buildIconInfo(icon: FontAwesomeIcons.phone, text: phone),
+                          buildIconInfo(icon: FontAwesomeIcons.solidClock, text: schedule),
                           context.watch<ShiftProvider>().isOpen
-                              ? _showRowIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Abierto", color: Colors.green)
-                              : _showRowIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Cerrado", color: Colors.red),
+                              ? buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Abierto", color: Colors.green)
+                              : buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Cerrado", color: Colors.red),
                         ],
                       ),
                     ),
@@ -160,220 +184,11 @@ class HomeInfoPage extends StatelessWidget {
       ],
     );
   }
-
-  Row _showRowIconInfo({required IconData icon, required String text, Color? color}) {
-    return Row(
-      spacing: 5,
-      children: [
-        Icon(icon, color: color ?? Colors.white),
-        Expanded(
-            child: Text(
-          text.trim(),
-          style: const TextStyle(color: Colors.white, overflow: TextOverflow.fade),
-          maxLines: 2,
-        )),
-      ],
-    );
-  }
-
-  Widget _buildCategories(BuildContext context) {
-    return Consumer<DishCategoriesProvider>(
-      builder: (context, dishCategoriesProvider, child) {
-        return SizedBox(
-          height: 50,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: dishCategoriesProvider.dishCategories.categories.length,
-            itemBuilder: (context, index) {
-              final category = dishCategoriesProvider.dishCategories.categories[index];
-
-              return TextButton(
-                onPressed: () {
-                  final context = category.categoryKey.currentContext;
-                  if (context != null) {
-                    Scrollable.ensureVisible(
-                      context,
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.ease,
-                      alignment: 0.0,
-                    );
-                  }
-                },
-                child: Text(
-                  category.name,
-                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  SliverChildListDelegate _buildDishes(BuildContext context) {
-    return SliverChildListDelegate(
-      [
-        Consumer<DishCategoriesProvider>(
-          builder: (context, dishCategoriesProvider, child) {
-            return Container(
-              color: Colors.grey.shade200,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Column(
-                  children: dishCategoriesProvider.dishCategories.categories
-                      .map((category) => SizedBox(
-                          key: category.categoryKey,
-                          width: double.infinity,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 3.0),
-                                child: Center(
-                                    child: Container(
-                                  width: double.infinity,
-                                  color: Colors.white,
-                                  child: Text(
-                                    category.name,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                                  ),
-                                )),
-                              ),
-                              Consumer<DishesProvider>(
-                                builder: (context, dishProvider, child) {
-                                  return Column(
-                                    children: dishProvider.getDishesByCategory(category.id).map((dish) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                        child: Container(
-                                          color: Colors.white,
-                                          width: double.infinity,
-                                          child: ElevatedButton(
-                                            style: _cardItemStyle(),
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return DishDialog(dish: dish);
-                                                },
-                                              );
-                                            },
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                SizedBox(
-                                                  height: 160,
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                    children: [
-                                                      SizedBox(
-                                                        width: 150,
-                                                        child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              dish.name,
-                                                              maxLines: 3,
-                                                              style: const TextStyle(
-                                                                  fontSize: 20, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
-                                                            ),
-                                                            ExpandableText(
-                                                              dish.description,
-                                                              maxLines: 3,
-                                                              enabled: false,
-                                                              style: TextStyle(color: Colors.grey),
-                                                            ),
-                                                            Center(
-                                                                child: dish.discountedPrice != 0
-                                                                    ? Row(
-                                                                        children: [
-                                                                          PriceWidget(
-                                                                              price: dish.discountedPrice,
-                                                                              color: Colors.green,
-                                                                              fontSize: 22,
-                                                                              fontWeight: FontWeight.bold),
-                                                                          const SizedBox(
-                                                                            width: 10,
-                                                                          ),
-                                                                          PriceWidget(
-                                                                              price: dish.regularPrice, textDecoration: TextDecoration.lineThrough),
-                                                                        ],
-                                                                      )
-                                                                    : PriceWidget(
-                                                                        price: dish.regularPrice, fontWeight: FontWeight.bold, fontSize: 25)),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      CachedNetworkImage(
-                                                        imageUrl: dish.imageUrl,
-                                                        width: 170,
-                                                        fit: BoxFit.cover,
-                                                        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                                        errorWidget: (context, url, error) => const Icon(Icons.error),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                ElevatedButton(
-                                                    onPressed: () async {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext context) {
-                                                          return DishDialog(dish: dish);
-                                                        },
-                                                      );
-                                                    },
-                                                    child: const Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-                                                        Icon(FontAwesomeIcons.cartShopping),
-                                                        SizedBox(width: 10),
-                                                        Text("AGREGAR AL CARRITO"),
-                                                      ],
-                                                    ))
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  );
-                                },
-                              )
-                            ],
-                          )))
-                      .toList(),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  ButtonStyle _cardItemStyle() {
-    return const ButtonStyle(
-      backgroundColor: WidgetStatePropertyAll(Colors.white),
-      foregroundColor: WidgetStatePropertyAll(Colors.black),
-      shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        ),
-      ),
-    );
-  }
 }
 
-class _ShowLastOrder extends StatelessWidget {
+class _LastOrderWidget extends StatelessWidget {
   final Order _order;
-  const _ShowLastOrder(Order order) : _order = order;
+  const _LastOrderWidget(Order order) : _order = order;
 
   @override
   Widget build(BuildContext context) {
@@ -501,6 +316,232 @@ class _ShowLastOrder extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class CategoriesScrollerWidget extends StatelessWidget {
+  const CategoriesScrollerWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<DishCategoriesProvider>(
+      builder: (context, dishCategoriesProvider, child) {
+        return SizedBox(
+          height: 50,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: dishCategoriesProvider.dishCategories.categories.length,
+            itemBuilder: (context, index) {
+              final category = dishCategoriesProvider.dishCategories.categories[index];
+
+              return TextButton(
+                onPressed: () {
+                  final context = category.categoryKey.currentContext;
+                  if (context != null) {
+                    Scrollable.ensureVisible(
+                      context,
+                      duration: const Duration(seconds: 1),
+                      curve: Curves.ease,
+                      alignment: 0.0,
+                    );
+                  }
+                },
+                child: Text(
+                  category.name,
+                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class StoreProductsWidget extends StatelessWidget {
+  const StoreProductsWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverList(
+      delegate: SliverChildListDelegate(
+        [
+          Consumer<DishCategoriesProvider>(
+            builder: (context, dishCategoriesProvider, child) {
+              return Container(
+                color: Colors.grey.shade200,
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Column(
+                  children: dishCategoriesProvider.dishCategories.categories.map((category) {
+                    return Column(
+                      key: category.categoryKey,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          margin: const EdgeInsets.symmetric(vertical: 16),
+                          color: Colors.white,
+                          child: Text(
+                            category.name,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        CategoryProductsWidget(categoryId: category.id)
+                      ],
+                    );
+                  }).toList(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryProductsWidget extends StatelessWidget {
+  final int categoryId;
+
+  const CategoryProductsWidget({
+    super.key,
+    required this.categoryId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<DishesProvider>(
+      builder: (context, dishProvider, child) {
+        return Column(
+          spacing: 16,
+          children: dishProvider.getDishesByCategory(categoryId).map((dish) {
+            return ProductCardWidget(dish: dish);
+          }).toList(),
+        );
+      },
+    );
+  }
+}
+
+class ProductCardWidget extends StatelessWidget {
+  final Dish dish;
+
+  const ProductCardWidget({
+    super.key,
+    required this.dish,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return DishDialog(dish: dish);
+          },
+        );
+      },
+      style: const ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll(Colors.white),
+        foregroundColor: WidgetStatePropertyAll(Colors.black),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+        )),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 160,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: 150,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        dish.name,
+                        maxLines: 3,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          overflow: TextOverflow.ellipsis,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ExpandableText(
+                        dish.description,
+                        maxLines: 3,
+                        enabled: false,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      Center(
+                        child: (dish.discountedPrice == 0)
+                            ? PriceWidget(
+                                price: dish.regularPrice,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                              )
+                            : Row(
+                                children: [
+                                  PriceWidget(
+                                    price: dish.discountedPrice,
+                                    color: Colors.green,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  PriceWidget(
+                                    price: dish.regularPrice,
+                                    textDecoration: TextDecoration.lineThrough,
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+                CachedNetworkImage(
+                  imageUrl: dish.imageUrl,
+                  width: 170,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                )
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return DishDialog(dish: dish);
+                },
+              );
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10,
+              children: [
+                Icon(FontAwesomeIcons.cartShopping),
+                Text("AGREGAR AL CARRITO"),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
