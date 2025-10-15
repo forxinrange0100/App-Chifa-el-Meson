@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "264968005767",
+    "project_id": "chifaelmeson-ae40a",
+    "storage_bucket": "chifaelmeson-ae40a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264968005767:android:608f5f9d52d9e0d895f022",
+        "android_client_info": {
+          "package_name": "com.delivera.delivera"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsyjEqASMTnScNomv5K5Fs7OWuM9svbYY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

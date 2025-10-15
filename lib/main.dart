@@ -1,7 +1,11 @@
+import 'package:delivera/firebase_options.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
 import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 import 'package:hive/hive.dart' show Hive;
 import 'package:delivera/model/order_model.dart' show Order;
+import 'package:delivera/services/firebase_messaging_service.dart';
+import 'package:delivera/services/local_notifications_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'dart:io' show HttpClient;
 import 'package:delivera/pages/home_page.dart' show HomePage;
@@ -23,7 +27,17 @@ import 'package:toastification/toastification.dart';
 
 void main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  final localNotificationsService = LocalNotificationsService.instance();
+  await localNotificationsService.init();
+
+  final firebaseMessagingService = FirebaseMessagingService.instance();
+  await firebaseMessagingService.init(localNotificationsService: localNotificationsService);
+  
   // Para evitar un error en la herramienta Network mientras se debuggea
   if (kDebugMode) {
     HttpClient.enableTimelineLogging = true;
