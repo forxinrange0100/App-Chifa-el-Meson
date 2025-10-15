@@ -18,7 +18,7 @@ Future<Dishes> fetchDishes() async {
       // log("JsonDecode : ${jsonDecode(response.body)}");
       // log("Response body: ${response.body}");
       // log("Response body decode: ${json.decode(response.body)}");
-      log("Fetch Dishes length: ${response.body.length}");
+      // log("Fetch Dishes length: ${response.body.length}");
       final result = json.decode(response.body);
       final products = result['products'];
       List<Dish> dishes = [];

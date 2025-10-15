@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:convert';
 
 class LocalNotificationsService {
   // Private constructor for singleton pattern
@@ -29,6 +31,8 @@ class LocalNotificationsService {
     'Channel name',
     description: 'Android push notification channel',
     importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
   );
 
   //Flag to track initialization status
@@ -57,7 +61,7 @@ class LocalNotificationsService {
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onDidReceiveNotificationResponse: (NotificationResponse response) {
       // Handle notification tap in foreground
-      print('Foreground notification has been tapped: ${response.payload}');
+      log('Foreground notification has been tapped: ${response.payload}');
     });
 
     // Create Android notification channel
@@ -73,7 +77,7 @@ class LocalNotificationsService {
   Future<void> showNotification(
     String? title,
     String? body,
-    String? payload,
+    Map<String, dynamic>? payload,
   ) async {
     // Android-specific notification details
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
@@ -82,6 +86,7 @@ class LocalNotificationsService {
       channelDescription: _androidChannel.description,
       importance: Importance.max,
       priority: Priority.high,
+      playSound: false,
     );
 
     // iOS-specific notification details
@@ -93,13 +98,25 @@ class LocalNotificationsService {
       iOS: iosDetails,
     );
 
+    final dynamic json = body != null ? jsonDecode(body) : null;
+      // log('Notification payload: $json');
+    final String text = json['text'] ?? '';
+    final String type = json['type'] ?? '';
+    final dynamic data = json['data'];
+
+    log('Notification title: $title');
+    log('Notification text: $text');
+    log('Notification type: $type');
+    log('Notification data: $data');
+    log('Notification payload: $payload');
+
     // Display the notification
     await _flutterLocalNotificationsPlugin.show(
       _notificationIdCounter++,
       title,
-      body,
+      text,
       notificationDetails,
-      payload: payload,
+      payload: payload.toString(),
     );
   }
 }
