@@ -16,8 +16,11 @@ class FirebaseMessagingService {
 
   // Reference to local notifications service for displaying notifications
   LocalNotificationsService? _localNotificationsService;
-
   LocalNotificationsService? get localNotificationsService => _localNotificationsService;
+
+  // FCM token for the device
+  String? _token;
+  String? get token => _token;
 
   /// Initialize Firebase Messaging and sets up all message listeners
   Future<void> init({required LocalNotificationsService localNotificationsService}) async {
@@ -49,11 +52,12 @@ class FirebaseMessagingService {
   /// Retrieves and manages the FCM token for push notifications
   Future<void> _handlePushNotificationsToken() async {
     // Get the FCM token for the device
-    final token = await FirebaseMessaging.instance.getToken();
+    _token = await FirebaseMessaging.instance.getToken();
     log('Push notifications token: $token');
 
     // Listen for token refresh events
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+      _token = fcmToken;
       log('FCM token refreshed: $fcmToken');
       // TODO: optionally send token to your server for targeting this device
     }).onError((error) {

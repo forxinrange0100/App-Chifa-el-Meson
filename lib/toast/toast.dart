@@ -14,10 +14,10 @@ void successToast(String message, {Icon? icon}) {
   );
 }
 
-void errorToast(String message, {Icon? icon}) {
+void errorToast(String message, {Icon? icon, String? title}) {
   toastification.show(
     icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
-    title: Text('Error'),
+    title: Text(title ?? 'Error'),
     description: Text(message),
     style: ToastificationStyle.flat,
     type: ToastificationType.error,
@@ -27,9 +27,10 @@ void errorToast(String message, {Icon? icon}) {
   );
 }
 
-void warningToast(String message, {Icon? icon}) {
+void warningToast(String message, {Icon? icon, String? title}) {
   toastification.show(
     icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
+    title: title != null ? Text(title) : null,
     description: Text(
       message,
       overflow: TextOverflow.ellipsis,
@@ -81,7 +82,7 @@ void unsavedInvoice() {
 
 // Toast for server error
 void serverErrorToast([String? error]) {
-  errorToast(error ?? 'Error del servidor, intente más tarde');
+  errorToast(error ?? 'Error del servidor, intente más tarde', title: 'Error del servidor');
 }
 
 // void storageNotGranted() {

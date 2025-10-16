@@ -614,6 +614,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         return;
       }
 
+      // Check if a delivery method is selected
+      if (_deliveryDetailsProvider.deliveryDetailEnum == null) {
+        // Handle the case where no delivery method is selected
+        errorOrderSummary("Método de entrega no seleccionado.");
+        return;
+      }
+
       // Update the delivery details before proceeding
       try {
         await _deliveryDetailsProvider.update();
@@ -623,13 +630,6 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         return;
       }
       if (!context.mounted) return;
-
-      // Check if a delivery method is selected
-      if (_deliveryDetailsProvider.deliveryDetailEnum == null) {
-        // Handle the case where no delivery method is selected
-        errorOrderSummary("Método de entrega no seleccionado.");
-        return;
-      }
 
       // Check if the delivery method 'Dispatch' is selected
       if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {

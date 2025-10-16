@@ -32,7 +32,7 @@ class OrderSummaryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Realiza peticion para crear el pedido y guarda el resultado
+  /// Realiza peticion para crear el pedido y guarda el resultado. La petición incluye el token FCM para notificaciones push.
   Future<void> postOrder() async {
     _orderResult = await fetchOrder(_orderSummary);
     notifyListeners();
