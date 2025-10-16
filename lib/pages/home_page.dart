@@ -9,6 +9,7 @@ import 'package:delivera/provider/data_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
+import 'package:delivera/widget/error_screen_widget.dart';
 import 'package:delivera/widget/loading_screen_widget.dart' show LoadingScreenWidget;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -96,12 +97,7 @@ class _HomePageState extends State<HomePage> {
                       ),
           );
         } else {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child: Text("Error: ${_dataProvider.errorMessage}"),
-            ),
-          );
+          return ErrorScreenWidget(errorMessage: _dataProvider.errorMessage);
         }
       },
     );

@@ -6,6 +6,7 @@ import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/utils/pdf/generate_invoice_pdf.dart';
+import 'package:delivera/widget/error_screen_widget.dart' show ErrorScreenWidget;
 import 'package:delivera/widget/invoice_card_widget.dart';
 import 'package:delivera/widget/loading_screen_widget.dart' show LoadingScreenWidget;
 import 'package:flutter/material.dart';
@@ -166,12 +167,7 @@ class _InvoicePageState extends State<InvoicePage> {
                   ),
                 );
         } else {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child: Text("Error: $_errorMessage"),
-            ),
-          );
+          return ErrorScreenWidget(errorMessage: _errorMessage);
         }
       },
     );
