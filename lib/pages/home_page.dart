@@ -89,12 +89,7 @@ class _HomePageState extends State<HomePage> {
                           child: CircularProgressIndicator(color: Colors.blue, backgroundColor: Colors.grey),
                         ),
                       )
-                    : Scaffold(
-                        backgroundColor: Colors.white,
-                        body: Center(
-                          child: Text("Error ${_dataProvider.errorMessage}"),
-                        ),
-                      ),
+                    : ErrorScreenWidget(errorMessage: _dataProvider.errorMessage),
           );
         } else {
           return ErrorScreenWidget(errorMessage: _dataProvider.errorMessage);
