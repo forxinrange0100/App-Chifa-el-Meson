@@ -12,15 +12,18 @@ class DataProvider extends ChangeNotifier {
   final DishesProvider _dishesProvider;
   final DishCategoriesProvider _dishCategoriesProvider;
   final DeliveryDetailsProvider _deliveryDetailsProvider;
+
   String _errorMessage = '';
+  String get errorMessage => _errorMessage;
+
   bool _done = false;
+  bool get done => _done;
 
   DataProvider(this._restaurantInfoProvider, this._dishesProvider,
       this._dishCategoriesProvider, this._deliveryDetailsProvider);
-  String get errorMessage => _errorMessage;
-  bool get done => _done;
 
   Future<void> getData() async {
+    reset();
     try {
       await getRestaurant();
       await getDishes();
@@ -53,5 +56,6 @@ class DataProvider extends ChangeNotifier {
   void reset() {
     _errorMessage = '';
     _done = false;
+    notifyListeners();
   }
 }

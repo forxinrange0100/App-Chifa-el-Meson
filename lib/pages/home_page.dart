@@ -73,7 +73,6 @@ class _HomePageState extends State<HomePage> {
 
                 if (isFirstBackPress) {
                   lastPressedAt = now;
-                  context.read<DataProvider>().reset();
                   closeAppToast();
                 } else {
                   SystemNavigator.pop();

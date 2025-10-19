@@ -30,6 +30,12 @@ class _InvoicePageState extends State<InvoicePage> {
   String? _errorMessage;
   late InvoiceProvider _invoiceProvider;
 
+  void _setReloading(bool isReloading) {
+    setState(() {
+      _reloading = isReloading;
+    });
+  }
+
   Future<bool> _getOrder() async {
     try {
       final invoiceProvider = context.read<InvoiceProvider>();
@@ -90,23 +96,21 @@ class _InvoicePageState extends State<InvoicePage> {
                       elevation: 2,
                       centerTitle: true,
                       leading: IconButton(
-                          onPressed: () {
-                            widget._order == null ? _navigateHome(context) : Navigator.pop(context);
-                          },
-                          icon: const Icon(Icons.arrow_back, color: Colors.black)),
+                        onPressed: () {
+                          widget._order == null ? _navigateHome(context) : Navigator.pop(context);
+                        },
+                        icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      ),
                       title: const Text("BOLETA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                       actions: [
                         IconButton(
-                            onPressed: () async {
-                              setState(() {
-                                _reloading = true;
-                              });
-                              await _getOrder();
-                              setState(() {
-                                _reloading = false;
-                              });
-                            },
-                            icon: const Icon(FontAwesomeIcons.arrowRotateRight))
+                          onPressed: () async {
+                            _setReloading(true);
+                            await _getOrder();
+                            _setReloading(false);
+                          },
+                          icon: const Icon(FontAwesomeIcons.arrowRotateRight),
+                        )
                       ],
                     ),
                     body: Column(
@@ -147,18 +151,19 @@ class _InvoicePageState extends State<InvoicePage> {
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: ElevatedButton(
-                                  style: ButtonStyle(
-                                      backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
-                                      foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black)),
-                                  onPressed: () {
-                                    if (widget._order != null) {
-                                      Navigator.pop(context);
-                                      return;
-                                    }
-                                    context.read<BottomNavigationBarProvider>().showHome();
-                                    _navigateHome(context);
-                                  },
-                                  child: Text(widget._order == null ? "Volver a la tienda" : "Volver al historial")),
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
+                                    foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black)),
+                                onPressed: () {
+                                  if (widget._order != null) {
+                                    Navigator.pop(context);
+                                    return;
+                                  }
+                                  context.read<BottomNavigationBarProvider>().showHome();
+                                  _navigateHome(context);
+                                },
+                                child: Text(widget._order == null ? "Volver a la tienda" : "Volver al historial"),
+                              ),
                             )
                           ],
                         )
@@ -186,21 +191,32 @@ class _InvoicePageState extends State<InvoicePage> {
 
   void _downloadInvoice() async {
     _invoiceProvider.setIsDownloadingInvoice(true);
-
-    final order = _invoiceProvider.order;
-    final pdfDocument = await generateInvoicePdf(
-      order,
-      context.read<RestaurantInfoProvider>().restaurantInfo,
-    );
-    if (!context.mounted) return;
-    final pdfBytes = await pdfDocument.save();
-    final directory = await getTemporaryDirectory();
-    final tempFile = File('${directory.path}/orden-${order.publicId}-${order.timestampChile.toIso8601String()}.pdf');
-    await tempFile.writeAsBytes(pdfBytes);
-    OpenFilex.open(tempFile.path);
-    if (!context.mounted) {
-      return;
+    try {
+      final order = _invoiceProvider.order;
+      final pdfDocument = await generateInvoicePdf(
+        order,
+        context.read<RestaurantInfoProvider>().restaurantInfo,
+      );
+      if (!context.mounted) return;
+      final pdfBytes = await pdfDocument.save();
+      final directory = await getTemporaryDirectory();
+      final tempFile = File('${directory.path}/orden-${order.publicId}-${order.timestampChile.toIso8601String()}.pdf');
+      await tempFile.writeAsBytes(pdfBytes);
+      OpenFilex.open(tempFile.path);
+      if (!context.mounted) {
+        return;
+      }
+    } catch (e, stackTrace) {
+      log("Error in invoice_page, downloadInvoice: ${e.toString()}");
+      log("Stack trace: $stackTrace");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al descargar la boleta: ${e.toString()}'),
+        ),
+      );
+    } finally {
+      _invoiceProvider.setIsDownloadingInvoice(false);
     }
-    _invoiceProvider.setIsDownloadingInvoice(false);
   }
 }
