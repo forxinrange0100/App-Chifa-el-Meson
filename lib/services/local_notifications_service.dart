@@ -77,7 +77,7 @@ class LocalNotificationsService {
   Future<void> showNotification(
     String? title,
     String? body,
-    Map<String, dynamic>? payload,
+    dynamic payload,
   ) async {
     // Android-specific notification details
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
@@ -97,26 +97,22 @@ class LocalNotificationsService {
       android: androidDetails,
       iOS: iosDetails,
     );
+    try {
 
-    final dynamic json = body != null ? jsonDecode(body) : null;
-      // log('Notification payload: $json');
-    final String text = json['text'] ?? '';
-    final String type = json['type'] ?? '';
-    final dynamic data = json['data'];
+      log('Notification title: $title');
+      log('Notification body: $body');
+      log('Notification payload: $payload');
 
-    log('Notification title: $title');
-    log('Notification text: $text');
-    log('Notification type: $type');
-    log('Notification data: $data');
-    log('Notification payload: $payload');
-
-    // Display the notification
-    await _flutterLocalNotificationsPlugin.show(
-      _notificationIdCounter++,
-      title,
-      text,
-      notificationDetails,
-      payload: payload.toString(),
-    );
+      // Display the notification
+      await _flutterLocalNotificationsPlugin.show(
+        _notificationIdCounter++,
+        title,
+        body,
+        notificationDetails,
+        payload: payload.toString(),
+      );
+    } catch (e) {
+        log('Error showing notification: $e');
+    }
   }
 }

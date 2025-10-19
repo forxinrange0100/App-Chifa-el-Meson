@@ -82,11 +82,20 @@ class FirebaseMessagingService {
   /// Handles messages received while the app is in the foreground
   void _onForegroundMessage(RemoteMessage message) {
     final notificationData = message.notification;
-    log('Foreground message received: ${message.toMap()}');
+    // log('Foreground message received: ${message.toMap()}');
     if (notificationData != null) {
+      // log .title
+      // log('Notification Title: ${notificationData.title}');
+      // log .body
+      // log('Notification Body: ${notificationData.body}');
+      // log('Notification Data: ${message.data['order_data']}');
       // Display a local notification using the service
-      _localNotificationsService?.showNotification(
-          notificationData.title, notificationData.body, message.data);
+      try {
+        _localNotificationsService?.showNotification(
+            notificationData.title, notificationData.body, message.data['order_data']);
+      } catch (e) {
+        log('Error showing notification: $e');
+      }
     }
   }
 
