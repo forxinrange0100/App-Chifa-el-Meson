@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dart:convert';
 
 class LocalNotificationsService {
   // Private constructor for singleton pattern
@@ -15,24 +14,23 @@ class LocalNotificationsService {
   //Main plugin instance for handling notifications
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
 
-  //Android-specific initialization settings using app launcher icon
-  final _androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  //iOS-specific initialization settings with permission requests
-  final _iosInitializationSettings = const DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
-
   //Android notification channel configuration
   final _androidChannel = const AndroidNotificationChannel(
-    'channel_id',
-    'Channel name',
-    description: 'Android push notification channel',
+    'delivera_channel',
+    'Delivera Notifications',
+    description: 'Android push notification channel for Delivera app',
     importance: Importance.max,
     playSound: true,
     enableVibration: true,
+  );
+
+  final _androidChannelFCM = const AndroidNotificationChannel(
+    'delivera_channel_fcm',
+    'Delivera FCM Notifications',
+    description: 'Android push notification channel for Delivera app FCM',
+    importance: Importance.none,
+    playSound: false,
+    enableVibration: false,
   );
 
   //Flag to track initialization status
@@ -50,19 +48,36 @@ class LocalNotificationsService {
 
     // Create plugin instance
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    
+    //Android-specific initialization settings using app launcher icon
+    final androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    //iOS-specific initialization settings with permission requests
+    final iosInitializationSettings = const DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
 
     // Combine platform-specific settings
     final initializationSettings = InitializationSettings(
-      android: _androidInitializationSettings,
-      iOS: _iosInitializationSettings,
+      android: androidInitializationSettings,
+      iOS: iosInitializationSettings,
     );
 
     // Initialize plugin with settings and callback for notification taps
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: (NotificationResponse response) {
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: (NotificationResponse response) {
       // Handle notification tap in foreground
-      log('Foreground notification has been tapped: ${response.payload}');
+      log('Foreground notification has been tapped.');
     });
+
+    // Refresh Android notification channels, use when making changes to channels
+    // await _refreshAndroidChannels();
+
+    // Create Android notification channel
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_androidChannelFCM);
 
     // Create Android notification channel
     await _flutterLocalNotificationsPlugin
@@ -73,20 +88,34 @@ class LocalNotificationsService {
     _isFlutterLocalNotificationInitialized = true;
   }
 
+  /// Refreshes Android notification channels by deleting existing ones.
+  // ignore: unused_element
+  Future<void> _refreshAndroidChannels() async {
+    var notificationChannels = await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.getNotificationChannels();
+    
+    // Delete all existing channels to avoid duplicates
+    if (notificationChannels != null) {
+      for (var channel in notificationChannels) {
+        log('Deleting existing channel: ${channel.id}');
+        await _flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+            ?.deleteNotificationChannel(channel.id);
+      }
+    }
+  }
+
   /// Show a local notification with the given title, body, and payload.
-  Future<void> showNotification(
-    String? title,
-    String? body,
-    dynamic payload,
-  ) async {
+  Future<void> showNotification(String? title, String? body, dynamic payload) async {
     // Android-specific notification details
-    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       _androidChannel.id,
       _androidChannel.name,
       channelDescription: _androidChannel.description,
-      importance: Importance.max,
+      importance: _androidChannel.importance,
+      playSound: _androidChannel.playSound,
       priority: Priority.high,
-      playSound: false,
     );
 
     // iOS-specific notification details
@@ -97,7 +126,9 @@ class LocalNotificationsService {
       android: androidDetails,
       iOS: iosDetails,
     );
+
     try {
+      _notificationIdCounter++;
 
       log('Notification title: $title');
       log('Notification body: $body');
@@ -105,14 +136,14 @@ class LocalNotificationsService {
 
       // Display the notification
       await _flutterLocalNotificationsPlugin.show(
-        _notificationIdCounter++,
+        _notificationIdCounter,
         title,
         body,
         notificationDetails,
         payload: payload.toString(),
       );
     } catch (e) {
-        log('Error showing notification: $e');
+      log('Error showing notification: $e');
     }
   }
 }

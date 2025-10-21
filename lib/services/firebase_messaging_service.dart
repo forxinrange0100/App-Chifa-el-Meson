@@ -45,7 +45,7 @@ class FirebaseMessagingService {
     // Check for initial message that opened the app from terminated state
     final RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      _onMessageOpenedApp(initialMessage);
+      _onMessageOpenedApp(initialMessage, fromTerminated: true);
     }
   }
 
@@ -59,7 +59,6 @@ class FirebaseMessagingService {
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
       _token = fcmToken;
       log('FCM token refreshed: $fcmToken');
-      // TODO: optionally send token to your server for targeting this device
     }).onError((error) {
       // Handle errors during token refresh
       log('Error refreshing FCM token: $error');
@@ -81,27 +80,35 @@ class FirebaseMessagingService {
 
   /// Handles messages received while the app is in the foreground
   void _onForegroundMessage(RemoteMessage message) {
-    final notificationData = message.notification;
     // log('Foreground message received: ${message.toMap()}');
+    final notificationData = message.notification;
     if (notificationData != null) {
-      // log .title
-      // log('Notification Title: ${notificationData.title}');
-      // log .body
-      // log('Notification Body: ${notificationData.body}');
-      // log('Notification Data: ${message.data['order_data']}');
       // Display a local notification using the service
       try {
         _localNotificationsService?.showNotification(
-            notificationData.title, notificationData.body, message.data['order_data']);
+          notificationData.title,
+          notificationData.body,
+          message.data['order_data'],
+        );
       } catch (e) {
-        log('Error showing notification: $e');
+        log('Error showing foreground notification: $e');
       }
     }
   }
 
   /// Handles notification taps when app is opened from the background or terminated state
-  void _onMessageOpenedApp(RemoteMessage message) {
-    log('Notification caused the app to open: ${message.toMap()}');
+  void _onMessageOpenedApp(RemoteMessage message, {bool fromTerminated = false}) {
+    log('Notification tapped from ${fromTerminated ? 'terminated' : 'background'}: ${message.toMap()}');
+    // Avisar al usuario si se abrió desde estado terminado con un toast
+    // if (fromTerminated) {
+    //   // Toast para avisar al usuario que se abrió la notificación desde estado terminado
+    //   LocalNotificationsService.instance().showNotification(
+    //     'Notificación abierta desde estado terminado',
+    //     'La notificación se abrió desde el estado terminado',
+    //     {},
+    //   );
+    // }
+
     // TODO: Add navigation or specific handling based on message data
   }
 }
@@ -118,6 +125,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     final localNotificationsService = LocalNotificationsService.instance();
     await localNotificationsService.init();
     await localNotificationsService.showNotification(
-        notificationData.title, notificationData.body, message.data);
+      notificationData.title,
+      notificationData.body,
+      message.data,
+    );
   }
 }
