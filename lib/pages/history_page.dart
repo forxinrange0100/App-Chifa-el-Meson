@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:delivera/enum/delivery_detail_enum.dart';
-import 'package:delivera/model/order_model.dart' show Order, StatusEnum;
+import 'package:delivera/enum/order_status_enum.dart';
+import 'package:delivera/model/order_model.dart' show Order;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/utils/format_date_time.dart';
@@ -95,7 +96,7 @@ class HistoryPage extends StatelessWidget {
   Widget _orderItem(BuildContext context, Order order) {
     final [String date, String time] = formatDateTime(order.timestampChile).split(', ');
     final DeliveryDetailEnum deliveryType = DeliveryDetailEnum.fromName(order.deliveryType);
-    final StatusEnum status = StatusEnum.fromName(order.status);
+    final OrderStatusEnum status = OrderStatusEnum.fromName(order.status);
 
     return TextButton(
       onPressed: () {
@@ -167,19 +168,19 @@ class HistoryPage extends StatelessWidget {
     );
   }
 
-  Widget orderStatusChip(StatusEnum status) {
+  Widget orderStatusChip(OrderStatusEnum status) {
     final Color color = switch (status) {
-      StatusEnum.pending => Colors.orange,
-      StatusEnum.completed => Colors.green,
-      StatusEnum.canceled => Colors.red,
+      OrderStatusEnum.pending => Colors.orange,
+      OrderStatusEnum.completed => Colors.green,
+      OrderStatusEnum.canceled => Colors.red,
       _ => Colors.grey,
     };
 
     const double alpha = .15;
     final Color backgroundColor = switch (status) {
-      StatusEnum.pending => Colors.orange.withValues(alpha: alpha),
-      StatusEnum.completed => Colors.green.withValues(alpha: alpha),
-      StatusEnum.canceled => Colors.red.withValues(alpha: alpha),
+      OrderStatusEnum.pending => Colors.orange.withValues(alpha: alpha),
+      OrderStatusEnum.completed => Colors.green.withValues(alpha: alpha),
+      OrderStatusEnum.canceled => Colors.red.withValues(alpha: alpha),
       _ => Colors.grey.withValues(alpha: alpha),
     };
 
@@ -206,7 +207,7 @@ class HistoryPage extends StatelessWidget {
   List<Order> generateFakeOrders() {
     const from = 1001;
     const to = 1010;
-    final status = StatusEnum.pending.name;
+    final status = OrderStatusEnum.pending.name;
     final deliveryType = DeliveryDetailEnum.dispatch.name;
     const total = 20000;
     List<Order> orders = [];
@@ -222,7 +223,7 @@ class HistoryPage extends StatelessWidget {
     final ordersBox = Hive.box<Order>(name: 'orders');
     const from = 1001;
     const to = 1010;
-    final status = StatusEnum.pending.name;
+    final status = OrderStatusEnum.pending.name;
     final deliveryType = DeliveryDetailEnum.dispatch.name;
     const total = 20000;
     for (int i = from; i < to + 1; i++) {

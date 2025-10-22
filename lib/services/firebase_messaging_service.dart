@@ -80,7 +80,7 @@ class FirebaseMessagingService {
 
   /// Handles messages received while the app is in the foreground
   void _onForegroundMessage(RemoteMessage message) {
-    // log('Foreground message received: ${message.toMap()}');
+    log('Foreground message received');
     final notificationData = message.notification;
     if (notificationData != null) {
       // Display a local notification using the service
@@ -96,15 +96,16 @@ class FirebaseMessagingService {
     }
   }
 
-  /// Handles notification taps when app is opened from the background or terminated state
+  /// Handles notification taps when app is opened from the background or terminated state.
+  /// Solo funciona con el canal por defecto de fcm.
+  /// Actualmente se usa un canal personalizado, por lo que esta función no se usa.
   void _onMessageOpenedApp(RemoteMessage message, {bool fromTerminated = false}) {
     log('Notification tapped from ${fromTerminated ? 'terminated' : 'background'}: ${message.toMap()}');
-    // Avisar al usuario si se abrió desde estado terminado con un toast
     // if (fromTerminated) {
     //   // Toast para avisar al usuario que se abrió la notificación desde estado terminado
     //   LocalNotificationsService.instance().showNotification(
-    //     'Notificación abierta desde estado terminado',
-    //     'La notificación se abrió desde el estado terminado',
+    //     'Notificación abierta desde background',
+    //     'La notificación se abrió desde el background',
     //     {},
     //   );
     // }
@@ -119,7 +120,7 @@ class FirebaseMessagingService {
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final notificationData = message.notification;
-  log('Background message received: ${message.toMap()}');
+  log('Background message received');
   if (notificationData != null) {
     // Display a local notification
     final localNotificationsService = LocalNotificationsService.instance();

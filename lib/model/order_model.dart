@@ -4,24 +4,6 @@ import 'package:delivera/model/payment_status_style_model.dart';
 import 'package:delivera/utils/date_time_chile.dart';
 import 'package:delivera/utils/format_price.dart';
 
-enum StatusEnum {
-  pending('Pendiente'),
-  completed('Completado'),
-  canceled('Cancelado'),
-  unknown('Desconocido');
-
-  final String label;
-  const StatusEnum(this.label);
-
-  static StatusEnum fromName(String name) {
-    if (name.isEmpty) return StatusEnum.unknown;
-    return StatusEnum.values.firstWhere(
-      (e) => e.name.toLowerCase() == name.toLowerCase(),
-      orElse: () => StatusEnum.unknown,
-    );
-  }
-}
-
 /// Represents an order that's retrieved from the server
 class Order {
   final int _id;

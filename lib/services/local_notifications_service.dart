@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'package:delivera/enum/notification_type_enum.dart';
+import 'package:delivera/model/notification_handler_model.dart' show NotificationHandler;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationsService {
@@ -48,7 +50,7 @@ class LocalNotificationsService {
 
     // Create plugin instance
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    
+
     //Android-specific initialization settings using app launcher icon
     final androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -66,10 +68,10 @@ class LocalNotificationsService {
     );
 
     // Initialize plugin with settings and callback for notification taps
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: (NotificationResponse response) {
-      // Handle notification tap in foreground
-      log('Foreground notification has been tapped.');
-    });
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: _notificationTapped,
+    );
 
     // Refresh Android notification channels, use when making changes to channels
     // await _refreshAndroidChannels();
@@ -94,7 +96,7 @@ class LocalNotificationsService {
     var notificationChannels = await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.getNotificationChannels();
-    
+
     // Delete all existing channels to avoid duplicates
     if (notificationChannels != null) {
       for (var channel in notificationChannels) {
@@ -104,6 +106,18 @@ class LocalNotificationsService {
             ?.deleteNotificationChannel(channel.id);
       }
     }
+  }
+
+  static void _notificationTapped(NotificationResponse response) {
+    // Handle notification tap
+    log('Notification has been tapped.');
+    if (response.payload == null) {
+      log('Notification has no payload.');
+      return;
+    }
+    // final notificationType = NotificationTypeEnum.fromName(response.payload!);
+    // final notificationHandler = NotificationHandler.fromType(notificationType);
+    // notificationHandler.handle(response.payload!);
   }
 
   /// Show a local notification with the given title, body, and payload.
