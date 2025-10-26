@@ -1,3 +1,4 @@
+import 'dart:convert' show jsonDecode, jsonEncode;
 import 'dart:developer';
 import 'package:delivera/enum/notification_type_enum.dart';
 import 'package:delivera/model/notification_handler_model.dart' show NotificationHandler;
@@ -115,9 +116,10 @@ class LocalNotificationsService {
       log('Notification has no payload.');
       return;
     }
-    // final notificationType = NotificationTypeEnum.fromName(response.payload!);
-    // final notificationHandler = NotificationHandler.fromType(notificationType);
-    // notificationHandler.handle(response.payload!);
+    final dynamic payload = jsonDecode(response.payload!);
+    final notificationType = NotificationTypeEnum.fromName(payload['type']);
+    final notificationHandler = NotificationHandler.fromType(notificationType);
+    notificationHandler.handleTapped(payload);
   }
 
   /// Show a local notification with the given title, body, and payload.
@@ -141,12 +143,19 @@ class LocalNotificationsService {
       iOS: iosDetails,
     );
 
+    log('Notification title: $title');
+    log('Notification body: $body');
+    // log('Notification payload: $payload');
+
+    // log('Notification type: ${payload['type']}');
+    // log('Notification order_data: ${payload['order_data']}');
+
+    final notificationType = NotificationTypeEnum.fromName(payload['type']);
+    final notificationHandler = NotificationHandler.fromType(notificationType);
+    notificationHandler.handleReceived(payload);
+
     try {
       _notificationIdCounter++;
-
-      log('Notification title: $title');
-      log('Notification body: $body');
-      log('Notification payload: $payload');
 
       // Display the notification
       await _flutterLocalNotificationsPlugin.show(
@@ -154,7 +163,7 @@ class LocalNotificationsService {
         title,
         body,
         notificationDetails,
-        payload: payload.toString(),
+        payload: jsonEncode(payload),
       );
     } catch (e) {
       log('Error showing notification: $e');

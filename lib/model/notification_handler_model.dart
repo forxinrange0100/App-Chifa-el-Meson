@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:delivera/enum/notification_type_enum.dart' show NotificationTypeEnum;
 
 abstract class NotificationHandler {
@@ -10,19 +12,36 @@ abstract class NotificationHandler {
     }
   }
 
-  void handle(dynamic payload);
+  void handleReceived(dynamic payload);
+  void handleTapped(dynamic payload);
 }
 
 class OrderTrackingNotification implements NotificationHandler {
+
   @override
-  void handle(dynamic payload) {
+  void handleReceived(dynamic payload) {
     // TODO: implement handle
+    log('OrderTracking Notification received');
+  }
+
+  @override
+  void handleTapped(dynamic payload) {
+    // TODO: implement handle
+    log('OrderTracking Notification tapped');
   }
 }
 
 class DefaultNotification implements NotificationHandler {
+
   @override
-  void handle(dynamic payload) {
+  void handleReceived(dynamic payload) {
     // TODO: implement handle
+    log('Default Notification received');
+  }
+
+  @override
+  void handleTapped(dynamic payload) {
+    // TODO: implement handle
+    log('Default Notification tapped');
   }
 }

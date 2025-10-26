@@ -88,7 +88,7 @@ class FirebaseMessagingService {
         _localNotificationsService?.showNotification(
           notificationData.title,
           notificationData.body,
-          message.data['order_data'],
+          message.data,
         );
       } catch (e) {
         log('Error showing foreground notification: $e');
