@@ -1,7 +1,9 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:delivera/enum/order_status_enum.dart' show OrderStatusEnum;
 import 'package:delivera/model/order_model.dart' show Order;
 import 'package:delivera/pages/home_page.dart';
+import 'package:delivera/pages/order_tracking_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
@@ -113,61 +115,62 @@ class _InvoicePageState extends State<InvoicePage> {
                         )
                       ],
                     ),
-                    body: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const InvoiceCardWidget(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Divider(),
-                            Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: ElevatedButton(
-                                onPressed: () => _downloadInvoice(),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Text("Descargar boleta"),
-                                    _invoiceProvider.isDownloadingInvoice
-                                        ? const Padding(
-                                            padding: EdgeInsets.only(left: 8.0),
-                                            child: SizedBox(
-                                              height: 20,
-                                              width: 20,
-                                              child: Center(
-                                                child: CircularProgressIndicator(
-                                                  color: Colors.blue,
-                                                  backgroundColor: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        : const SizedBox()
-                                  ],
-                                ),
+                    body: const InvoiceCardWidget(),
+                    bottomNavigationBar: Container(
+                      padding: const EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 5,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () => _downloadInvoice(),
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll<Color>(Colors.blue.shade800),
+                            ),
+                            label: const Text(
+                              "Descargar boleta",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            icon: _invoiceProvider.isDownloadingInvoice
+                                ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 16, height: 16))
+                                : const Icon(FontAwesomeIcons.download, size: 16),
+                            iconAlignment: IconAlignment.end,
+                          ),
+                          if (OrderStatusEnum.fromName(_invoiceProvider.order.status) == OrderStatusEnum.pending)
+                            ElevatedButton(
+                              onPressed: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => OrderTrackingPage(order: _invoiceProvider.order)),
+                              ),
+                              child: const Text(
+                                'Ver seguimiento',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
-                                    foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black)),
-                                onPressed: () {
-                                  if (widget._order != null) {
-                                    Navigator.pop(context);
-                                    return;
-                                  }
-                                  context.read<BottomNavigationBarProvider>().showHome();
-                                  _navigateHome(context);
-                                },
-                                child: Text(widget._order == null ? "Volver a la tienda" : "Volver al historial"),
-                              ),
-                            )
-                          ],
-                        )
-                      ],
+                          ElevatedButton(
+                            onPressed: () {
+                              if (widget._order != null) {
+                                Navigator.pop(context);
+                                return;
+                              }
+                              context.read<BottomNavigationBarProvider>().showHome();
+                              _navigateHome(context);
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
+                              foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black),
+                            ),
+                            child: Text(
+                              widget._order == null ? "Volver a la tienda" : "Volver al historial",
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 );

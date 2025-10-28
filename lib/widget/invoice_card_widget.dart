@@ -16,279 +16,277 @@ class InvoiceCardWidget extends StatelessWidget {
     final InvoiceProvider invoiceProvider = context.watch<InvoiceProvider>();
     final RestaurantInfoProvider restaurantInfoProvider = context.watch<RestaurantInfoProvider>();
 
-    return Expanded(
-      child: ListView(
-        physics: const BouncingScrollPhysics(),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              elevation: 10,
-              color: Colors.white,
-              child: Column(
-                children: [
-                  const Text(
-                    "CLIENTE",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            elevation: 10,
+            color: Colors.white,
+            child: Column(
+              children: [
+                const Text(
+                  "CLIENTE",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      FontAwesomeIcons.moneyBillWave,
+                      size: 15,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text("Nº de orden: ${invoiceProvider.order.publicId}"),
+                  ],
+                ),
+                Text(
+                  restaurantInfoProvider.restaurantInfo.name,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      FontAwesomeIcons.locationDot,
+                      size: 15,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(restaurantInfoProvider.restaurantInfo.address)
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      FontAwesomeIcons.solidClock,
+                      size: 15,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(formatDateTime(invoiceProvider.order.timestampChile))
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Container(
+                    color: invoiceProvider.order.paymentStatusStyle.backgroundColor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.moneyCheckDollar,
+                            size: 15,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "Pago: ${invoiceProvider.order.paymentStatusStyle.label}",
+                            style: TextStyle(color: invoiceProvider.order.paymentStatusStyle.color, fontWeight: FontWeight.bold, fontSize: 15),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                const DottedLine(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
                     children: [
-                      const Icon(
-                        FontAwesomeIcons.moneyBillWave,
-                        size: 15,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.solidUser,
+                            size: 15,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text("Cliente: ${invoiceProvider.order.clientName}")
+                        ],
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text("Nº de orden: ${invoiceProvider.order.publicId}"),
+                      if (invoiceProvider.order.deliveryType == DeliveryDetailEnum.dispatch.name)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              FontAwesomeIcons.locationDot,
+                              size: 15,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text("Dirección: ${invoiceProvider.order.clientAddress}")
+                          ],
+                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.phoneFlip,
+                            size: 15,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text("Teléfono: ${invoiceProvider.order.clientPhone}")
+                        ],
+                      )
                     ],
                   ),
-                  Text(
-                    restaurantInfoProvider.restaurantInfo.name,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                const DottedLine(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
                     children: [
-                      const Icon(
-                        FontAwesomeIcons.locationDot,
-                        size: 15,
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.boxesStacked,
+                            size: 15,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "Detalles del pedido",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )
+                        ],
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(restaurantInfoProvider.restaurantInfo.address)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Table(
+                          columnWidths: const {
+                            0: FlexColumnWidth(2),
+                            1: FlexColumnWidth(1),
+                            2: FlexColumnWidth(1),
+                          },
+                          children: [
+                            const TableRow(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(width: 1, color: Colors.black),
+                                ),
+                              ),
+                              children: [
+                                Text('Producto', style: TextStyle(fontWeight: FontWeight.bold)),
+                                Center(
+                                  child: Text('Cant', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                                Center(
+                                  child: Text('Importe', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                            ...invoiceProvider.order.orderProducts.map((orderProduct) {
+                              return TableRow(
+                                decoration: (invoiceProvider.order.orderProducts.lastOrNull == orderProduct)
+                                    ? null
+                                    : const BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(width: 1, color: Colors.grey),
+                                        ),
+                                      ),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0,
+                                    ),
+                                    child: Text(orderProduct.product.name),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(
+                                        orderProduct.quantity.toString(),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: PriceWidget(price: orderProduct.totalPrice),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            })
+                          ],
+                        ),
+                      )
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                const DottedLine(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
                     children: [
-                      const Icon(
-                        FontAwesomeIcons.solidClock,
-                        size: 15,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [const Text("Subtotal"), PriceWidget(price: invoiceProvider.order.subtotal)],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [const Text("Costo de envío"), PriceWidget(price: invoiceProvider.order.deliveryCost)],
                       ),
                       const SizedBox(
-                        width: 10,
+                        height: 10,
                       ),
-                      Text(formatDateTime(invoiceProvider.order.timestampChile))
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Container(
-                      color: invoiceProvider.order.paymentStatusStyle.backgroundColor,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "TOTAL",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          PriceWidget(
+                            price: invoiceProvider.order.total,
+                            fontWeight: FontWeight.bold,
+                          )
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              FontAwesomeIcons.moneyCheckDollar,
-                              size: 15,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
                             Text(
-                              "Pago: ${invoiceProvider.order.paymentStatusStyle.label}",
-                              style: TextStyle(color: invoiceProvider.order.paymentStatusStyle.color, fontWeight: FontWeight.bold, fontSize: 15),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const DottedLine(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              FontAwesomeIcons.solidUser,
-                              size: 15,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text("Cliente: ${invoiceProvider.order.clientName}")
-                          ],
-                        ),
-                        if (invoiceProvider.order.deliveryType == DeliveryDetailEnum.dispatch.name)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                FontAwesomeIcons.locationDot,
-                                size: 15,
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text("Dirección: ${invoiceProvider.order.clientAddress}")
-                            ],
-                          ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              FontAwesomeIcons.phoneFlip,
-                              size: 15,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text("Teléfono: ${invoiceProvider.order.clientPhone}")
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  const DottedLine(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Column(
-                      children: [
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.boxesStacked,
-                              size: 15,
+                              "¡Muchas gracias por tu compra!",
+                              style: TextStyle(fontSize: 12),
                             ),
                             SizedBox(
                               width: 10,
                             ),
-                            Text(
-                              "Detalles del pedido",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            Icon(
+                              FontAwesomeIcons.faceSmile,
+                              size: 15,
                             )
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Table(
-                            columnWidths: const {
-                              0: FlexColumnWidth(2),
-                              1: FlexColumnWidth(1),
-                              2: FlexColumnWidth(1),
-                            },
-                            children: [
-                              const TableRow(
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(width: 1, color: Colors.black),
-                                  ),
-                                ),
-                                children: [
-                                  Text('Producto', style: TextStyle(fontWeight: FontWeight.bold)),
-                                  Center(
-                                    child: Text('Cant', style: TextStyle(fontWeight: FontWeight.bold)),
-                                  ),
-                                  Center(
-                                    child: Text('Importe', style: TextStyle(fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              ),
-                              ...invoiceProvider.order.orderProducts.map((orderProduct) {
-                                return TableRow(
-                                  decoration: (invoiceProvider.order.orderProducts.lastOrNull == orderProduct)
-                                      ? null
-                                      : const BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(width: 1, color: Colors.grey),
-                                          ),
-                                        ),
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0,
-                                      ),
-                                      child: Text(orderProduct.product.name),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: Text(
-                                          orderProduct.quantity.toString(),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: PriceWidget(price: orderProduct.totalPrice),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              })
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const DottedLine(),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [const Text("Subtotal"), PriceWidget(price: invoiceProvider.order.subtotal)],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [const Text("Costo de envío"), PriceWidget(price: invoiceProvider.order.deliveryCost)],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "TOTAL",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            PriceWidget(
-                              price: invoiceProvider.order.total,
-                              fontWeight: FontWeight.bold,
-                            )
-                          ],
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "¡Muchas gracias por tu compra!",
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Icon(
-                                FontAwesomeIcons.faceSmile,
-                                size: 15,
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-          )
-        ],
-      ),
+          ),
+        )
+      ],
     );
   }
 }

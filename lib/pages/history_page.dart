@@ -3,6 +3,7 @@ import 'package:delivera/enum/delivery_detail_enum.dart';
 import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
+import 'package:delivera/pages/order_tracking_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
@@ -100,7 +101,11 @@ class HistoryPage extends StatelessWidget {
 
     return TextButton(
       onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => InvoicePage(order: order)));
+        if (status == OrderStatusEnum.pending) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => OrderTrackingPage(order: order)));
+        } else {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => InvoicePage(order: order)));
+        }
       },
       child: Row(
         children: [
@@ -160,8 +165,7 @@ class HistoryPage extends StatelessWidget {
             height: 70,
             padding: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(border: BoxBorder.fromLTRB(left: BorderSide())),
-            child: Icon(Icons.receipt_long_outlined),
-            // child: status == StatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
+            child: status == OrderStatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
           ),
         ],
       ),
