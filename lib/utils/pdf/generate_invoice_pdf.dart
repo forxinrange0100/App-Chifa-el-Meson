@@ -1,4 +1,4 @@
-import 'package:delivera/enum/delivery_detail_enum.dart' show DeliveryDetailEnum;
+import 'package:delivera/enum/delivery_type_enum.dart' show DeliveryTypeEnum;
 import 'package:delivera/model/order_model.dart';
 import 'package:delivera/model/restaurant_info_model.dart';
 import 'package:delivera/utils/format_date_time.dart';
@@ -82,7 +82,7 @@ Future<pw.Document> generateInvoicePdf(Order order, RestaurantInfo restaurantInf
                               mainAxisAlignment: pw.MainAxisAlignment.center,
                               children: [pw.Image(user, height: 15), pw.SizedBox(width: 10), pw.Text("Cliente: ${order.clientName}")]),
                           pw.SizedBox(height: 5),
-                          if (order.deliveryType == DeliveryDetailEnum.dispatch.name) ...[
+                          if (order.deliveryType == DeliveryTypeEnum.dispatch.name) ...[
                             pw.Row(
                                 mainAxisAlignment: pw.MainAxisAlignment.center,
                                 children: [pw.Image(locationDot, height: 15), pw.SizedBox(width: 10), pw.Text("Dirección: ${order.clientAddress}")]),

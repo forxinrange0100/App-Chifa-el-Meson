@@ -1,4 +1,4 @@
-import 'package:delivera/enum/delivery_detail_enum.dart' show DeliveryDetailEnum;
+import 'package:delivera/enum/delivery_type_enum.dart' show DeliveryTypeEnum;
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/utils/format_date_time.dart';
@@ -116,7 +116,7 @@ class InvoiceCardWidget extends StatelessWidget {
                           Text("Cliente: ${invoiceProvider.order.clientName}")
                         ],
                       ),
-                      if (invoiceProvider.order.deliveryType == DeliveryDetailEnum.dispatch.name)
+                      if (invoiceProvider.order.deliveryType == DeliveryTypeEnum.dispatch.name)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

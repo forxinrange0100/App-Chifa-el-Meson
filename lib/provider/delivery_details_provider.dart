@@ -1,17 +1,18 @@
-import 'package:delivera/enum/delivery_detail_enum.dart';
+import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/model/delivery_zones.dart';
 import 'package:delivera/utils/fech_dispatch_enabled.dart' show fetchDispatchEnabled;
 import 'package:delivera/utils/fetch_delivery_zones.dart' show fetchDeliveryZones;
 import 'package:flutter/material.dart';
 
 class DeliveryDetailsProvider extends ChangeNotifier {
-  DeliveryDetailEnum? _deliveryDetailEnum;
-  DeliveryZones _deliveryZones = DeliveryZones.example();
-  bool? _dispatchEnabled;
 
   DeliveryDetailsProvider();
 
-  DeliveryDetailEnum? get deliveryDetailEnum => _deliveryDetailEnum;
+  DeliveryTypeEnum? _deliveryTypeEnum;
+  DeliveryTypeEnum? get deliveryTypeEnum => _deliveryTypeEnum;
+
+  DeliveryZones _deliveryZones = DeliveryZones.example();
+  bool? _dispatchEnabled;
   DeliveryZones get deliveryZones => _deliveryZones;
   bool? get dispatchEnabled => _dispatchEnabled;
 
@@ -22,13 +23,13 @@ class DeliveryDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setDeliveryDetailEnum(DeliveryDetailEnum deliveryDetailEnum) {
-    _deliveryDetailEnum = deliveryDetailEnum;
+  void setDeliveryTypeEnum(DeliveryTypeEnum deliveryTypeEnum) {
+    _deliveryTypeEnum = deliveryTypeEnum;
     notifyListeners();
   }
 
-  void clearDeliveryDetailEnum({bool notify = false}) {
-    _deliveryDetailEnum = null;
+  void clearDeliveryTypeEnum({bool notify = false}) {
+    _deliveryTypeEnum = null;
     if (notify) notifyListeners();
   }
 }

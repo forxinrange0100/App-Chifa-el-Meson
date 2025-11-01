@@ -1,4 +1,4 @@
-import 'package:delivera/enum/delivery_detail_enum.dart';
+import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/input_status_enum.dart';
 import 'package:delivera/model/input_status_model.dart';
 import 'package:delivera/model/payment_result_model.dart';
@@ -114,7 +114,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   @override
   void dispose() {
     // Usa la referencia guardada, no el context.read directamente
-    _deliveryDetailsProvider.clearDeliveryDetailEnum();
+    _deliveryDetailsProvider.clearDeliveryTypeEnum();
     // Limpia los controladores
     _textEditingControllerAddress.dispose();
     _textEditingControllerFullName.dispose();
@@ -165,14 +165,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.pickup
+                            side: _deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.pickup
                                 ? const BorderSide(color: Colors.black, width: 1.5)
                                 : BorderSide.none,
                           ),
                         ),
                       ),
                       onPressed: () {
-                        _deliveryDetailsProvider.setDeliveryDetailEnum(DeliveryDetailEnum.pickup);
+                        _deliveryDetailsProvider.setDeliveryTypeEnum(DeliveryTypeEnum.pickup);
                         _orderSummaryProvider.setDeliveryDetailsPickUp();
                       },
                       child: const Column(
@@ -186,7 +186,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         shape: WidgetStatePropertyAll(
                           RoundedRectangleBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: _deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch
+                            side: _deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.dispatch
                                 ? const BorderSide(color: Colors.black, width: 1.5)
                                 : BorderSide.none,
                           ),
@@ -199,7 +199,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                       onPressed: () {
                         _deliveryDetailsProvider.dispatchEnabled == false
                             ? errorOrderSummary("El envío a domicilio no está disponible en este momento.")
-                            : _deliveryDetailsProvider.setDeliveryDetailEnum(DeliveryDetailEnum.dispatch);
+                            : _deliveryDetailsProvider.setDeliveryTypeEnum(DeliveryTypeEnum.dispatch);
                         // Don't set the OrderSummaryProvider delivery details here
                       },
                       child: const Column(
@@ -211,9 +211,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 ],
               ),
             ),
-            switch (_deliveryDetailsProvider.deliveryDetailEnum) {
-              DeliveryDetailEnum.pickup => _deliveryPickupSelected(context),
-              DeliveryDetailEnum.dispatch => _deliveryDispatchSelected(context),
+            switch (_deliveryDetailsProvider.deliveryTypeEnum) {
+              DeliveryTypeEnum.pickup => _deliveryPickupSelected(context),
+              DeliveryTypeEnum.dispatch => _deliveryDispatchSelected(context),
               _ => Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -615,7 +615,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       }
 
       // Check if a delivery method is selected
-      if (_deliveryDetailsProvider.deliveryDetailEnum == null) {
+      if (_deliveryDetailsProvider.deliveryTypeEnum == null) {
         // Handle the case where no delivery method is selected
         errorOrderSummary("Método de entrega no seleccionado.");
         return;
@@ -632,11 +632,11 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       if (!context.mounted) return;
 
       // Check if the delivery method 'Dispatch' is selected
-      if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
+      if (_deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.dispatch) {
         // Check if dispatch is enabled
         if (_deliveryDetailsProvider.dispatchEnabled == false) {
           errorOrderSummary("El envío a domicilio no está disponible en este momento.");
-          _deliveryDetailsProvider.clearDeliveryDetailEnum(notify: true);
+          _deliveryDetailsProvider.clearDeliveryTypeEnum(notify: true);
           _orderSummaryProvider.clearDeliveryDetails();
           return;
         }
@@ -669,7 +669,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       }
 
       // if the delivery method is 'Dispatch', set the delivery address
-      if (_deliveryDetailsProvider.deliveryDetailEnum == DeliveryDetailEnum.dispatch) {
+      if (_deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.dispatch) {
         _orderSummaryProvider.setDeliveryAddress(_textEditingControllerAddress.text);
       }
 

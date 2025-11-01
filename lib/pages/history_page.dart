@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:delivera/enum/delivery_detail_enum.dart';
+import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
@@ -96,7 +96,7 @@ class HistoryPage extends StatelessWidget {
 
   Widget _orderItem(BuildContext context, Order order) {
     final [String date, String time] = formatDateTime(order.timestampChile).split(', ');
-    final DeliveryDetailEnum deliveryType = DeliveryDetailEnum.fromName(order.deliveryType);
+    final DeliveryTypeEnum deliveryType = DeliveryTypeEnum.fromName(order.deliveryType);
     final OrderStatusEnum status = OrderStatusEnum.fromName(order.status);
 
     return TextButton(
@@ -142,12 +142,12 @@ class HistoryPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: switch (deliveryType) {
-                        DeliveryDetailEnum.pickup => [
+                        DeliveryTypeEnum.pickup => [
                             Icon(Icons.store, size: 16),
                             SizedBox(width: 4),
                             Text("Recoger", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
                           ],
-                        DeliveryDetailEnum.dispatch => [
+                        DeliveryTypeEnum.dispatch => [
                             Icon(Icons.motorcycle, size: 16),
                             SizedBox(width: 4),
                             Text("Domicilio", style: TextStyle(fontSize: 14, color: Colors.grey[800]))
@@ -173,12 +173,7 @@ class HistoryPage extends StatelessWidget {
   }
 
   Widget orderStatusChip(OrderStatusEnum status) {
-    final Color color = switch (status) {
-      OrderStatusEnum.pending => Colors.orange,
-      OrderStatusEnum.completed => Colors.green,
-      OrderStatusEnum.canceled => Colors.red,
-      _ => Colors.grey,
-    };
+    final Color color = status.getColor();
 
     const double alpha = .15;
     final Color backgroundColor = switch (status) {
@@ -212,7 +207,7 @@ class HistoryPage extends StatelessWidget {
     const from = 1001;
     const to = 1010;
     final status = OrderStatusEnum.pending.name;
-    final deliveryType = DeliveryDetailEnum.dispatch.name;
+    final deliveryType = DeliveryTypeEnum.dispatch.name;
     const total = 20000;
     List<Order> orders = [];
 
@@ -228,7 +223,7 @@ class HistoryPage extends StatelessWidget {
     const from = 1001;
     const to = 1010;
     final status = OrderStatusEnum.pending.name;
-    final deliveryType = DeliveryDetailEnum.dispatch.name;
+    final deliveryType = DeliveryTypeEnum.dispatch.name;
     const total = 20000;
     for (int i = from; i < to + 1; i++) {
       var order = Order.some(publicId: i, status: status, deliveryType: deliveryType, total: total);
