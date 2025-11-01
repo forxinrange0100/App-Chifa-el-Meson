@@ -13,7 +13,6 @@ import 'package:delivera/widget/expandable_text_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hive/hive.dart' show Hive;
 import 'package:provider/provider.dart';
 
 import '../model/order_model.dart' show Order;
@@ -23,9 +22,7 @@ class HomeInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ordersBox = Hive.box<Order>(name: 'orders');
-    final List<String> ordersBoxKeys = ordersBox.keys;
-    final Order? lastOrder = ordersBoxKeys.isEmpty ? null : ordersBox.get(ordersBoxKeys.last);
+    final Order? lastOrder = Order.getLastOrder();
 
     return CustomScrollView(
       controller: context.watch<ScrollControllerProvider>().scrollController,

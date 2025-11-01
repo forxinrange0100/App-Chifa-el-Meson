@@ -43,7 +43,7 @@ class _InvoicePageState extends State<InvoicePage> {
       final invoiceProvider = context.read<InvoiceProvider>();
       if (widget._order == null) {
         await invoiceProvider.getOrder();
-        invoiceProvider.storeOrder();
+        invoiceProvider.order.storeOrder();
       } else {
         invoiceProvider.setOrder(widget._order!);
       }
@@ -140,11 +140,11 @@ class _InvoicePageState extends State<InvoicePage> {
                                 : const Icon(FontAwesomeIcons.download, size: 16),
                             iconAlignment: IconAlignment.end,
                           ),
-                          if (OrderStatusEnum.fromName(_invoiceProvider.order.status) == OrderStatusEnum.pending)
+                          if (OrderStatusEnum.fromName(_invoiceProvider.order.status).isActive())
                             ElevatedButton(
                               onPressed: () => Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => OrderTrackingPage(order: _invoiceProvider.order)),
+                                MaterialPageRoute(builder: (context) => OrderTrackingPage()),
                               ),
                               child: const Text(
                                 'Ver seguimiento',
@@ -153,6 +153,7 @@ class _InvoicePageState extends State<InvoicePage> {
                             ),
                           ElevatedButton(
                             onPressed: () {
+                              context.read<InvoiceProvider>().clearOrder();
                               if (widget._order != null) {
                                 Navigator.pop(context);
                                 return;

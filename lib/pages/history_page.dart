@@ -5,6 +5,7 @@ import 'package:delivera/model/order_model.dart' show Order;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
 import 'package:delivera/pages/order_tracking_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
+import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
 import 'package:flutter/material.dart';
@@ -101,8 +102,9 @@ class HistoryPage extends StatelessWidget {
 
     return TextButton(
       onPressed: () {
-        if (status == OrderStatusEnum.pending) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => OrderTrackingPage(order: order)));
+        if (status.isActive()) {
+          context.read<InvoiceProvider>().setOrder(order);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => OrderTrackingPage()));
         } else {
           Navigator.push(context, MaterialPageRoute(builder: (context) => InvoicePage(order: order)));
         }
@@ -165,7 +167,7 @@ class HistoryPage extends StatelessWidget {
             height: 70,
             padding: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(border: BoxBorder.fromLTRB(left: BorderSide())),
-            child: status == OrderStatusEnum.pending ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
+            child: status.isActive() ? Icon(Icons.near_me_outlined) : Icon(Icons.receipt_long_outlined),
           ),
         ],
       ),
@@ -176,12 +178,7 @@ class HistoryPage extends StatelessWidget {
     final Color color = status.getColor();
 
     const double alpha = .15;
-    final Color backgroundColor = switch (status) {
-      OrderStatusEnum.pending => Colors.orange.withValues(alpha: alpha),
-      OrderStatusEnum.completed => Colors.green.withValues(alpha: alpha),
-      OrderStatusEnum.canceled => Colors.red.withValues(alpha: alpha),
-      _ => Colors.grey.withValues(alpha: alpha),
-    };
+    final Color backgroundColor = color.withValues(alpha: alpha);
 
     return Align(
       alignment: Alignment.centerLeft,

@@ -77,14 +77,7 @@ class Dish {
     final map = json as Map<String, dynamic>;
     map['created_at'] = map['createdAt'] ?? DateTime.now().toString();
     map['updated_at'] = map['updatedAt'] ?? DateTime.now().toString();
-    if (map['enabled'] is bool) {
-      // Ya está bien, no hacer nada
-    } else if (map['enabled'] is int) {
-      map['enabled'] = intToBool(map['enabled']);
-    } else {
-      map['enabled'] = true;
-    }
-    
+
     return Dish(
         id: map['id'],
         createdAt: DateTime.parse(map['created_at']),
@@ -95,7 +88,7 @@ class Dish {
         discountedPrice: map['discounted_price'],
         image: map['image'],
         categoryId: map['category_id'],
-        enabled: map['enabled'],
+        enabled: dynamicToBool(map['enabled'], defaultValue: true),
         displayOrder: map['display_order'],
         units: map['units']);
   }

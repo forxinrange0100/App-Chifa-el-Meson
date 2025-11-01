@@ -11,7 +11,11 @@ class OrderProduct {
 
   bool get enabled => product.enabled;
 
-  OrderProduct({required this.product, required this.quantity, required this.note});
+  OrderProduct({
+    required this.product,
+    required this.quantity,
+    String? note,
+  }) : note = note ?? '';
 
   OrderProduct copyWith({
     Dish? product,
@@ -30,7 +34,7 @@ class OrderProduct {
     return OrderProduct(
       product: Dish.fromJson(map['product']),
       quantity: map['quantity'],
-      note: map['note'] ?? '',
+      note: map['note'],
     );
   }
 

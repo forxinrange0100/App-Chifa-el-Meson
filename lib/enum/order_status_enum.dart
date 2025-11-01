@@ -26,6 +26,16 @@ enum OrderStatusEnum {
     );
   }
 
+  bool isActive() {
+    switch (this) {
+      case OrderStatusEnum.completed:
+      case OrderStatusEnum.canceled:
+        return false;
+      default:
+        return true;
+    }
+  }
+
   IconData getIcon() {
     switch (this) {
       case OrderStatusEnum.pending:

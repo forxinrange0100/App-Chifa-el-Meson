@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart' show CachedNetworkImage;
 import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/order_status_enum.dart';
-import 'package:delivera/model/order_model.dart' show Order;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/widget/expandable_text_widget.dart' show ExpandableText;
@@ -10,9 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:timelines_plus/timelines_plus.dart';
 
 class OrderTrackingPage extends StatelessWidget {
-  final Order _order;
-
-  const OrderTrackingPage({super.key, required Order order}) : _order = order;
+  const OrderTrackingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +32,11 @@ class OrderTrackingPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Consumer<InvoiceProvider>(
           builder: (context, orderProvider, child) {
-            final statusProcess = OrderStatusEnum.getStatusProcess(DeliveryTypeEnum.fromName(orderProvider.order.deliveryType));
-            final status = OrderStatusEnum.fromName(_order.status);
+            final order = orderProvider.order;
+            final statusProcess = OrderStatusEnum.getStatusProcess(DeliveryTypeEnum.fromName(order.deliveryType));
+            final status = OrderStatusEnum.fromName(order.status);
             final itemCounter = statusProcess.length;
-            final currentIndex = statusProcess.indexOf(status) + 2;
+            final currentIndex = statusProcess.indexOf(status);
             final double iconSize = 32;
             return LayoutBuilder(
               builder: (context, constraints) => Column(
@@ -95,7 +93,7 @@ class OrderTrackingPage extends StatelessWidget {
                   //   ],
                   // ),
                   Text(
-                    OrderStatusEnum.fromName(orderProvider.order.status).label,
+                    OrderStatusEnum.fromName(order.status).label,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Divider(height: 0, color: Colors.grey.shade300, thickness: 1),
@@ -109,10 +107,10 @@ class OrderTrackingPage extends StatelessWidget {
                   ),
                   ListView.separated(
                     shrinkWrap: true,
-                    itemCount: orderProvider.order.orderProducts.length,
+                    itemCount: order.orderProducts.length,
                     separatorBuilder: (_, __) => Divider(height: 5),
                     itemBuilder: (context, index) {
-                      final orderProduct = _order.enabledProducts[index];
+                      final orderProduct = order.orderProducts[index];
                       return Row(
                         spacing: 8,
                         children: [
@@ -155,7 +153,7 @@ class OrderTrackingPage extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => InvoicePage(order: _order)),
+                MaterialPageRoute(builder: (context) => InvoicePage(order: context.read<InvoiceProvider>().order)),
               ),
               child: const Text(
                 'Ver boleta',
@@ -163,7 +161,10 @@ class OrderTrackingPage extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                context.read<InvoiceProvider>().clearOrder();
+                Navigator.pop(context);
+              },
               style: ButtonStyle(
                 backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
                 foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black),

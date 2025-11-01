@@ -3,6 +3,7 @@ import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/model/payment_status_style_model.dart';
 import 'package:delivera/utils/date_time_chile.dart';
 import 'package:delivera/utils/format_price.dart';
+import 'package:hive/hive.dart' show Hive;
 
 /// Represents an order that's retrieved from the server
 class Order {
@@ -11,6 +12,7 @@ class Order {
   int subtotal;
   int total;
   final DateTime timestamp;
+  final DateTime? updatedAt;
   final String deliveryType;
   final int deliveryCost;
   String status;
@@ -33,18 +35,21 @@ class Order {
       required this.subtotal,
       required this.total,
       required this.timestamp,
+      DateTime? updatedAt,
       required this.deliveryType,
       required this.deliveryCost,
       required this.status,
       required this.paymentStatus,
       required this.paymentType,
-      required this.clientAddress,
+      String? clientAddress,
       required this.clientPhone,
       required this.clientEmail,
       required this.clientName,
       required this.orderProducts})
       : paymentStatusStyle = PaymentStatusStyle(paymentStatus),
-        _id = id;
+        _id = id,
+        clientAddress = clientAddress ?? '',
+        updatedAt = updatedAt ?? timestamp;
 
   /// Factory constructor to create an Order with default values
   factory Order.empty() => Order(
@@ -106,6 +111,7 @@ class Order {
     int? subtotal,
     int? total,
     DateTime? timestamp,
+    DateTime? updatedAt,
     String? deliveryType,
     int? deliveryCost,
     String? status,
@@ -123,6 +129,7 @@ class Order {
         subtotal: subtotal ?? this.subtotal,
         total: total ?? this.total,
         timestamp: timestamp ?? this.timestamp,
+        updatedAt: updatedAt ?? this.updatedAt,
         deliveryType: deliveryType ?? this.deliveryType,
         deliveryCost: deliveryCost ?? this.deliveryCost,
         status: status ?? this.status,
@@ -172,24 +179,42 @@ class Order {
     total = subtotal + deliveryCost;
   }
 
+  /// Guardar el Order en el almacenamiento local (Hive)
+  /// Si ya existe, lo actualiza
+  void storeOrder() {
+    // Store order in Hive
+    final ordersBox = Hive.box<Order>(name: 'orders');
+    ordersBox.put(publicId.toString(), this);
+    ordersBox.close();
+  }
+
+  static Order? getLastOrder() {
+    final ordersBox = Hive.box<Order>(name: 'orders');
+    final List<String> ordersBoxKeys = ordersBox.keys;
+    return ordersBoxKeys.isEmpty ? null : ordersBox.get(ordersBoxKeys.last);
+  }
+
   /// Factory constructor to create an Order from a JSON
   factory Order.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
+    map['updated_at'] = map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null;
+
     return Order(
-      id: map['id'] as int,
-      publicId: map['public_id'] as int,
-      subtotal: map['subtotal'] as int,
-      total: map['total'] as int,
+      id: map['id'],
+      publicId: map['public_id'],
+      subtotal: map['subtotal'],
+      total: map['total'],
       timestamp: DateTime.parse(map['timestamp']),
-      deliveryType: map['delivery_type'] as String,
-      deliveryCost: map['delivery_cost'] as int,
-      status: map['status'] as String,
-      paymentStatus: map['payment_status'] as String,
-      paymentType: map['payment_type'] as String,
-      clientAddress: map['client_address'] as String,
-      clientPhone: map['client_phone'] as String,
-      clientEmail: map['client_email'] as String,
-      clientName: map['client_name'] as String,
+      updatedAt: map['updated_at'],
+      deliveryType: map['delivery_type'],
+      deliveryCost: map['delivery_cost'],
+      status: map['status'],
+      paymentStatus: map['payment_status'],
+      paymentType: map['payment_type'],
+      clientAddress: map['client_address'],
+      clientPhone: map['client_phone'],
+      clientEmail: map['client_email'],
+      clientName: map['client_name'],
       orderProducts: List<OrderProduct>.from(map['order_products'].map((x) => OrderProduct.fromJson(x))),
     );
   }

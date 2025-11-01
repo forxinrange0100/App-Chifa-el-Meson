@@ -3,7 +3,6 @@ import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/provider/order_summary_provider.dart';
 import 'package:delivera/utils/fetch_order_full.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart' show Hive;
 
 class InvoiceProvider extends ChangeNotifier {
   final OrderSummaryProvider _orderSummaryProvider;
@@ -30,11 +29,9 @@ class InvoiceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void storeOrder() {
-    // Store order in Hive
-    final orderBox = Hive.box<Order>(name:'orders');
-    orderBox.put((_order.publicId).toString(), _order);
-    orderBox.close();
+  void clearOrder() {
+    _order = Order.empty();
+    notifyListeners();
   }
 
   void setIsDownloadingInvoice(bool value) {
