@@ -66,11 +66,11 @@ enum OrderStatusEnum {
       // case OrderStatusEnum.in_progress:
       //   return Colors.orange;
       case OrderStatusEnum.ready_for_pickup:
-        return Colors.cyan;
-      case OrderStatusEnum.out_for_delivery:
-        return Colors.green;
-      case OrderStatusEnum.completed:
         return Colors.teal;
+      case OrderStatusEnum.out_for_delivery:
+        return Colors.teal;
+      case OrderStatusEnum.completed:
+        return Colors.green;
       case OrderStatusEnum.canceled:
         return Colors.red;
       default:

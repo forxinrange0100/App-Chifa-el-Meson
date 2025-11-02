@@ -1,4 +1,5 @@
 import 'package:delivera/firebase_options.dart';
+import 'package:delivera/model/order_tracking_model.dart' show OrderTracking;
 import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
 import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 import 'package:hive/hive.dart' show Hive;
@@ -51,6 +52,7 @@ void main() async {
 
   Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
   Hive.registerAdapter('Order', Order.fromJson);
+  Hive.registerAdapter('OrderTracking', OrderTracking.fromJson);
 }
 
 class MyApp extends StatelessWidget {
