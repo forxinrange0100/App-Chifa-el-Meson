@@ -9,6 +9,26 @@ class OrderTracking {
 
   OrderTracking({required this.orderPublicId, required this.timestamps});
 
+  factory OrderTracking.empty() => OrderTracking(orderPublicId: 0, timestamps: {});
+
+  factory OrderTracking.some({
+    int? orderPublicId,
+    Map<OrderStatusEnum, DateTime>? timestamps,
+  }) =>
+      OrderTracking.empty().copyWith(
+        orderPublicId: orderPublicId,
+        timestamps: timestamps,
+      );
+
+  OrderTracking copyWith({
+    int? orderPublicId,
+    Map<OrderStatusEnum, DateTime>? timestamps,
+  }) =>
+      OrderTracking(
+        orderPublicId: orderPublicId ?? this.orderPublicId,
+        timestamps: timestamps ?? this.timestamps,
+      );
+
   factory OrderTracking.fromOrder(Order order) {
     return OrderTracking(
       orderPublicId: order.publicId,

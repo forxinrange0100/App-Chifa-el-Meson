@@ -44,14 +44,14 @@ class OrderTrackingPage extends StatelessWidget {
               final itemCounter = statusProcess.length;
               final double iconSize = 32;
 
-              final orderTracking = OrderTracking.fromStorage(order.publicId);
-              log('orderTracking: ${orderTracking?.toJson()}');
-              final OrderStatusEnum? lastActiveStatus = orderTracking?.lastActiveStatus();
-              final currentIndex = statusProcess.indexOf(lastActiveStatus ?? status);
+              final orderTracking = OrderTracking.fromStorage(order.publicId) ?? OrderTracking.fromOrder(order);
+              log('orderTracking: ${orderTracking.toJson()}');
+              final OrderStatusEnum lastActiveStatus = orderTracking.lastActiveStatus();
+              final currentIndex = statusProcess.indexOf(lastActiveStatus);
               log('lastActiveStatus: $lastActiveStatus, currentIndex: $currentIndex');
 
               // Indice del nodo que debería mostrarse como cancelado
-              int canceledIndex = statusProcess.indexOf(lastActiveStatus!) + 1;
+              int canceledIndex = statusProcess.indexOf(lastActiveStatus) + 1;
               log('canceledIndex: $canceledIndex');
 
               return Column(
@@ -129,11 +129,11 @@ class OrderTrackingPage extends StatelessWidget {
                         },
                         // oppositeContentsBuilder: (context, index) => Icon(Icons.access_alarms_outlined, size: iconSize),
                         contentsBuilder: (_, index) {
-                          DateTime? timestamp = orderTracking?.timestamps[statusProcess[index]];
+                          DateTime? timestamp = orderTracking.timestamps[statusProcess[index]];
                           if (status == OrderStatusEnum.canceled && index == canceledIndex) {
-                            timestamp = orderTracking?.timestamps[status];
+                            timestamp = orderTracking.timestamps[status];
                           } else {
-                            timestamp = orderTracking?.timestamps[statusProcess[index]];
+                            timestamp = orderTracking.timestamps[statusProcess[index]];
                           }
                           if (timestamp == null) return null;
                           final formattedTimestamp = formatHourMinute(dateTimeChile(timestamp));
@@ -163,43 +163,29 @@ class OrderTrackingPage extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
-                      color: status.getColor().withValues(alpha: .15),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: status.getColor(), width: 1.5),
-                    ),
+                        color: status.getColor().withValues(alpha: .15),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: status.getColor(), width: 1.5)),
                     constraints: BoxConstraints.tightFor(width: 100),
                     margin: EdgeInsets.symmetric(vertical: 5),
                     child: Text(
                       status.label,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: status.getColor(),
-                      ),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: status.getColor()),
                     ),
                   ),
-                  // SizedBox(
-                  //   height: 16,
-                  //   child: Center(
-                  //     child: Text(
-                  //       OrderStatusEnum.fromName(order.status).label,
-                  //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  // if (status != OrderStatusEnum.canceled && status != OrderStatusEnum.completed)
+                  //   SizedBox(
+                  //     height: 20,
+                  //     child: Center(
+                  //       child: Text(
+                  //         'La hora de entrega es de 1 hora aproximadamente.',
+                  //         style: TextStyle(
+                  //           fontSize: 14,
+                  //         ),
+                  //       ),
                   //     ),
                   //   ),
-                  // ),
-                  if (status != OrderStatusEnum.canceled && status != OrderStatusEnum.completed)
-                    SizedBox(
-                      height: 20,
-                      child: Center(
-                        child: Text(
-                          'La hora de entrega es de 1 hora aproximadamente.',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ),
                   Divider(height: 0, color: Colors.grey.shade300, thickness: 1),
                   SizedBox(
                     height: 32,
@@ -221,8 +207,8 @@ class OrderTrackingPage extends StatelessWidget {
                           children: [
                             CachedNetworkImage(
                               imageUrl: orderProduct.product.imageUrl,
-                              width: 50,
-                              height: 50,
+                              width: 75,
+                              height: 75,
                               placeholder: (_, __) => CircularProgressIndicator(),
                               errorWidget: (_, __, ___) => Icon(Icons.error),
                             ),

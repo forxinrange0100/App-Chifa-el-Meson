@@ -37,6 +37,7 @@ class OrderTrackingNotification implements NotificationHandler {
     orderTracking.store(DeliveryTypeEnum.fromName(order.deliveryType));
     final routeContext = navigatorKey.currentContext;
     if (routeContext == null) return;
+    if (order.publicId != routeContext.read<InvoiceProvider>().order.publicId) return;
     routeContext.read<InvoiceProvider>().setOrder(order);
   }
 
