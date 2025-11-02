@@ -3,6 +3,8 @@ import 'package:delivera/firebase_options.dart' show DefaultFirebaseOptions;
 import 'package:delivera/services/local_notifications_service.dart';
 import 'package:firebase_core/firebase_core.dart' show Firebase;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hive/hive.dart' show Hive;
+import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 
 class FirebaseMessagingService {
   // Private constructor for singleton pattern
@@ -118,6 +120,7 @@ class FirebaseMessagingService {
 /// Handles messages when the app is fully terminated
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final notificationData = message.notification;
   log('Background message received');
@@ -125,7 +128,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     // Display a local notification
     final localNotificationsService = LocalNotificationsService.instance();
     await localNotificationsService.init();
-    await localNotificationsService.showNotification(
+    localNotificationsService.showNotification(
       notificationData.title,
       notificationData.body,
       message.data,
