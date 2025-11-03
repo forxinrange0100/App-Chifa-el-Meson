@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:delivera/enum/order_status_enum.dart' show OrderStatusEnum;
 import 'package:delivera/model/order_model.dart' show Order;
+import 'package:delivera/pages/history_page.dart' show HistoryPage;
 import 'package:delivera/pages/home_page.dart';
 import 'package:delivera/pages/order_tracking_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
@@ -99,7 +100,7 @@ class _InvoicePageState extends State<InvoicePage> {
                       centerTitle: true,
                       leading: IconButton(
                         onPressed: () {
-                          widget._order == null ? _navigateHome(context) : Navigator.pop(context);
+                          widget._order == null ? _navigateHome(context) : _navigateHistory(context);
                         },
                         icon: const Icon(Icons.arrow_back, color: Colors.black),
                       ),
@@ -155,7 +156,7 @@ class _InvoicePageState extends State<InvoicePage> {
                             onPressed: () {
                               context.read<InvoiceProvider>().clearOrder();
                               if (widget._order != null) {
-                                Navigator.pop(context);
+                                _navigateHistory(context);
                                 return;
                               }
                               context.read<BottomNavigationBarProvider>().showHome();
@@ -188,6 +189,17 @@ class _InvoicePageState extends State<InvoicePage> {
       context,
       MaterialPageRoute(
         builder: (context) => const HomePage(),
+      ),
+      (route) => false,
+    );
+  }
+
+  void _navigateHistory(BuildContext context) {
+    context.read<BottomNavigationBarProvider>().showHistory();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HistoryPage(),
       ),
       (route) => false,
     );

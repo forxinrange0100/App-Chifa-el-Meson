@@ -10,7 +10,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
   Hive.registerAdapter('Order', Order.fromJson);
-  readAll();
+  // readAll();
+  // delete(100001);
+  deleteAll();
+  log("Finished.");
 }
 
 void readAll() {
@@ -20,6 +23,11 @@ void readAll() {
     if (order == null) continue;
     log(order.toJson().toString());
   }
+}
+
+void delete(int publicId) {
+  final ordersBox = Hive.box<Order>(name: 'orders');
+  ordersBox.delete(publicId.toString());
 }
 
 void deleteAll() {

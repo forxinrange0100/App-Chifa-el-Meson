@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 abstract class NotificationHandler {
+  int? notificationId;
   factory NotificationHandler.fromType(NotificationTypeEnum typeEnum) {
     switch (typeEnum) {
       case NotificationTypeEnum.orderTracking:
@@ -26,6 +27,9 @@ abstract class NotificationHandler {
 }
 
 class OrderTrackingNotification implements NotificationHandler {
+  @override
+  int? notificationId = 1;
+
   @override
   void handleReceived(dynamic payload) {
     log('OrderTracking Notification received');
@@ -57,14 +61,15 @@ class OrderTrackingNotification implements NotificationHandler {
 
 class DefaultNotification implements NotificationHandler {
   @override
+  int? notificationId;
+
+  @override
   void handleReceived(dynamic payload) {
-    // TODO: implement handle
     log('Default Notification received');
   }
 
   @override
   void handleTapped(dynamic payload) {
-    // TODO: implement handle
     log('Default Notification tapped');
   }
 }

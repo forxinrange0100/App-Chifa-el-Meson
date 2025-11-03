@@ -1,10 +1,14 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart' show CachedNetworkImage;
+import 'package:delivera/enum/bottom_navigation_bar_enum.dart' show BottomNavigationBarEnum;
 import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/model/order_tracking_model.dart' show OrderTracking;
+import 'package:delivera/pages/history_page.dart' show HistoryPage;
+import 'package:delivera/pages/home_page.dart' show HomePage;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/utils/date_time_chile.dart';
 import 'package:delivera/utils/format_date_time.dart';
@@ -26,9 +30,7 @@ class OrderTrackingPage extends StatelessWidget {
         elevation: 2,
         centerTitle: true,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => navigateBack(context),
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
         title: const Text("SEGUIMIENTO", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -255,10 +257,7 @@ class OrderTrackingPage extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                context.read<InvoiceProvider>().clearOrder();
-                Navigator.pop(context);
-              },
+              onPressed: () => navigateBack(context),
               style: ButtonStyle(
                 backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
                 foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black),
@@ -271,6 +270,36 @@ class OrderTrackingPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void navigateBack(BuildContext context) {
+    if (context.read<BottomNavigationBarProvider>().index == BottomNavigationBarEnum.history.index) {
+      navigateHistory(context);
+    } else {
+      navigateHome(context);
+    }
+  }
+
+  void navigateHome(BuildContext context) {
+    context.read<BottomNavigationBarProvider>().showHome();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+      (route) => false,
+    );
+  }
+
+  void navigateHistory(BuildContext context) {
+    context.read<BottomNavigationBarProvider>().showHistory();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HistoryPage(),
+      ),
+      (route) => false,
     );
   }
 }

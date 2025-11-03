@@ -40,7 +40,7 @@ class LocalNotificationsService {
   bool _isFlutterLocalNotificationInitialized = false;
 
   //Counter for generating unique notification IDs
-  int _notificationIdCounter = 0;
+  int _notificationIdCounter = 100;
 
   /// Initializes the local notifications plugin for Android and iOS.
   Future<void> init() async {
@@ -155,16 +155,18 @@ class LocalNotificationsService {
     notificationHandler.handleReceived(payload);
 
     try {
-      _notificationIdCounter++;
+      final int notificationId = notificationHandler.notificationId ?? _notificationIdCounter;
 
       // Display the notification
       await _flutterLocalNotificationsPlugin.show(
-        _notificationIdCounter,
+        notificationId,
         title,
         body,
         notificationDetails,
         payload: jsonEncode(payload),
       );
+
+      _notificationIdCounter++;
     } catch (e) {
       log('Error showing notification: $e');
     }

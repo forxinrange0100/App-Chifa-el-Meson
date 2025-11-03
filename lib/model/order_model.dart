@@ -1,3 +1,5 @@
+import 'dart:developer' show log;
+
 import 'package:delivera/model/dish_model.dart' show Dish;
 import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/model/payment_status_style_model.dart';
@@ -182,10 +184,13 @@ class Order {
   /// Guardar el Order en el almacenamiento local (Hive)
   /// Si ya existe, lo actualiza
   void storeOrder() {
-    // Store order in Hive
-    final ordersBox = Hive.box<Order>(name: 'orders');
-    ordersBox.put(publicId.toString(), this);
-    ordersBox.close();
+    try {
+      final ordersBox = Hive.box<Order>(name: 'orders');
+      ordersBox.put(publicId.toString(), this);
+      ordersBox.close();
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
+    }
   }
 
   static Order? getLastOrder() {
