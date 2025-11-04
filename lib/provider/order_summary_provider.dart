@@ -1,3 +1,5 @@
+import 'dart:developer' show log;
+
 import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/user_details_model.dart';
@@ -13,6 +15,7 @@ class OrderSummaryProvider extends ChangeNotifier {
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
   PaymentResult _orderResult = PaymentResult(publicId: 0);
+
   /// To track the delivery details selection
   DeliveryDetails _deliveryDetails;
 
@@ -21,7 +24,6 @@ class OrderSummaryProvider extends ChangeNotifier {
 
   OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
       : _deliveryDetails = PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
-
 
   void setOrderSummary(String fullName, String email, String phoneNumber, String paymentType) {
     _orderSummary = OrderSummary(
@@ -71,25 +73,28 @@ class OrderSummaryProvider extends ChangeNotifier {
 
   /// Guarda los datos del usuario y los datos de envio de forma local
   void storeUserData() {
-    final userBox = Hive.box(name: 'user');
-    userBox.putAll({
-      'name': _orderSummary.userDetails.fullName,
-      'email': _orderSummary.userDetails.email,
-      'phone': _orderSummary.userDetails.phoneNumber,
-    });
+    try {
+      final userBox = Hive.box(name: 'user');
+      userBox.putAll({
+        'name': _orderSummary.userDetails.fullName,
+        'email': _orderSummary.userDetails.email,
+        'phone': _orderSummary.userDetails.phoneNumber,
+      });
 
-    if (_deliveryDetails is Dispatch) {
-      userBox.putAll({
-        'deliveryZoneId': (_deliveryDetails as Dispatch).zone.id,
-        'deliveryAddress': (_deliveryDetails as Dispatch).address,
-      });
-    } else if (userBox.get('deliveryZoneId') == null) {
-      userBox.putAll({
-        'deliveryZoneId': null,
-        'deliveryAddress': null,
-      });
+      if (_deliveryDetails is Dispatch) {
+        userBox.putAll({
+          'deliveryZoneId': (_deliveryDetails as Dispatch).zone.id,
+          'deliveryAddress': (_deliveryDetails as Dispatch).address,
+        });
+      } else if (userBox.get('deliveryZoneId') == null) {
+        userBox.putAll({
+          'deliveryZoneId': null,
+          'deliveryAddress': null,
+        });
+      }
+      userBox.close();
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
     }
-
-    userBox.close();
   }
 }
