@@ -13,14 +13,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 /// This widget displays the payment UI and manages payment-related logic.
 /// Pass a [Uri] to specify the payment endpoint or resource.
 class PaymentPage extends StatefulWidget {
-  final Uri uri;
-  final String paymentType;
+  final Uri? uri;
+  final String? paymentType;
   final String? token;
 
   const PaymentPage({
     super.key,
-    required this.uri,
-    required this.paymentType,
+    this.uri,
+    this.paymentType,
     this.token,
   });
 
@@ -35,6 +35,9 @@ class PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
+    // TODO: Mostrar error e implementar pantalla de error cuando ocurra un error en el webvie
+    if (widget.uri == null || widget.paymentType == null) return;
+    
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.transparent)
@@ -88,7 +91,7 @@ class PaymentPageState extends State<PaymentPage> {
 
       _controller.loadHtmlString(html);
     } else {
-      _controller.loadRequest(widget.uri);
+      _controller.loadRequest(widget.uri!);
     }
   }
 
@@ -131,7 +134,7 @@ class PaymentPageState extends State<PaymentPage> {
         // Navigate to InvoicePage when payment is done or canceled
         builder: (context) => const InvoicePage(),
       ),
-      (route) => false,
+      ModalRoute.withName('HomePage')
     );
   }
 }

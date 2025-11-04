@@ -1,4 +1,11 @@
 import 'package:delivera/firebase_options.dart';
+import 'package:delivera/pages/history_page.dart' show HistoryPage;
+import 'package:delivera/pages/home_info_page.dart' show HomeInfoPage;
+import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
+import 'package:delivera/pages/order_summary_page.dart' show OrderSummaryPage;
+import 'package:delivera/pages/order_tracking_page.dart' show OrderTrackingPage;
+import 'package:delivera/pages/payment_page.dart' show PaymentPage;
+import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
 import 'package:delivera/utils/initialize_hive.dart' show initializeHive;
 import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
 import 'package:delivera/services/firebase_messaging_service.dart';
@@ -88,6 +95,17 @@ class MyApp extends StatelessWidget {
       child: ToastificationWrapper(
         child: MaterialApp(
           navigatorKey: navigatorKey,
+          initialRoute: 'HomePage',
+          routes: {
+            'HomePage': (_) => const HomePage(),
+            'HomeInfoPage': (_) => const HomeInfoPage(),
+            'ShoppingCartPage': (_) => const ShoppingCartPage(),
+            'HistoryPage': (_) => const HistoryPage(),
+            'OrderSummaryPage': (_) => const OrderSummaryPage(),
+            'PaymentPage': (_) => const PaymentPage(),
+            'InvoicePage': (_) => const InvoicePage(),
+            'OrderTrackingPage': (_) => const OrderTrackingPage(),
+          },
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
@@ -105,7 +123,6 @@ class MyApp extends StatelessWidget {
             ),
             useMaterial3: false,
           ),
-          home: const HomePage(),
         ),
       ),
     );
