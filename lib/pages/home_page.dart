@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:delivera/enum/bottom_navigation_bar_enum.dart';
+import 'package:delivera/model/notification_handler_model.dart' show NotificationHandler;
 import 'package:delivera/pages/home_info_page.dart' show HomeInfoPage;
 import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
 import 'package:delivera/pages/history_page.dart' show HistoryPage;
@@ -44,6 +45,7 @@ class _HomePageState extends State<HomePage> {
           FlutterNativeSplash.remove();
         }
       });
+      NotificationHandler.handleStoredNotification();
       _data = _getData();
       setState(() {});
     });

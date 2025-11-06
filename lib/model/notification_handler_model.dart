@@ -9,6 +9,8 @@ import 'package:delivera/model/order_tracking_model.dart' show OrderTracking;
 import 'package:delivera/pages/order_tracking_page.dart';
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart' show Hive;
+import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 import 'package:provider/provider.dart';
 
 abstract class NotificationHandler {
@@ -22,8 +24,50 @@ abstract class NotificationHandler {
     }
   }
 
+  factory NotificationHandler.fromRuntimeType(String runtimeType) {
+    switch (runtimeType) {
+      case 'OrderTrackingNotification':
+        return OrderTrackingNotification();
+      default:
+        return DefaultNotification();
+    }
+  }
+
   void handleReceived(dynamic payload);
   void handleTapped(dynamic payload);
+  
+  /// Guarda el tipo de notification handler y el payload en el storage local.
+  /// Para poder instanciar el mismo tipo de notification handler cuando se abre la app.
+  static void store(NotificationHandler notificationHandler, dynamic payload) async {
+    Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
+
+    try {
+      final notificationBox = Hive.box(name: 'notification');
+      if (notificationBox.isNotEmpty) notificationBox.clear();
+      notificationBox.put(notificationHandler.runtimeType.toString(), payload);
+      notificationBox.close();
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
+    }
+  }
+
+  /// Busca la notificación en el storage local y ejecuta sus acciones si corresponde.
+  /// Instancia el [NotificationHandler] correspondiente y ejecuta su metodo [NotificationHandler.handleTapped].
+  static void handleStoredNotification() {
+    try {
+      final notificationBox = Hive.box(name: 'notification');
+      log('notificationBox empty: ${notificationBox.isEmpty}');
+      if (notificationBox.isEmpty) return;
+      final String notificationHandlerType = notificationBox.keys.first;
+      final dynamic payload = notificationBox.get(notificationHandlerType);
+      final notificationHandler = NotificationHandler.fromRuntimeType(notificationHandlerType);
+      notificationHandler.handleTapped(payload);
+      notificationBox.clear();
+      notificationBox.close();
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
+    }
+  }
 }
 
 class OrderTrackingNotification implements NotificationHandler {

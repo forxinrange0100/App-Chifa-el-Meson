@@ -37,7 +37,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  
+
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -47,14 +47,15 @@ void main() async {
 
   final firebaseMessagingService = FirebaseMessagingService.instance();
   await firebaseMessagingService.init(localNotificationsService: localNotificationsService);
-  
+
   // Para evitar un error en la herramienta Network mientras se debuggea
   if (kDebugMode) {
     HttpClient.enableTimelineLogging = true;
   }
-  runApp(const MyApp());
 
   await initializeHive();
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

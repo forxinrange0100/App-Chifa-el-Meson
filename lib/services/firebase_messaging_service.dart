@@ -127,10 +127,14 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     // Display a local notification
     final localNotificationsService = LocalNotificationsService.instance();
     await localNotificationsService.init();
-    localNotificationsService.showNotification(
-      notificationData.title,
-      notificationData.body,
-      message.data,
-    );
+    try {
+      await localNotificationsService.showNotification(
+        notificationData.title,
+        notificationData.body,
+        message.data,
+      );
+    } catch (e, stackTrace) {
+      log('Error showing background notification: $e', error: e, stackTrace: stackTrace);
+    }
   }
 }

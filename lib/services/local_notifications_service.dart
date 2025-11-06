@@ -1,6 +1,7 @@
 import 'dart:convert' show jsonDecode, jsonEncode;
 import 'dart:developer';
 import 'package:delivera/enum/notification_type_enum.dart';
+import 'package:delivera/main.dart' show navigatorKey;
 import 'package:delivera/model/notification_handler_model.dart' show NotificationHandler;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -72,6 +73,7 @@ class LocalNotificationsService {
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: _notificationTapped,
+      onDidReceiveBackgroundNotificationResponse: _notificationTapped,
     );
 
     // Refresh Android notification channels, use when making changes to channels
@@ -128,6 +130,7 @@ class LocalNotificationsService {
     final androidDetails = AndroidNotificationDetails(
       _androidChannel.id,
       _androidChannel.name,
+      icon: '@mipmap/ic_launcher',
       channelDescription: _androidChannel.description,
       importance: _androidChannel.importance,
       playSound: _androidChannel.playSound,
@@ -153,6 +156,10 @@ class LocalNotificationsService {
     final notificationType = NotificationTypeEnum.fromName(payload['type']);
     final notificationHandler = NotificationHandler.fromType(notificationType);
     notificationHandler.handleReceived(payload);
+    // Si se recibió desde un estado terminado, guardar el notification handler y el payload en el storage local
+    if (navigatorKey.currentState == null) {
+      NotificationHandler.store(notificationHandler, payload);
+    }
 
     try {
       final int notificationId = notificationHandler.notificationId ?? _notificationIdCounter;
