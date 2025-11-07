@@ -1,5 +1,6 @@
 import 'dart:convert' show jsonDecode, jsonEncode;
 import 'dart:developer';
+import 'dart:ui' show Color;
 import 'package:delivera/enum/notification_type_enum.dart';
 import 'package:delivera/main.dart' show navigatorKey;
 import 'package:delivera/model/notification_handler_model.dart' show NotificationHandler;
@@ -54,7 +55,7 @@ class LocalNotificationsService {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     //Android-specific initialization settings using app launcher icon
-    final androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
+    final androidInitializationSettings = const AndroidInitializationSettings('ic_launcher_foreground');
 
     //iOS-specific initialization settings with permission requests
     final iosInitializationSettings = const DarwinInitializationSettings(
@@ -130,11 +131,11 @@ class LocalNotificationsService {
     final androidDetails = AndroidNotificationDetails(
       _androidChannel.id,
       _androidChannel.name,
-      icon: '@mipmap/ic_launcher',
       channelDescription: _androidChannel.description,
       importance: _androidChannel.importance,
       playSound: _androidChannel.playSound,
       priority: Priority.high,
+      color: const Color(0xFFD92C19),
     );
 
     // iOS-specific notification details
