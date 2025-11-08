@@ -2,11 +2,14 @@ import 'dart:developer';
 
 import 'package:delivera/enum/bottom_navigation_bar_enum.dart';
 import 'package:delivera/model/notification_handler_model.dart' show NotificationHandler;
+import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/pages/home_info_page.dart' show HomeInfoPage;
+import 'package:delivera/pages/payment_page.dart' show PaymentPage;
 import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
 import 'package:delivera/pages/history_page.dart' show HistoryPage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/data_provider.dart';
+import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
@@ -84,12 +87,7 @@ class _HomePageState extends State<HomePage> {
             child: _dataProvider.done && _dataProvider.errorMessage.isEmpty
                 ? _HomeBuilder()
                 : !_dataProvider.done
-                    ? const Scaffold(
-                        backgroundColor: Colors.white,
-                        body: Center(
-                          child: CircularProgressIndicator(color: Colors.blue, backgroundColor: Colors.grey),
-                        ),
-                      )
+                    ? LoadingScreenWidget()
                     : ErrorScreenWidget(errorMessage: _dataProvider.errorMessage),
           );
         } else {
@@ -150,8 +148,27 @@ class _HomeBuilder extends StatelessWidget {
               ],
             ),
           ),
+          bottomSheet: pendingPayment(context),
         );
       },
+    );
+  }
+
+  Widget? pendingPayment(BuildContext context) {
+    PaymentResult? orderResult = PaymentResult.fromStorage();
+    log('Has pending payment: ${orderResult != null}');
+    if (orderResult == null) return null;
+
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            context.read<InvoiceProvider>().publicId = orderResult.publicId;
+            return PaymentPage(paymentData: orderResult.paymentData);
+          },
+        ));
+      },
+      child: Text('Continuar pago'),
     );
   }
 }

@@ -696,16 +696,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       _orderSummaryProvider.storeUserData();
 
       // If the order result has a payment URL, navigate to the PaymentPage
-      if (_orderSummaryProvider.orderResult.paymentData != null) {
-        final PaymentData paymentData = _orderSummaryProvider.orderResult.paymentData!;
-        final url = paymentData.paymentUrl;
-        final paymentType = paymentData.paymentType;
-        final token = paymentData.token;
-        final Uri uri = Uri.parse(url);
+      if (_orderSummaryProvider.orderResult != null) {
+        final PaymentResult orderResult = _orderSummaryProvider.orderResult!;
         _orderSummaryProvider.clearPaymentData();
+        orderResult.store();
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {
-            return PaymentPage(uri: uri, paymentType: paymentType, token: token);
+            return PaymentPage(paymentData: orderResult.paymentData);
           },
         ));
       }

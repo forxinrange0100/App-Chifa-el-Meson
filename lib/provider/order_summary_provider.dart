@@ -14,12 +14,12 @@ class OrderSummaryProvider extends ChangeNotifier {
   OrderSummary _orderSummary = OrderSummary.empty();
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
-  PaymentResult _orderResult = PaymentResult(publicId: 0);
+  PaymentResult? _orderResult;
 
   /// To track the delivery details selection
   DeliveryDetails _deliveryDetails;
 
-  PaymentResult get orderResult => _orderResult;
+  PaymentResult? get orderResult => _orderResult;
   DeliveryDetails get deliveryDetails => _deliveryDetails;
 
   OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
@@ -63,7 +63,7 @@ class OrderSummaryProvider extends ChangeNotifier {
   }
 
   void clearPaymentData() {
-    _orderResult.paymentData = null;
+    _orderResult = null;
   }
 
   void clearOrderSummary() {

@@ -1,26 +1,31 @@
 import 'package:delivera/model/order_model.dart';
-import 'package:delivera/model/order_summary_model.dart';
-import 'package:delivera/provider/order_summary_provider.dart';
+import 'package:delivera/model/payment_result_model.dart' show PaymentResult;
 import 'package:delivera/utils/fetch_order_full.dart';
 import 'package:flutter/material.dart';
 
 class InvoiceProvider extends ChangeNotifier {
-  final OrderSummaryProvider _orderSummaryProvider;
+  int? publicId;
   bool _isDownloadingInvoice = false;
   Order _order = Order.empty();
 
-  DeliveryDetails get deliveryDetails => _orderSummaryProvider.deliveryDetails;
   bool get isDownloadingInvoice => _isDownloadingInvoice;
   Order get order => _order;
 
-  InvoiceProvider(this._orderSummaryProvider);
+  InvoiceProvider();
 
+  /// Realiza peticion para obtener el pedido completo usando el publicId.
+  /// Guarda el pedido obtenido en el provider,establece publicId en null y borra los datos de pago del almacenamiento local.
   Future<void> getOrder() async {
+    if (publicId == null) {
+      throw Exception("publicId is null");
+    }
     try {
-      _order = await fetchOrderFull(_orderSummaryProvider.orderResult.publicId);
+      _order = await fetchOrderFull(publicId!);
     } catch (_) {
       rethrow;
     }
+    publicId = null;
+    PaymentResult.clearStorage();
     notifyListeners();
   }
 

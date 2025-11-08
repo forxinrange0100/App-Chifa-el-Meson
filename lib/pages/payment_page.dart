@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
@@ -13,15 +14,11 @@ import 'package:webview_flutter/webview_flutter.dart';
 /// This widget displays the payment UI and manages payment-related logic.
 /// Pass a [Uri] to specify the payment endpoint or resource.
 class PaymentPage extends StatefulWidget {
-  final Uri? uri;
-  final String? paymentType;
-  final String? token;
+  final PaymentData? paymentData;
 
   const PaymentPage({
     super.key,
-    this.uri,
-    this.paymentType,
-    this.token,
+    this.paymentData,
   });
 
   @override
@@ -31,13 +28,19 @@ class PaymentPage extends StatefulWidget {
 class PaymentPageState extends State<PaymentPage> {
   late WebViewController _controller;
   bool _isLoading = true;
+  late final Uri uri;
+  late final String paymentType;
+  late final String? token;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Mostrar error e implementar pantalla de error cuando ocurra un error en el webvie
-    if (widget.uri == null || widget.paymentType == null) return;
-    
+    // TODO: Mostrar error e implementar pantalla de error cuando ocurra un error en el webview
+    if (widget.paymentData == null) return;
+    uri = Uri.parse(widget.paymentData!.paymentUrl);
+    paymentType = widget.paymentData!.paymentType;
+    token = widget.paymentData!.token;
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.transparent)
@@ -78,12 +81,12 @@ class PaymentPageState extends State<PaymentPage> {
       );
 
     // Aquí la lógica para transbank
-    if (widget.paymentType == 'transbank' && widget.token != null) {
+    if (paymentType == 'transbank' && token != null) {
       final html = '''
         <html>
           <body onload="document.forms[0].submit()">
-            <form action="${widget.uri.toString()}" method="POST">
-              <input type="hidden" name="token_ws" value="${widget.token}"/>
+            <form action="${uri.toString()}" method="POST">
+              <input type="hidden" name="token_ws" value="$token"/>
             </form>
           </body>
         </html>
@@ -91,7 +94,7 @@ class PaymentPageState extends State<PaymentPage> {
 
       _controller.loadHtmlString(html);
     } else {
-      _controller.loadRequest(widget.uri!);
+      _controller.loadRequest(uri);
     }
   }
 
@@ -134,7 +137,7 @@ class PaymentPageState extends State<PaymentPage> {
         // Navigate to InvoicePage when payment is done or canceled
         builder: (context) => const InvoicePage(),
       ),
-      ModalRoute.withName('HomePage')
+      ModalRoute.withName('HomePage'),
     );
   }
 }

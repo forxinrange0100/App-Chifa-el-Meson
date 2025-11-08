@@ -80,9 +80,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => InvoiceProvider(
-            context.read<OrderSummaryProvider>(),
-          ),
+          create: (context) => InvoiceProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) => DataProvider(
