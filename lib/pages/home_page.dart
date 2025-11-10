@@ -30,6 +30,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Future<bool>? _data;
   late DataProvider _dataProvider;
+  DateTime? lastPressedAt;
 
   Future<bool> _getData() async {
     await context.read<DataProvider>().getData();
@@ -56,9 +57,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime? lastPressedAt;
-    _dataProvider = context.watch<DataProvider>();
-
     return FutureBuilder<bool>(
       future: _data,
       builder: (context, snapshot) {
@@ -67,34 +65,39 @@ class _HomePageState extends State<HomePage> {
         } else if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
           return PopScope(
             canPop: false,
-            onPopInvokedWithResult: (didPop, _) {
-              if (!didPop) {
-                if (context.read<BottomNavigationBarProvider>().index != BottomNavigationBarEnum.home.index) {
-                  context.read<BottomNavigationBarProvider>().showHome();
-                  return;
-                }
-                final now = DateTime.now();
-                final isFirstBackPress = lastPressedAt == null || now.difference(lastPressedAt!) > const Duration(seconds: 5);
-
-                if (isFirstBackPress) {
-                  lastPressedAt = now;
-                  closeAppToast();
-                } else {
-                  SystemNavigator.pop();
-                }
+            onPopInvokedWithResult: (didPop, _) => handlePop(didPop, context),
+            child: Consumer<DataProvider>(builder: (context, dataProvider, child) {
+              if (!dataProvider.done) {
+                return LoadingScreenWidget();
+              } else if (dataProvider.errorMessage.isNotEmpty) {
+                return ErrorScreenWidget(errorMessage: dataProvider.errorMessage);
               }
-            },
-            child: _dataProvider.done && _dataProvider.errorMessage.isEmpty
-                ? _HomeBuilder()
-                : !_dataProvider.done
-                    ? LoadingScreenWidget()
-                    : ErrorScreenWidget(errorMessage: _dataProvider.errorMessage),
+              return _HomeBuilder();
+            }),
           );
         } else {
-          return ErrorScreenWidget(errorMessage: _dataProvider.errorMessage);
+          return ErrorScreenWidget(errorMessage: context.read<DataProvider>().errorMessage);
         }
       },
     );
+  }
+
+  void handlePop(bool didPop, BuildContext context) {
+    if (didPop) return;
+
+    if (context.read<BottomNavigationBarProvider>().index != BottomNavigationBarEnum.home.index) {
+      context.read<BottomNavigationBarProvider>().showHome();
+      return;
+    }
+    final now = DateTime.now();
+    final isFirstBackPress = lastPressedAt == null || now.difference(lastPressedAt!) > const Duration(seconds: 5);
+
+    if (isFirstBackPress) {
+      lastPressedAt = now;
+      closeAppToast();
+    } else {
+      SystemNavigator.pop();
+    }
   }
 }
 
@@ -109,8 +112,10 @@ class _HomeBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pendingPaymentWidget = pendingPayment(context);
     return Consumer<BottomNavigationBarProvider>(
       builder: (context, bottomNavigationProvider, child) {
+        child = pendingPaymentWidget;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.white,
@@ -132,8 +137,8 @@ class _HomeBuilder extends StatelessWidget {
                 }
                 bottomNavigationProvider.setIndex(bottomNavigationBarEnum);
               },
-              destinations: [
-                const NavigationDestination(
+              destinations: const [
+                NavigationDestination(
                   icon: Icon(Icons.home),
                   label: "Inicio",
                 ),
@@ -141,14 +146,14 @@ class _HomeBuilder extends StatelessWidget {
                   icon: _CartIconWidget(),
                   label: "Carrito",
                 ),
-                const NavigationDestination(
+                NavigationDestination(
                   icon: Icon(Icons.history),
                   label: "Historial",
                 )
               ],
             ),
           ),
-          bottomSheet: pendingPayment(context),
+          bottomSheet: child,
         );
       },
     );

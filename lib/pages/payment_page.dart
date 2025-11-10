@@ -120,22 +120,7 @@ class PaymentPageState extends State<PaymentPage> {
           children: [
             WebViewWidget(controller: _controller),
             if (_isLoading)
-              const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 20,
-                  children: [
-                    CircularProgressIndicator(
-                      color: Colors.blue,
-                      backgroundColor: Colors.grey,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Text("Estamos redirigíendote al portal de pago...", textAlign: TextAlign.center),
-                    )
-                  ],
-                ),
-              ),
+              RedirectingWidget(),
           ],
         ),
       ),
@@ -149,7 +134,33 @@ class PaymentPageState extends State<PaymentPage> {
         // Navigate to InvoicePage when payment is done or canceled
         builder: (context) => const InvoicePage(),
       ),
-      ModalRoute.withName('HomePage'),
+      (route) => false,
+    );
+  }
+}
+
+class RedirectingWidget extends StatelessWidget {
+  const RedirectingWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 20,
+        children: [
+          CircularProgressIndicator(
+            color: Colors.blue,
+            backgroundColor: Colors.grey,
+          ),
+          Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Text("Estamos redirigíendote al portal de pago...", textAlign: TextAlign.center),
+          )
+        ],
+      ),
     );
   }
 }

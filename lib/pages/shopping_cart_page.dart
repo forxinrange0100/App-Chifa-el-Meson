@@ -147,9 +147,10 @@ class ShoppingCartPage extends StatelessWidget {
       return;
     }
     
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const OrderSummaryPage()),
+      (route) => false,
     );
   }
 

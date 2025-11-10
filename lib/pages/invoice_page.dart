@@ -32,6 +32,7 @@ class _InvoicePageState extends State<InvoicePage> {
   bool _reloading = false;
   String? _errorMessage;
   late InvoiceProvider _invoiceProvider;
+  late final bool _hasOrder;
 
   void _setReloading(bool isReloading) {
     setState(() {
@@ -42,11 +43,11 @@ class _InvoicePageState extends State<InvoicePage> {
   Future<bool> _getOrder() async {
     try {
       final invoiceProvider = context.read<InvoiceProvider>();
-      if (widget._order == null) {
+      if (_hasOrder) {
+        invoiceProvider.setOrder(widget._order!);
+      } else {
         await invoiceProvider.getOrder();
         invoiceProvider.order.storeOrder();
-      } else {
-        invoiceProvider.setOrder(widget._order!);
       }
 
       return true;
@@ -63,6 +64,7 @@ class _InvoicePageState extends State<InvoicePage> {
   @override
   void initState() {
     super.initState();
+    _hasOrder = widget._order != null;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _isOrderFetched = _getOrder();
       setState(() {});
@@ -76,130 +78,120 @@ class _InvoicePageState extends State<InvoicePage> {
       builder: (context, snapshot) {
         _invoiceProvider = context.watch<InvoiceProvider>();
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (_errorMessage != null) {
+          return ErrorScreenWidget(errorMessage: _errorMessage!);
+        }
+        if (snapshot.connectionState != ConnectionState.done && snapshot.data != true || _reloading) {
           log('ConnectionState: waiting');
           return LoadingScreenWidget();
-        } else if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
-          log('ConnectionState: done');
-          return _reloading
-              ? LoadingScreenWidget()
-              : PopScope(
-                  canPop: widget._order == null ? false : true,
-                  onPopInvokedWithResult: (didPop, _) {
-                    if (!didPop) {
-                      _navigateHome(context);
-                    }
-                  },
-                  child: Scaffold(
-                    backgroundColor: Colors.white,
-                    appBar: AppBar(
-                      surfaceTintColor: const Color.fromARGB(255, 89, 81, 81),
-                      backgroundColor: Colors.white,
-                      shadowColor: Colors.black,
-                      elevation: 2,
-                      centerTitle: true,
-                      leading: IconButton(
-                        onPressed: () {
-                          widget._order == null ? _navigateHome(context) : _navigateHistory(context);
-                        },
-                        icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      ),
-                      title: const Text("BOLETA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                      actions: [
-                        IconButton(
-                          onPressed: () async {
-                            _setReloading(true);
-                            await _getOrder();
-                            _setReloading(false);
-                          },
-                          icon: const Icon(FontAwesomeIcons.arrowRotateRight),
-                        )
-                      ],
-                    ),
-                    body: const InvoiceCardWidget(),
-                    bottomNavigationBar: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      decoration: BoxDecoration(
-                        border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        spacing: 5,
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () => _downloadInvoice(),
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll<Color>(Colors.blue.shade800),
-                            ),
-                            label: const Text(
-                              "Descargar boleta",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                            icon: _invoiceProvider.isDownloadingInvoice
-                                ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 16, height: 16))
-                                : const Icon(FontAwesomeIcons.download, size: 16),
-                            iconAlignment: IconAlignment.end,
-                          ),
-                          if (OrderStatusEnum.fromName(_invoiceProvider.order.status).isActive())
-                            ElevatedButton(
-                              onPressed: () => Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => OrderTrackingPage()),
-                              ),
-                              child: const Text(
-                                'Ver seguimiento',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                            ),
-                          ElevatedButton(
-                            onPressed: () {
-                              context.read<InvoiceProvider>().clearOrder();
-                              if (widget._order != null) {
-                                _navigateHistory(context);
-                                return;
-                              }
-                              context.read<BottomNavigationBarProvider>().showHome();
-                              _navigateHome(context);
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
-                              foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black),
-                            ),
-                            child: Text(
-                              widget._order == null ? "Volver a la tienda" : "Volver al historial",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-        } else {
-          return ErrorScreenWidget(errorMessage: _errorMessage);
         }
+
+        log('ConnectionState: done');
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) {
+              navigateBack(context, toHistory: _hasOrder);
+            }
+          },
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              surfaceTintColor: const Color.fromARGB(255, 89, 81, 81),
+              backgroundColor: Colors.white,
+              shadowColor: Colors.black,
+              elevation: 2,
+              centerTitle: true,
+              leading: IconButton(
+                onPressed: () => navigateBack(context, toHistory: _hasOrder),
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+              ),
+              title: const Text("BOLETA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    _setReloading(true);
+                    await _getOrder();
+                    _setReloading(false);
+                  },
+                  icon: const Icon(FontAwesomeIcons.arrowRotateRight),
+                )
+              ],
+            ),
+            body: const InvoiceCardWidget(),
+            bottomNavigationBar: Container(
+              padding: const EdgeInsets.all(5.0),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: Colors.grey.shade300, width: 1)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 5,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => _downloadInvoice(),
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll<Color>(Colors.blue.shade800),
+                    ),
+                    label: const Text(
+                      "Descargar boleta",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    icon: _invoiceProvider.isDownloadingInvoice
+                        ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 16, height: 16))
+                        : const Icon(FontAwesomeIcons.download, size: 16),
+                    iconAlignment: IconAlignment.end,
+                  ),
+                  if (OrderStatusEnum.fromName(_invoiceProvider.order.status).isActive())
+                    ElevatedButton(
+                      onPressed: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => OrderTrackingPage()),
+                      ),
+                      child: const Text(
+                        'Ver seguimiento',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<InvoiceProvider>().clearOrder();
+                      navigateBack(context, toHistory: _hasOrder);
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll<Color>(Colors.grey.shade400),
+                      foregroundColor: const WidgetStatePropertyAll<Color>(Colors.black),
+                    ),
+                    child: Text(
+                      _hasOrder ? "Volver al historial" : "Volver a la tienda",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
   }
 
-  void _navigateHome(BuildContext context) {
-    context.read<BottomNavigationBarProvider>().showHome();
+  void navigateBack(BuildContext context, {bool toHistory = false}) {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+      return;
+    }
+
+    if (toHistory) {
+      context.read<BottomNavigationBarProvider>().showHistory();
+    } else {
+      context.read<BottomNavigationBarProvider>().showHome();
+    }
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => const HomePage(),
-      ),
-      (route) => false,
-    );
-  }
-
-  void _navigateHistory(BuildContext context) {
-    context.read<BottomNavigationBarProvider>().showHistory();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const HistoryPage(),
       ),
       (route) => false,
     );

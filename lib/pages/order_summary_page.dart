@@ -4,7 +4,9 @@ import 'package:delivera/model/input_status_model.dart';
 import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/user_box_model.dart' show UserBox;
+import 'package:delivera/pages/home_page.dart' show HomePage;
 import 'package:delivera/pages/payment_page.dart';
+import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/provider/delivery_details_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
@@ -136,254 +138,265 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
           backgroundColor: Colors.white,
           shadowColor: Colors.black,
           elevation: 2,
+          leading: IconButton(
+            onPressed: () => _navigateBack(context),
+            icon: const Icon(FontAwesomeIcons.arrowLeft, color: Colors.black),
+          ),
           centerTitle: true,
           titleTextStyle: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
           title: const Text(
             "RESUMEN DE COMPRA",
           )),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: ListView(
-          children: [
-            _showTitle("Detalles de entrega"),
-            const SizedBox(
-              height: 5,
-            ),
-            ElevatedButtonTheme(
-              data: const ElevatedButtonThemeData(
-                style: ButtonStyle(
-                  padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(16.0)),
-                  foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
-                  backgroundColor: WidgetStatePropertyAll<Color>(Colors.white),
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _navigateBack(context);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: ListView(
+            children: [
+              _showTitle("Detalles de entrega"),
+              const SizedBox(
+                height: 5,
+              ),
+              ElevatedButtonTheme(
+                data: const ElevatedButtonThemeData(
+                  style: ButtonStyle(
+                    padding: WidgetStatePropertyAll<EdgeInsets>(EdgeInsets.all(16.0)),
+                    foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
+                    backgroundColor: WidgetStatePropertyAll<Color>(Colors.white),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                        style: ButtonStyle(
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: const BorderRadius.all(Radius.circular(6)),
+                              side: _deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.pickup
+                                  ? const BorderSide(color: Colors.black, width: 1.5)
+                                  : BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          _deliveryDetailsProvider.setDeliveryTypeEnum(DeliveryTypeEnum.pickup);
+                          _orderSummaryProvider.setDeliveryDetailsPickUp();
+                        },
+                        child: const Column(
+                          children: [
+                            Icon(FontAwesomeIcons.store),
+                            Text("Retiro en tienda"),
+                          ],
+                        )),
+                    ElevatedButton(
+                        style: ButtonStyle(
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: const BorderRadius.all(Radius.circular(6)),
+                              side: _deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.dispatch
+                                  ? const BorderSide(color: Colors.black, width: 1.5)
+                                  : BorderSide.none,
+                            ),
+                          ),
+                          backgroundColor:
+                              WidgetStatePropertyAll<Color>(_deliveryDetailsProvider.dispatchEnabled == false ? Colors.grey.shade100 : Colors.white),
+                          foregroundColor:
+                              WidgetStatePropertyAll<Color>(_deliveryDetailsProvider.dispatchEnabled == false ? Colors.grey.shade600 : Colors.black),
+                        ),
+                        onPressed: () {
+                          _deliveryDetailsProvider.dispatchEnabled == false
+                              ? errorOrderSummary("El envío a domicilio no está disponible en este momento.")
+                              : _deliveryDetailsProvider.setDeliveryTypeEnum(DeliveryTypeEnum.dispatch);
+                          // Don't set the OrderSummaryProvider delivery details here
+                        },
+                        child: const Column(
+                          children: [
+                            Icon(FontAwesomeIcons.motorcycle),
+                            Text("Envío a domicilio"),
+                          ],
+                        ))
+                  ],
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              switch (_deliveryDetailsProvider.deliveryTypeEnum) {
+                DeliveryTypeEnum.pickup => _deliveryPickupSelected(context),
+                DeliveryTypeEnum.dispatch => _deliveryDispatchSelected(context),
+                _ => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Por favor, seleccione un método de entrega.",
+                      style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+              },
+              const Divider(),
+              _selectPaymentMethod(),
+              const Divider(),
+              const Text(
+                "Mis datos",
+                style: _titleStyle,
+              ),
+              const Text("Nombre y Apellido (*):"),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextFormField(
+                  onChanged: (value) {
+                    setState(() {
+                      _inputStatusFullName.verify(value);
+                    });
+                  },
+                  controller: _textEditingControllerFullName,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey.shade200,
+                    hintText: 'Ingrese su nombre',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                  ),
+                ),
+              ),
+              (_inputStatusFullName.status == InputStatusEnum.invalid)
+                  ? Text(
+                      _inputStatusFullName.errorMessage,
+                      style: _textInvalidStyle,
+                    )
+                  : const SizedBox(),
+              const Text("Email (*):"),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextFormField(
+                  onChanged: (value) {
+                    setState(() {
+                      _inputStatusEmail.verify(value);
+                    });
+                  },
+                  controller: _textEditingControllerEmail,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
+                  ],
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey.shade200,
+                    hintText: 'Ingrese su correo',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                  ),
+                ),
+              ),
+              (_inputStatusEmail.status == InputStatusEnum.invalid)
+                  ? Text(
+                      _inputStatusEmail.errorMessage,
+                      style: _textInvalidStyle,
+                    )
+                  : const SizedBox(),
+              const Text("Celular (*):"),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TextFormField(
+                  onChanged: (value) {
+                    setState(() {
+                      _inputStatusPhoneNumber.verify(value);
+                    });
+                  },
+                  controller: _textEditingControllerPhoneNumber,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // Allow only digits
+                    FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
+                  ],
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey.shade200,
+                    hintText: 'Ingrese su celular. Ejemplo: 912345678',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                  ),
+                ),
+              ),
+              (_inputStatusPhoneNumber.status == InputStatusEnum.invalid)
+                  ? Text(
+                      _inputStatusPhoneNumber.errorMessage,
+                      style: _textInvalidStyle,
+                    )
+                  : const SizedBox(),
+              const Divider(),
+              const Text(
+                "Resumen de compra",
+                style: _titleStyle,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [const Text("Subtotal"), PriceWidget(price: context.watch<ShoppingCartProvider>().subtotal)],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [const Text("Descuentos"), PriceWidget(price: context.watch<ShoppingCartProvider>().discount)],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                      style: ButtonStyle(
-                        shape: WidgetStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: _deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.pickup
-                                ? const BorderSide(color: Colors.black, width: 1.5)
-                                : BorderSide.none,
-                          ),
-                        ),
-                      ),
-                      onPressed: () {
-                        _deliveryDetailsProvider.setDeliveryTypeEnum(DeliveryTypeEnum.pickup);
-                        _orderSummaryProvider.setDeliveryDetailsPickUp();
-                      },
-                      child: const Column(
-                        children: [
-                          Icon(FontAwesomeIcons.store),
-                          Text("Retiro en tienda"),
-                        ],
-                      )),
-                  ElevatedButton(
-                      style: ButtonStyle(
-                        shape: WidgetStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            side: _deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.dispatch
-                                ? const BorderSide(color: Colors.black, width: 1.5)
-                                : BorderSide.none,
-                          ),
-                        ),
-                        backgroundColor:
-                            WidgetStatePropertyAll<Color>(_deliveryDetailsProvider.dispatchEnabled == false ? Colors.grey.shade100 : Colors.white),
-                        foregroundColor:
-                            WidgetStatePropertyAll<Color>(_deliveryDetailsProvider.dispatchEnabled == false ? Colors.grey.shade600 : Colors.black),
-                      ),
-                      onPressed: () {
-                        _deliveryDetailsProvider.dispatchEnabled == false
-                            ? errorOrderSummary("El envío a domicilio no está disponible en este momento.")
-                            : _deliveryDetailsProvider.setDeliveryTypeEnum(DeliveryTypeEnum.dispatch);
-                        // Don't set the OrderSummaryProvider delivery details here
-                      },
-                      child: const Column(
-                        children: [
-                          Icon(FontAwesomeIcons.motorcycle),
-                          Text("Envío a domicilio"),
-                        ],
-                      ))
+                  const Text("Costo de Envío"),
+                  (_orderSummaryProvider.deliveryDetails is Dispatch)
+                      ? PriceWidget(price: (_orderSummaryProvider.deliveryDetails as Dispatch).zone.price)
+                      : const PriceWidget(price: 0)
                 ],
               ),
-            ),
-            switch (_deliveryDetailsProvider.deliveryTypeEnum) {
-              DeliveryTypeEnum.pickup => _deliveryPickupSelected(context),
-              DeliveryTypeEnum.dispatch => _deliveryDispatchSelected(context),
-              _ => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Por favor, seleccione un método de entrega.",
-                    style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-            },
-            const Divider(),
-            _selectPaymentMethod(),
-            const Divider(),
-            const Text(
-              "Mis datos",
-              style: _titleStyle,
-            ),
-            const Text("Nombre y Apellido (*):"),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _inputStatusFullName.verify(value);
-                  });
-                },
-                controller: _textEditingControllerFullName,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su nombre',
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                ),
-              ),
-            ),
-            (_inputStatusFullName.status == InputStatusEnum.invalid)
-                ? Text(
-                    _inputStatusFullName.errorMessage,
-                    style: _textInvalidStyle,
-                  )
-                : const SizedBox(),
-            const Text("Email (*):"),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _inputStatusEmail.verify(value);
-                  });
-                },
-                controller: _textEditingControllerEmail,
-                inputFormatters: [
-                  FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
-                ],
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su correo',
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                ),
-              ),
-            ),
-            (_inputStatusEmail.status == InputStatusEnum.invalid)
-                ? Text(
-                    _inputStatusEmail.errorMessage,
-                    style: _textInvalidStyle,
-                  )
-                : const SizedBox(),
-            const Text("Celular (*):"),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _inputStatusPhoneNumber.verify(value);
-                  });
-                },
-                controller: _textEditingControllerPhoneNumber,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly, // Allow only digits
-                  FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
-                ],
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey.shade200,
-                  hintText: 'Ingrese su celular. Ejemplo: 912345678',
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                ),
-              ),
-            ),
-            (_inputStatusPhoneNumber.status == InputStatusEnum.invalid)
-                ? Text(
-                    _inputStatusPhoneNumber.errorMessage,
-                    style: _textInvalidStyle,
-                  )
-                : const SizedBox(),
-            const Divider(),
-            const Text(
-              "Resumen de compra",
-              style: _titleStyle,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [const Text("Subtotal"), PriceWidget(price: context.watch<ShoppingCartProvider>().subtotal)],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [const Text("Descuentos"), PriceWidget(price: context.watch<ShoppingCartProvider>().discount)],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Costo de Envío"),
-                (_orderSummaryProvider.deliveryDetails is Dispatch)
-                    ? PriceWidget(price: (_orderSummaryProvider.deliveryDetails as Dispatch).zone.price)
-                    : const PriceWidget(price: 0)
-              ],
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("TOTAL"),
-                PriceWidget(
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("TOTAL"),
+                  PriceWidget(
                     price: _orderSummaryProvider.deliveryDetails.cost +
                         context.watch<ShoppingCartProvider>().subtotal -
-                        context.watch<ShoppingCartProvider>().discount)
-              ],
-            ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ElevatedButton.icon(
-                  onPressed: () => _handleSubmit(context),
-                  iconAlignment: IconAlignment.end,
-                  icon: _isSubmitting
-                      ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 24, height: 24))
-                      : const Icon(FontAwesomeIcons.arrowRight),
-                  label: SizedBox(
-                    width: double.infinity,
-                    child: const Text(
-                      "Finalizar Pago",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  )),
-            )
-          ],
+                        context.watch<ShoppingCartProvider>().discount,
+                  )
+                ],
+              ),
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ElevatedButton.icon(
+                    onPressed: () => _handleSubmit(context),
+                    iconAlignment: IconAlignment.end,
+                    icon: _isSubmitting
+                        ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 24, height: 24))
+                        : const Icon(FontAwesomeIcons.arrowRight),
+                    label: SizedBox(
+                      width: double.infinity,
+                      child: const Text(
+                        "Finalizar Pago",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    )),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -717,4 +730,15 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       }
     });
   }
+}
+
+void _navigateBack(BuildContext context) {
+  context.read<BottomNavigationBarProvider>().showShoppingCar();
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const HomePage(),
+    ),
+    (route) => false,
+  );
 }

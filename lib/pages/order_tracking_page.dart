@@ -35,11 +35,15 @@ class OrderTrackingPage extends StatelessWidget {
         ),
         title: const Text("SEGUIMIENTO", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: LayoutBuilder(
-          builder: (context, constraints) => Consumer<InvoiceProvider>(
-            builder: (context, orderProvider, child) {
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) navigateBack(context);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: LayoutBuilder(
+            builder: (context, constraints) => Consumer<InvoiceProvider>(builder: (context, orderProvider, child) {
               final order = orderProvider.order;
               final status = OrderStatusEnum.fromName(order.status);
               final statusProcess = OrderStatusEnum.getStatusProcess(DeliveryTypeEnum.fromName(order.deliveryType));
@@ -230,7 +234,7 @@ class OrderTrackingPage extends StatelessWidget {
                   ),
                 ],
               );
-            },
+            }),
           ),
         ),
       ),
@@ -274,30 +278,20 @@ class OrderTrackingPage extends StatelessWidget {
   }
 
   void navigateBack(BuildContext context) {
-    if (context.read<BottomNavigationBarProvider>().index == BottomNavigationBarEnum.history.index) {
-      navigateHistory(context);
-    } else {
-      navigateHome(context);
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+      return;
     }
-  }
 
-  void navigateHome(BuildContext context) {
-    context.read<BottomNavigationBarProvider>().showHome();
+    if (context.read<BottomNavigationBarProvider>().index == BottomNavigationBarEnum.history.index) {
+      context.read<BottomNavigationBarProvider>().showHistory();
+    } else {
+      context.read<BottomNavigationBarProvider>().showHome();
+    }
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (context) => const HomePage(),
-      ),
-      (route) => false,
-    );
-  }
-
-  void navigateHistory(BuildContext context) {
-    context.read<BottomNavigationBarProvider>().showHistory();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const HistoryPage(),
       ),
       (route) => false,
     );
