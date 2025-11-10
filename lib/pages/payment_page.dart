@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
+import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
 import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
 import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class PaymentPageState extends State<PaymentPage> {
   late final Uri uri;
   late final String paymentType;
   late final String? token;
+  bool hasError = false;
 
   @override
   void initState() {
@@ -47,8 +49,6 @@ class PaymentPageState extends State<PaymentPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
-            context.read<ShoppingCartProvider>().cleanShoppingCart();
-            context.read<OrderSummaryProvider>().clearOrderSummary();
             context.read<BottomNavigationBarProvider>().showHome();
             setState(() {
               _isLoading = true;
@@ -66,12 +66,23 @@ class PaymentPageState extends State<PaymentPage> {
             log('Web resource error failingUrl: ${error.errorType}');
           },
           onHttpError: (HttpResponseError error) {
-            log('HTTP error: ${error.request}');
-            log('HTTP error status code: ${error.response}');
+            log('HTTP error: ${error.request?.uri.toString()}');
+            int? statusCode = error.response?.statusCode;
+            log('HTTP error status code: ${error.response?.statusCode}');
+            if (statusCode == 400) {
+              setState(() {
+                hasError = true;
+              });
+            }
           },
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.contains('/order/')) {
               log('Navigating to invoice page: ${request.url}');
+              context.read<ShoppingCartProvider>().cleanShoppingCart();
+              final orderSummaryProvider = context.read<OrderSummaryProvider>();
+              context.read<InvoiceProvider>().publicId = orderSummaryProvider.orderResult?.publicId;
+              orderSummaryProvider.clearOrderSummary();
+              orderSummaryProvider.clearPaymentData();
               _navigateInvoice(context);
               return NavigationDecision.prevent;
             }
@@ -86,7 +97,8 @@ class PaymentPageState extends State<PaymentPage> {
         <html>
           <body onload="document.forms[0].submit()">
             <form action="${uri.toString()}" method="POST">
-              <input type="hidden" name="token_ws" value="$token"/>
+              <input type="hidden" name="token_ws" value="$token" />
+              <input type="submit" value="Pagar" />
             </form>
           </body>
         </html>
@@ -101,7 +113,7 @@ class PaymentPageState extends State<PaymentPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: hasError,
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(

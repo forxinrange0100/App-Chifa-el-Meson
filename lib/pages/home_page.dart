@@ -158,6 +158,7 @@ class _HomeBuilder extends StatelessWidget {
     PaymentResult? orderResult = PaymentResult.fromStorage();
     log('Has pending payment: ${orderResult != null}');
     if (orderResult == null) return null;
+    log('Url: ${orderResult.paymentData.paymentUrl}. Token: ${orderResult.paymentData.token}. Type: ${orderResult.paymentData.paymentType}');
 
     return ElevatedButton(
       onPressed: () {

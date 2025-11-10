@@ -698,8 +698,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       // If the order result has a payment URL, navigate to the PaymentPage
       if (_orderSummaryProvider.orderResult != null) {
         final PaymentResult orderResult = _orderSummaryProvider.orderResult!;
-        _orderSummaryProvider.clearPaymentData();
-        orderResult.store();
+        if (orderResult.paymentData.paymentType == 'getnet') {
+          orderResult.store();
+        }
         Navigator.push(context, MaterialPageRoute(
           builder: (context) {
             return PaymentPage(paymentData: orderResult.paymentData);
