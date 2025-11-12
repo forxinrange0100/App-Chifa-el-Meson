@@ -29,7 +29,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<bool>? _data;
-  late DataProvider _dataProvider;
   DateTime? lastPressedAt;
 
   Future<bool> _getData() async {
@@ -161,18 +160,28 @@ class _HomeBuilder extends StatelessWidget {
 
   Widget? pendingPayment(BuildContext context) {
     PaymentResult? orderResult = PaymentResult.fromStorage();
-    log('Has pending payment: ${orderResult != null}');
-    if (orderResult == null) return null;
-    log('Url: ${orderResult.paymentData.paymentUrl}. Token: ${orderResult.paymentData.token}. Type: ${orderResult.paymentData.paymentType}');
+
+    final bool hasOrderResult = orderResult != null;
+    log('Has pending payment: $hasOrderResult');
+    if (!hasOrderResult) {
+      return null;
+    }
+    log(
+      'Url: ${orderResult.paymentData.paymentUrl} '
+      'Token: ${orderResult.paymentData.token} '
+      'Type: ${orderResult.paymentData.paymentType}',
+    );
+
+    context.read<InvoiceProvider>().publicId = orderResult.publicId;
 
     return ElevatedButton(
       onPressed: () {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            context.read<InvoiceProvider>().publicId = orderResult.publicId;
-            return PaymentPage(paymentData: orderResult.paymentData);
-          },
-        ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentPage(paymentData: orderResult.paymentData),
+          ),
+        );
       },
       child: Text('Continuar pago'),
     );

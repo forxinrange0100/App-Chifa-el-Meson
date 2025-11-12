@@ -33,7 +33,6 @@ dependencies:
   http: ^1.4.0
   cached_network_image: ^3.4.1
   provider: ^6.1.5
-  webview_flutter: ^4.13.0
   font_awesome_flutter: ^10.8.0
   toastification: ^3.0.3
   intl: ^0.20.2
@@ -54,6 +53,8 @@ dependencies:
   firebase_core: ^4.1.0
   timelines_plus: ^1.0.8
   material_symbols_icons: ^4.2874.0
+  url_launcher: ^6.3.2
+  app_links: ^6.4.1
 
 dev_dependencies:
   flutter_test:

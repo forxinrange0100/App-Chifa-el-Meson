@@ -1,3 +1,7 @@
+import 'dart:async' show StreamSubscription;
+import 'dart:developer' show log;
+
+import 'package:app_links/app_links.dart' show AppLinks;
 import 'package:delivera/firebase_options.dart';
 import 'package:delivera/pages/history_page.dart' show HistoryPage;
 import 'package:delivera/pages/home_info_page.dart' show HomeInfoPage;
@@ -58,8 +62,78 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLinks = AppLinks();
+  StreamSubscription? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    listenForAppLinks();
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> listenForAppLinks() async {
+    // Caso cuando la app se abre desde un link estando cerrada
+    final initialLink = await _appLinks.getInitialLink();
+    if (initialLink != null) {
+      log('cuidao');
+      _handleAppLink(initialLink);
+    }
+
+    // Caso cuando la app ya está abierta
+    // _sub = _appLinks.uriLinkStream.listen((uri) {
+    //   log('sin cuidao');
+    //   _handleAppLink(uri);
+    // }, onError: (err) {
+    //   log("Error en app link stream: $err");
+    // });
+  }
+
+  void _handleAppLink(Uri uri) {
+    if (uri.scheme != 'delivera') return;
+
+    FlutterNativeSplash.remove();
+    setState(() {});
+
+    final host = uri.host;
+    final pathSegments = uri.pathSegments;
+    log('path segments: $pathSegments');
+    switch (host) {
+      case 'invoice':
+        final publicId = int.parse(pathSegments.first);
+        log('public id: $publicId');
+        _navigateInvoice(publicId);
+        break;
+      default:
+        log("DeepLin host desconocido: $host");
+    }
+  }
+
+  void _navigateInvoice(int publicId) {
+    final con = navigatorKey.currentContext;
+
+    con!.read<InvoiceProvider>().publicId = publicId;
+
+    Navigator.pushAndRemoveUntil(
+      con,
+      MaterialPageRoute(builder: (con) => const InvoicePage()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -94,7 +168,6 @@ class MyApp extends StatelessWidget {
       child: ToastificationWrapper(
         child: MaterialApp(
           navigatorKey: navigatorKey,
-          initialRoute: 'HomePage',
           routes: {
             'HomePage': (_) => const HomePage(),
             'HomeInfoPage': (_) => const HomeInfoPage(),
@@ -122,6 +195,7 @@ class MyApp extends StatelessWidget {
             ),
             useMaterial3: false,
           ),
+          home: const HomePage(),
         ),
       ),
     );

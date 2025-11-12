@@ -1,19 +1,18 @@
+import 'dart:io';
 import 'dart:developer';
-
-import 'package:delivera/model/payment_result_model.dart';
-import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
-import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
-import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
-import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
-import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart' show OpenFilex;
+import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:app_links/app_links.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:delivera/model/payment_result_model.dart';
+import 'package:delivera/pages/invoice_page.dart';
+import 'package:delivera/provider/invoice_provider.dart';
+import 'package:delivera/provider/order_summary_provider.dart';
+import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'dart:async';
 
-/// A page that handles payment processing using the provided [uri].
-///
-/// This widget displays the payment UI and manages payment-related logic.
-/// Pass a [Uri] to specify the payment endpoint or resource.
 class PaymentPage extends StatefulWidget {
   final PaymentData? paymentData;
 
@@ -27,76 +26,116 @@ class PaymentPage extends StatefulWidget {
 }
 
 class PaymentPageState extends State<PaymentPage> {
-  late WebViewController _controller;
   bool _isLoading = true;
-  late final Uri uri;
-  late final String paymentType;
-  late final String? token;
-  bool hasError = false;
+  bool _hasError = false;
+  bool _paymentOpened = false;
+
+  late final AppLinks _appLinks;
+  StreamSubscription? _sub;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Mostrar error e implementar pantalla de error cuando ocurra un error en el webview
-    if (widget.paymentData == null) return;
-    uri = Uri.parse(widget.paymentData!.paymentUrl);
-    paymentType = widget.paymentData!.paymentType;
-    token = widget.paymentData!.token;
+    _appLinks = AppLinks();
+    initializePayment();
+    listenForAppLinks();
+  }
 
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.transparent)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (String url) {
-            context.read<BottomNavigationBarProvider>().showHome();
-            setState(() {
-              _isLoading = true;
-            });
-          },
-          onPageFinished: (String url) {
-            setState(() {
-              _isLoading = false;
-            });
-          },
-          onUrlChange: (UrlChange change) => log('URL changed to: ${change.url}'),
-          onWebResourceError: (WebResourceError error) {
-            log('Web resource error: ${error.errorCode}');
-            log('Web resource error description: ${error.description}');
-            log('Web resource error failingUrl: ${error.errorType}');
-          },
-          onHttpError: (HttpResponseError error) {
-            log('HTTP error: ${error.request?.uri.toString()}');
-            int? statusCode = error.response?.statusCode;
-            log('HTTP error status code: ${error.response?.statusCode}');
-            if (statusCode == 400) {
-              setState(() {
-                hasError = true;
-              });
-            }
-          },
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.contains('/order/')) {
-              log('Navigating to invoice page: ${request.url}');
-              context.read<ShoppingCartProvider>().cleanShoppingCart();
-              final orderSummaryProvider = context.read<OrderSummaryProvider>();
-              context.read<InvoiceProvider>().publicId = orderSummaryProvider.orderResult?.publicId;
-              orderSummaryProvider.clearOrderSummary();
-              orderSummaryProvider.clearPaymentData();
-              _navigateInvoice(context);
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> initializePayment() async {
+    final paymentData = widget.paymentData;
+    if (paymentData == null) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final uri = paymentData.paymentUrl;
+      final paymentType = paymentData.paymentType;
+      final token = paymentData.token;
+
+      await _openPaymentInBrowser(
+        paymentUrl: uri,
+        paymentType: paymentType,
+        token: token,
       );
 
-    // Aquí la lógica para transbank
-    if (paymentType == 'transbank' && token != null) {
-      final html = '''
+      setState(() {
+        _paymentOpened = true;
+        _isLoading = false;
+      });
+    } catch (e, s) {
+      log("Error al abrir el navegador: $e");
+      log(s.toString());
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> listenForAppLinks() async {
+    // Caso cuando la app se abre desde un link estando cerrada
+    try {
+      final initialLink = await _appLinks.getInitialLink();
+      if (initialLink != null) {
+        log('el cuidao');
+        _handleAppLink(initialLink);
+      }
+    } catch (e) {
+      log("Error leyendo initial app link: $e");
+    }
+
+    // Caso cuando la app ya está abierta
+    _sub = _appLinks.uriLinkStream.listen((uri) {
+      log('cambios');
+      _handleAppLink(uri);
+    }, onError: (err) {
+      log("Error en app link stream: $err");
+    });
+  }
+
+  void _handleAppLink(Uri uri) {
+    if (uri.scheme != 'delivera') return;
+
+    final host = uri.host;
+    final pathSegments = uri.pathSegments;
+    log('path segments: $pathSegments');
+    switch (host) {
+      case 'invoice':
+        final publicId = int.parse(pathSegments.first);
+        log('public id: $publicId');
+        _navigateInvoice(publicId);
+        break;
+      default:
+        log("DeepLin host desconocido: $host");
+    }
+  }
+
+  Future<void> _openPaymentInBrowser({
+    required String paymentUrl,
+    required String paymentType,
+    String? token,
+  }) async {
+    if (paymentType == 'getnet') {
+      final uri = Uri.parse(paymentUrl);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    // Transbank POST con formulario HTML temporal
+    final htmlContent = '''
         <html>
           <body onload="document.forms[0].submit()">
-            <form action="${uri.toString()}" method="POST">
+            <form action="$paymentUrl" method="POST">
               <input type="hidden" name="token_ws" value="$token" />
               <input type="submit" value="Pagar" />
             </form>
@@ -104,45 +143,80 @@ class PaymentPageState extends State<PaymentPage> {
         </html>
       ''';
 
-      _controller.loadHtmlString(html);
-    } else {
-      _controller.loadRequest(uri);
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/payment_form.html');
+    await file.writeAsString(htmlContent);
+
+    if (Platform.isAndroid) {
+      await OpenFilex.open(file.path, type: "text/html");
+    } else if (Platform.isIOS) {
+      final uri = Uri.parse(paymentUrl);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  void _navigateInvoice(int publicId) {
+    context.read<ShoppingCartProvider>().cleanShoppingCart();
+    final orderSummaryProvider = context.read<OrderSummaryProvider>();
+    orderSummaryProvider.clearOrderSummary();
+    orderSummaryProvider.clearPaymentData();
+    context.read<InvoiceProvider>().publicId = publicId;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const InvoicePage()),
+      (route) => false,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: hasError,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            WebViewWidget(controller: _controller),
-            if (_isLoading)
-              RedirectingWidget(),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          if (_isLoading)
+            const RedirectingWidget()
+          else if (_hasError)
+            const _ErrorWidget()
+          else if (_paymentOpened)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(30),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 20,
+                  children: [
+                    Text(
+                      "Se ha abierto un navegador para completar el pago.\n",
+                      textAlign: TextAlign.center,
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _openPaymentInBrowser(
+                        paymentUrl: widget.paymentData!.paymentUrl,
+                        paymentType: widget.paymentData!.paymentType,
+                        token: widget.paymentData!.token,
+                      ),
+                      child: Text('Reintentar pago'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
-    );
-  }
-
-  void _navigateInvoice(BuildContext context) {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        // Navigate to InvoicePage when payment is done or canceled
-        builder: (context) => const InvoicePage(),
-      ),
-      (route) => false,
+      bottomNavigationBar: _isLoading
+          ? null
+          : ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Volver atrás'),
+            ),
     );
   }
 }
 
 class RedirectingWidget extends StatelessWidget {
-  const RedirectingWidget({
-    super.key,
-  });
+  const RedirectingWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -151,15 +225,31 @@ class RedirectingWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 20,
         children: [
-          CircularProgressIndicator(
-            color: Colors.blue,
-            backgroundColor: Colors.grey,
-          ),
+          CircularProgressIndicator(color: Colors.blue, backgroundColor: Colors.grey),
           Padding(
             padding: EdgeInsets.all(20.0),
-            child: Text("Estamos redirigíendote al portal de pago...", textAlign: TextAlign.center),
+            child: Text("Estamos redirigiéndote al portal de pago...", textAlign: TextAlign.center),
           )
         ],
+      ),
+    );
+  }
+}
+
+class _ErrorWidget extends StatelessWidget {
+  const _ErrorWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(30),
+        child: Text(
+          "Ocurrió un error al iniciar el proceso de pago.\n"
+          "Por favor, inténtalo nuevamente.",
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.red),
+        ),
       ),
     );
   }
