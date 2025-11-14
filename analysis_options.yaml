@@ -34,3 +34,10 @@ analyzer:
     - android/**
     - .dart_tool/**
     - lib/generated/**
+    - .idea/**
+    - .continue/**
+    - .qodo/**
+    - assets/**
+    - .flutter-plugins-dependencies
+    - firebase.json
+    - pubspec.lock
