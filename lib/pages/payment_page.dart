@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:developer';
+import 'package:delivera/environment.dart' show Urls;
 import 'package:delivera/provider/payment_provider.dart' show PaymentProvider;
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart' show OpenFilex;
@@ -181,27 +182,33 @@ Future<void> openBrowserTransbank(
   String token,
 ) async {
   // Transbank POST con formulario HTML temporal
-  final htmlContent = '''
-      <html>
-        <body onload="document.forms[0].submit()">
-          <form action="$paymentUrl" method="POST">
-            <input type="hidden" name="token_ws" value="$token" />
-            <input type="submit" value="Pagar" />
-          </form>
-        </body>
-      </html>
-    ''';
+  // final htmlContent = '''
+  //     <html>
+  //       <body onload="document.forms[0].submit()">
+  //         <form action="$paymentUrl" method="POST">
+  //           <input type="hidden" name="token_ws" value="$token" />
+  //           <input type="submit" value="Pagar" />
+  //         </form>
+  //       </body>
+  //     </html>
+  //   ''';
 
-  final dir = await getTemporaryDirectory();
-  final file = File('${dir.path}/payment_form.html');
-  await file.writeAsString(htmlContent);
+  // final dir = await getTemporaryDirectory();
+  // final file = File('${dir.path}/payment_form.html');
+  // await file.writeAsString(htmlContent);
 
-  if (Platform.isAndroid) {
-    await OpenFilex.open(file.path, type: "text/html");
-  } else if (Platform.isIOS) {
-    final uri = Uri.parse(paymentUrl);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
+  // if (Platform.isAndroid) {
+  //   await OpenFilex.open(file.path, type: "text/html");
+  // } else if (Platform.isIOS) {
+  //   final uri = Uri.parse(paymentUrl);
+  //   await launchUrl(uri, mode: LaunchMode.externalApplication);
+  // }
+
+  final uri = Uri.parse(
+    '${Urls.apiUrl}/api/transbank/form?payment_url=$paymentUrl&token_ws=$token',
+  );
+
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
 /// Abre el navegador para completar el pago, dependiendo del tipo de pago.

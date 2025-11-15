@@ -89,8 +89,8 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
       log('Has pending payment: $_hasOrderResult');
       if (!_hasOrderResult) return;
       log(
-        'Url: ${_orderResult!.paymentData.paymentUrl} '
-        'Token: ${_orderResult!.paymentData.token} '
+        'Url: ${_orderResult!.paymentData.paymentUrl}\n'
+        'Token: ${_orderResult!.paymentData.token}\n'
         'Type: ${_orderResult!.paymentData.paymentType}',
       );
       _continuePaymentModal();
