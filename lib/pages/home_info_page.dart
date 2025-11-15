@@ -1,13 +1,19 @@
+import 'dart:developer' show log;
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/model/cart_item_model.dart' show CartItem;
 import 'package:delivera/model/dish_model.dart' show Dish;
+import 'package:delivera/model/payment_result_model.dart' show PaymentResult;
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';
+import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/scroll_controller_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:delivera/toast/toast.dart' show addingCartItemsToast;
+import 'package:delivera/utils/navigation.dart' show navigatePayment;
 import 'package:delivera/widget/dish_dialog_widget.dart';
 import 'package:delivera/widget/expandable_text_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
@@ -24,32 +30,122 @@ class HomeInfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final Order? lastOrder = Order.getLastOrder();
 
-    return CustomScrollView(
-      controller: context.watch<ScrollControllerProvider>().scrollController,
-      slivers: [
-        SliverToBoxAdapter(
-          child: HeaderWidget(),
-        ),
-        if (lastOrder != null)
+    return Scaffold(
+      body: CustomScrollView(
+        controller: context.watch<ScrollControllerProvider>().scrollController,
+        slivers: [
           SliverToBoxAdapter(
-            child: _LastOrderWidget(lastOrder),
+            child: HeaderWidget(),
           ),
-        SliverAppBar(
-          pinned: true,
-          floating: false,
-          primary: false,
-          expandedHeight: 50,
-          collapsedHeight: 70,
-          backgroundColor: Colors.white,
-          shadowColor: Colors.black,
-          flexibleSpace: FlexibleSpaceBar(
-            centerTitle: true,
-            title: CategoriesScrollerWidget(),
-            titlePadding: EdgeInsets.zero,
+          if (lastOrder != null)
+            SliverToBoxAdapter(
+              child: _LastOrderWidget(lastOrder),
+            ),
+          SliverAppBar(
+            pinned: true,
+            floating: false,
+            primary: false,
+            expandedHeight: 50,
+            collapsedHeight: 70,
+            backgroundColor: Colors.white,
+            shadowColor: Colors.black,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: CategoriesScrollerWidget(),
+              titlePadding: EdgeInsets.zero,
+            ),
           ),
-        ),
-        StoreProductsWidget()
-      ],
+          StoreProductsWidget(),
+        ],
+      ),
+      floatingActionButton: _ContinuePayment(),
+    );
+  }
+}
+
+class _ContinuePayment extends StatefulWidget {
+  const _ContinuePayment({
+    super.key,
+  });
+
+  @override
+  State<_ContinuePayment> createState() => _ContinuePaymentState();
+}
+
+class _ContinuePaymentState extends State<_ContinuePayment> {
+  PaymentResult? _orderResult;
+  bool _hasOrderResult = false;
+  bool _modalShowing = false;
+
+  // context.read<InvoiceProvider>().publicId = _orderResult.publicId;
+  // context.read<OrderSummaryProvider>().setOrderResult(_orderResult);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _orderResult = PaymentResult.fromStorage();
+      _hasOrderResult = _orderResult != null;
+
+      log('Has pending payment: $_hasOrderResult');
+      if (!_hasOrderResult) return;
+      log(
+        'Url: ${_orderResult!.paymentData.paymentUrl} '
+        'Token: ${_orderResult!.paymentData.token} '
+        'Type: ${_orderResult!.paymentData.paymentType}',
+      );
+      _continuePaymentModal();
+    });
+  }
+
+  Future<void> _continuePaymentModal() {
+    setState(() => _modalShowing = true);
+
+    final buttonStyle = TextButton.styleFrom(
+      padding: const EdgeInsets.all(12),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    );
+
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Pago pendiente'),
+          content: const Text('Tiene un pago sin terminar.\n¿Desea continuar con el pago?'),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              style: buttonStyle,
+              child: const Text('Cerrar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.read<OrderSummaryProvider>().setOrderResult(_orderResult!);
+                navigatePayment(Navigator.of(context));
+              },
+              // style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.amber)),
+              style: buttonStyle.copyWith(backgroundColor: WidgetStatePropertyAll(Colors.amber)),
+              child: const Text('Continuar pago', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    ).then((_) {
+      setState(() => _modalShowing = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_hasOrderResult || _modalShowing) return SizedBox();
+
+    return FloatingActionButton(
+      onPressed: () => _continuePaymentModal(),
+      tooltip: 'Continuar pago',
+      mini: true,
+      splashColor: Colors.white70,
+      backgroundColor: Colors.amber.withValues(alpha: .9),
+      child: Icon(Icons.attach_money, size: 24),
     );
   }
 }

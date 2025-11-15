@@ -1,11 +1,9 @@
 import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/input_status_enum.dart';
 import 'package:delivera/model/input_status_model.dart';
-import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/user_box_model.dart' show UserBox;
 import 'package:delivera/pages/home_page.dart' show HomePage;
-import 'package:delivera/pages/payment_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/provider/delivery_details_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart';

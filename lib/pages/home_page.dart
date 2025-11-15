@@ -112,10 +112,8 @@ class _HomeBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pendingPaymentWidget = pendingPayment(context);
     return Consumer<BottomNavigationBarProvider>(
       builder: (context, bottomNavigationProvider, child) {
-        child = pendingPaymentWidget;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.white,
@@ -153,32 +151,8 @@ class _HomeBuilder extends StatelessWidget {
               ],
             ),
           ),
-          bottomSheet: child,
         );
       },
-    );
-  }
-
-  Widget? pendingPayment(BuildContext context) {
-    PaymentResult? orderResult = PaymentResult.fromStorage();
-
-    final bool hasOrderResult = orderResult != null;
-    log('Has pending payment: $hasOrderResult');
-    if (!hasOrderResult) {
-      return null;
-    }
-    log(
-      'Url: ${orderResult.paymentData.paymentUrl} '
-      'Token: ${orderResult.paymentData.token} '
-      'Type: ${orderResult.paymentData.paymentType}',
-    );
-
-    context.read<InvoiceProvider>().publicId = orderResult.publicId;
-    context.read<OrderSummaryProvider>().setOrderResult(orderResult);
-
-    return ElevatedButton(
-      onPressed: () => navigatePayment(Navigator.of(context)),
-      child: Text('Continuar pago'),
     );
   }
 }
