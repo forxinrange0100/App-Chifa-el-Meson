@@ -3,8 +3,8 @@ import 'dart:developer' show log;
 import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/user_details_model.dart';
-import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
+import 'package:delivera/toast/toast.dart' show serverErrorToast;
 import 'package:delivera/utils/fetch_order.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart' show Hive;
@@ -12,7 +12,6 @@ import 'package:hive/hive.dart' show Hive;
 class OrderSummaryProvider extends ChangeNotifier {
   // TODO: hacer _details nullable
   OrderSummary _orderSummary = OrderSummary.empty();
-  final RestaurantInfoProvider _restaurantInfoProvider;
   final ShoppingCartProvider _shoppingCartProvider;
   PaymentResult? _orderResult;
 
@@ -22,8 +21,7 @@ class OrderSummaryProvider extends ChangeNotifier {
   PaymentResult? get orderResult => _orderResult;
   DeliveryDetails get deliveryDetails => _deliveryDetails;
 
-  OrderSummaryProvider(this._restaurantInfoProvider, this._shoppingCartProvider)
-      : _deliveryDetails = PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
+  OrderSummaryProvider(this._shoppingCartProvider) : _deliveryDetails = PickUp();
 
   void setOrderSummary(String fullName, String email, String phoneNumber, String paymentType) {
     _orderSummary = OrderSummary(
@@ -34,14 +32,33 @@ class OrderSummaryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Realiza peticion para crear el pedido y guarda el resultado. La petición incluye el token FCM para notificaciones push.
-  Future<void> postOrder() async {
-    _orderResult = await fetchOrder(_orderSummary);
+  /// Realiza peticion para crear el pedido y guarda el resultado. 
+  /// La petición incluye el token FCM para notificaciones push.
+  /// Devuelve true si la petición fue exitosa, false en caso contrario
+  Future<bool> postOrder() async {
+    _orderResult = null;
+    try {
+      _orderResult = await fetchOrder(_orderSummary);
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
+    }
+
+    if (_orderResult == null) {
+      serverErrorToast("Error al realizar el pedido. Por favor, intente más tarde.");
+      notifyListeners();
+      return false;
+    }
+
+    _orderResult!.store();
+
     notifyListeners();
+    return true;
   }
 
+  void setOrderResult(PaymentResult paymentResult) => _orderResult = paymentResult;
+
   void setDeliveryDetailsPickUp() {
-    _deliveryDetails = PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
+    _deliveryDetails = PickUp();
     notifyListeners();
   }
 
@@ -57,10 +74,7 @@ class OrderSummaryProvider extends ChangeNotifier {
   }
 
   // TODO: hacer _details nullable
-  void clearDeliveryDetails() {
-    _deliveryDetails = PickUp(address: _restaurantInfoProvider.restaurantInfo.address);
-    notifyListeners();
-  }
+  void clearDeliveryDetails() => setDeliveryDetailsPickUp();
 
   void clearPaymentData() {
     _orderResult = null;

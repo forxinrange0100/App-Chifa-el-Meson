@@ -3,16 +3,17 @@ import 'dart:developer';
 import 'package:delivera/enum/bottom_navigation_bar_enum.dart';
 import 'package:delivera/model/notification_handler_model.dart' show NotificationHandler;
 import 'package:delivera/model/payment_result_model.dart';
-import 'package:delivera/pages/home_info_page.dart' show HomeInfoPage;
-import 'package:delivera/pages/payment_page.dart' show PaymentPage;
-import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
-import 'package:delivera/pages/history_page.dart' show HistoryPage;
+import 'package:delivera/pages/home_info_page.dart';
+import 'package:delivera/pages/shopping_cart_page.dart';
+import 'package:delivera/pages/history_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/data_provider.dart';
-import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
+import 'package:delivera/provider/invoice_provider.dart';
+import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
+import 'package:delivera/utils/navigation.dart';
 import 'package:delivera/widget/error_screen_widget.dart';
 import 'package:delivera/widget/loading_screen_widget.dart' show LoadingScreenWidget;
 import 'package:flutter/material.dart';
@@ -173,16 +174,10 @@ class _HomeBuilder extends StatelessWidget {
     );
 
     context.read<InvoiceProvider>().publicId = orderResult.publicId;
+    context.read<OrderSummaryProvider>().setOrderResult(orderResult);
 
     return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PaymentPage(paymentData: orderResult.paymentData),
-          ),
-        );
-      },
+      onPressed: () => navigatePayment(Navigator.of(context)),
       child: Text('Continuar pago'),
     );
   }

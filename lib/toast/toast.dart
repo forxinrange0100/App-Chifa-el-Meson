@@ -2,49 +2,63 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toastification/toastification.dart';
 
+void toastWrapper(Function showToast) {
+  try {
+    showToast();
+  } catch (_) {
+    // Ignore errors
+  }
+}
+
 void successToast(String message, {Icon? icon}) {
-  toastification.show(
-    icon: icon ?? const Icon(FontAwesomeIcons.solidCircleCheck),
-    title: Text(message),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.success,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
-    autoCloseDuration: const Duration(seconds: 3),
+  toastWrapper(
+    () => toastification.show(
+      icon: icon ?? const Icon(FontAwesomeIcons.solidCircleCheck),
+      title: Text(message),
+      style: ToastificationStyle.flat,
+      type: ToastificationType.success,
+      showProgressBar: true,
+      progressBarTheme: const ProgressIndicatorThemeData(color: Colors.green),
+      autoCloseDuration: const Duration(seconds: 3),
+    ),
   );
 }
 
 void errorToast(String message, {Icon? icon, String? title}) {
-  toastification.show(
-    icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
-    title: Text(title ?? 'Error'),
-    description: Text(message),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.error,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
-    autoCloseDuration: const Duration(seconds: 5),
+  toastWrapper(
+    () => toastification.show(
+      icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
+      title: Text(title ?? 'Error'),
+      description: Text(message),
+      style: ToastificationStyle.flat,
+      type: ToastificationType.error,
+      showProgressBar: true,
+      progressBarTheme: const ProgressIndicatorThemeData(color: Colors.red),
+      autoCloseDuration: const Duration(seconds: 5),
+    ),
   );
 }
 
 void warningToast(String message, {Icon? icon, String? title}) {
-  toastification.show(
-    icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
-    title: title != null ? Text(title) : null,
-    description: Text(
-      message,
-      overflow: TextOverflow.ellipsis,
-      maxLines: 2,
-      style: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
+  toastWrapper(
+    () => toastification.show(
+      icon: icon ?? const Icon(FontAwesomeIcons.triangleExclamation),
+      title: title != null ? Text(title) : null,
+      description: Text(
+        message,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 2,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
       ),
+      style: ToastificationStyle.flat,
+      type: ToastificationType.warning,
+      showProgressBar: true,
+      progressBarTheme: const ProgressIndicatorThemeData(color: Colors.orange),
+      autoCloseDuration: const Duration(seconds: 5),
     ),
-    style: ToastificationStyle.flat,
-    type: ToastificationType.warning,
-    showProgressBar: true,
-    progressBarTheme: const ProgressIndicatorThemeData(color: Colors.orange),
-    autoCloseDuration: const Duration(seconds: 5),
   );
 }
 
@@ -68,7 +82,7 @@ void cleanCartToast() {
   successToast('Carrito vaciado');
 }
 
-void errorOrderSummary([String? error]) {
+void formErrorToast([String? error]) {
   errorToast(error ?? 'Faltan campos', icon: const Icon(FontAwesomeIcons.circleXmark));
 }
 
@@ -83,6 +97,10 @@ void unsavedInvoice() {
 // Toast for server error
 void serverErrorToast([String? error]) {
   errorToast(error ?? 'Error del servidor, intente más tarde', title: 'Error del servidor');
+}
+
+void occupiedToast(String message) {
+  warningToast(message);
 }
 
 // void storageNotGranted() {

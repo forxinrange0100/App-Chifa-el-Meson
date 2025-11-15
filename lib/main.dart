@@ -149,7 +149,6 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
         ChangeNotifierProvider(
           create: (context) => OrderSummaryProvider(
-            context.read<RestaurantInfoProvider>(),
             context.read<ShoppingCartProvider>(),
           ),
         ),

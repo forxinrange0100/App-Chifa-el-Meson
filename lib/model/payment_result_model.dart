@@ -25,7 +25,10 @@ class PaymentResult {
 
   PaymentResult({required this.paymentData, required this.publicId});
 
+  // Guarda el resultado de la order en el almacenamiento local
+  // Solo si es tipo getnet
   void store() {
+    if (paymentData.paymentType != 'getnet') return;
     final paymentBox = Hive.box(name: 'payment');
     paymentBox.putAll({
       'paymentType': paymentData.paymentType,

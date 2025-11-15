@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:developer';
+import 'package:delivera/provider/payment_provider.dart' show PaymentProvider;
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart' show OpenFilex;
 import 'package:path_provider/path_provider.dart';
@@ -14,22 +15,13 @@ import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'dart:async';
 
 class PaymentPage extends StatefulWidget {
-  final PaymentData? paymentData;
-
-  const PaymentPage({
-    super.key,
-    this.paymentData,
-  });
+  const PaymentPage({super.key});
 
   @override
   PaymentPageState createState() => PaymentPageState();
 }
 
 class PaymentPageState extends State<PaymentPage> {
-  bool _isLoading = true;
-  bool _hasError = false;
-  bool _paymentOpened = false;
-
   late final AppLinks _appLinks;
   StreamSubscription? _sub;
 
@@ -37,8 +29,10 @@ class PaymentPageState extends State<PaymentPage> {
   void initState() {
     super.initState();
     _appLinks = AppLinks();
-    initializePayment();
-    listenForAppLinks();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initializePayment();
+      listenForAppLinks();
+    });
   }
 
   @override
@@ -48,52 +42,18 @@ class PaymentPageState extends State<PaymentPage> {
   }
 
   Future<void> initializePayment() async {
-    final paymentData = widget.paymentData;
+    final paymentData = context.read<OrderSummaryProvider>().orderResult?.paymentData;
+    final paymentProvider = context.read<PaymentProvider>();
+
     if (paymentData == null) {
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
+      paymentProvider.onError();
       return;
     }
 
-    try {
-      final uri = paymentData.paymentUrl;
-      final paymentType = paymentData.paymentType;
-      final token = paymentData.token;
-
-      await _openPaymentInBrowser(
-        paymentUrl: uri,
-        paymentType: paymentType,
-        token: token,
-      );
-
-      setState(() {
-        _paymentOpened = true;
-        _isLoading = false;
-      });
-    } catch (e, s) {
-      log("Error al abrir el navegador: $e");
-      log(s.toString());
-      setState(() {
-        _hasError = true;
-        _isLoading = false;
-      });
-    }
+    openBrowser(paymentProvider, paymentData);
   }
 
   Future<void> listenForAppLinks() async {
-    // Caso cuando la app se abre desde un link estando cerrada
-    try {
-      final initialLink = await _appLinks.getInitialLink();
-      if (initialLink != null) {
-        log('el cuidao');
-        _handleAppLink(initialLink);
-      }
-    } catch (e) {
-      log("Error leyendo initial app link: $e");
-    }
-
     // Caso cuando la app ya está abierta
     _sub = _appLinks.uriLinkStream.listen((uri) {
       log('cambios');
@@ -120,41 +80,6 @@ class PaymentPageState extends State<PaymentPage> {
     }
   }
 
-  Future<void> _openPaymentInBrowser({
-    required String paymentUrl,
-    required String paymentType,
-    String? token,
-  }) async {
-    if (paymentType == 'getnet') {
-      final uri = Uri.parse(paymentUrl);
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-      return;
-    }
-
-    // Transbank POST con formulario HTML temporal
-    final htmlContent = '''
-        <html>
-          <body onload="document.forms[0].submit()">
-            <form action="$paymentUrl" method="POST">
-              <input type="hidden" name="token_ws" value="$token" />
-              <input type="submit" value="Pagar" />
-            </form>
-          </body>
-        </html>
-      ''';
-
-    final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/payment_form.html');
-    await file.writeAsString(htmlContent);
-
-    if (Platform.isAndroid) {
-      await OpenFilex.open(file.path, type: "text/html");
-    } else if (Platform.isIOS) {
-      final uri = Uri.parse(paymentUrl);
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
-
   void _navigateInvoice(int publicId) {
     context.read<ShoppingCartProvider>().cleanShoppingCart();
     final orderSummaryProvider = context.read<OrderSummaryProvider>();
@@ -171,47 +96,137 @@ class PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          if (_isLoading)
-            const RedirectingWidget()
-          else if (_hasError)
-            const _ErrorWidget()
-          else if (_paymentOpened)
-            Center(
-              child: Padding(
-                padding: EdgeInsets.all(30),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 20,
-                  children: [
-                    Text(
-                      "Se ha abierto un navegador para completar el pago.\n",
-                      textAlign: TextAlign.center,
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _openPaymentInBrowser(
-                        paymentUrl: widget.paymentData!.paymentUrl,
-                        paymentType: widget.paymentData!.paymentType,
-                        token: widget.paymentData!.token,
-                      ),
-                      child: Text('Reintentar pago'),
-                    ),
-                  ],
+    return Consumer<PaymentProvider>(
+      builder: (context, paymentProvider, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              if (paymentProvider.isLoading)
+                const RedirectingWidget()
+              else if (paymentProvider.hasError)
+                const _ErrorWidget()
+              else if (paymentProvider.paymentOpened)
+                const _BrowserOpenedWidget(),
+            ],
+          ),
+          bottomNavigationBar: paymentProvider.isLoading
+              ? null
+              : ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Volver atrás'),
                 ),
-              ),
-            ),
-        ],
-      ),
-      bottomNavigationBar: _isLoading
-          ? null
-          : ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Volver atrás'),
-            ),
+        );
+      },
     );
+  }
+}
+
+class _BrowserOpenedWidget extends StatelessWidget {
+  const _BrowserOpenedWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 10,
+          children: [
+            Text(
+              "Se ha abierto un navegador para completar el pago.",
+              textAlign: TextAlign.center,
+            ),
+            ElevatedButton(
+              onPressed: () => _retryPayment(context),
+              child: Text('Reintentar pago'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _retryPayment(BuildContext context) async {
+    final orderSummaryProvider = context.read<OrderSummaryProvider>();
+    final paymentProvider = context.read<PaymentProvider>();
+
+    if (orderSummaryProvider.orderResult == null) return;
+
+    paymentProvider.onLoading();
+
+    final paymentData = orderSummaryProvider.orderResult!.paymentData;
+
+    void caseTransbank() async {
+      bool success = await orderSummaryProvider.postOrder();
+      if (!success) {
+        paymentProvider.setHasError(true);
+        paymentProvider.setIsLoading(false);
+        return;
+      }
+    }
+
+    await openBrowser(paymentProvider, paymentData, caseTransbank: caseTransbank);
+  }
+}
+
+Future<void> openBrowserGetnet(String paymentUrl) async {
+  final uri = Uri.parse(paymentUrl);
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+Future<void> openBrowserTransbank(
+  String paymentUrl,
+  String token,
+) async {
+  // Transbank POST con formulario HTML temporal
+  final htmlContent = '''
+      <html>
+        <body onload="document.forms[0].submit()">
+          <form action="$paymentUrl" method="POST">
+            <input type="hidden" name="token_ws" value="$token" />
+            <input type="submit" value="Pagar" />
+          </form>
+        </body>
+      </html>
+    ''';
+
+  final dir = await getTemporaryDirectory();
+  final file = File('${dir.path}/payment_form.html');
+  await file.writeAsString(htmlContent);
+
+  if (Platform.isAndroid) {
+    await OpenFilex.open(file.path, type: "text/html");
+  } else if (Platform.isIOS) {
+    final uri = Uri.parse(paymentUrl);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+}
+
+/// Abre el navegador para completar el pago, dependiendo del tipo de pago.
+/// Los callback [caseGetnet] y [caseTransbank] son llamados antes de sus respectivos casos.
+Future<void> openBrowser(
+  PaymentProvider paymentProvider,
+  PaymentData paymentData, {
+  void Function()? caseGetnet,
+  void Function()? caseTransbank,
+}) async {
+  try {
+    switch (paymentData.paymentType) {
+      case 'getnet':
+        caseGetnet?.call();
+        openBrowserGetnet(paymentData.paymentUrl);
+        break;
+      case 'transbank':
+        caseTransbank?.call();
+        openBrowserTransbank(paymentData.paymentUrl, paymentData.token!);
+        break;
+    }
+    paymentProvider.onOpened();
+  } catch (e, s) {
+    log("Error al abrir el navegador: $e", stackTrace: s);
+    paymentProvider.onError();
   }
 }
 

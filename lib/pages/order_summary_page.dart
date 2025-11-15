@@ -13,6 +13,7 @@ import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
+import 'package:delivera/utils/navigation.dart' show navigatePayment;
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show FilteringTextInputFormatter;
@@ -209,7 +210,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         ),
                         onPressed: () {
                           _deliveryDetailsProvider.dispatchEnabled == false
-                              ? errorOrderSummary("El envío a domicilio no está disponible en este momento.")
+                              ? formErrorToast("El envío a domicilio no está disponible en este momento.")
                               : _deliveryDetailsProvider.setDeliveryTypeEnum(DeliveryTypeEnum.dispatch);
                           // Don't set the OrderSummaryProvider delivery details here
                         },
@@ -599,7 +600,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   Future<void> _handleSubmit(BuildContext context) async {
     // Check if the form is already submitting
     if (_isSubmitting) {
-      serverErrorToast("Ya se está procesando su pedido. Por favor, espere.");
+      occupiedToast("Ya se está procesando su pedido. Por favor, espere.");
       return;
     }
 
@@ -623,14 +624,14 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
       // Verify if the shift is open
       if (!context.read<ShiftProvider>().isOpen) {
-        errorOrderSummary("El turno ha cerrado. Por favor, intente más tarde.");
+        formErrorToast("El turno ha cerrado. Por favor, intente más tarde.");
         return;
       }
 
       // Check if a delivery method is selected
       if (_deliveryDetailsProvider.deliveryTypeEnum == null) {
         // Handle the case where no delivery method is selected
-        errorOrderSummary("Método de entrega no seleccionado.");
+        formErrorToast("Método de entrega no seleccionado.");
         return;
       }
 
@@ -648,7 +649,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
       if (_deliveryDetailsProvider.deliveryTypeEnum == DeliveryTypeEnum.dispatch) {
         // Check if dispatch is enabled
         if (_deliveryDetailsProvider.dispatchEnabled == false) {
-          errorOrderSummary("El envío a domicilio no está disponible en este momento.");
+          formErrorToast("El envío a domicilio no está disponible en este momento.");
           _deliveryDetailsProvider.clearDeliveryTypeEnum(notify: true);
           _orderSummaryProvider.clearDeliveryDetails();
           return;
@@ -656,28 +657,28 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
         // Check if the zone is selected
         if (_orderSummaryProvider.deliveryDetails is! Dispatch) {
-          errorOrderSummary("Zona de envío no seleccionada.");
+          formErrorToast("Zona de envío no seleccionada.");
           return;
         }
 
         // Check if the address is valid
         if (_inputStatusAddress.status != InputStatusEnum.valid) {
-          errorOrderSummary(_inputStatusAddress.errorMessage);
+          formErrorToast(_inputStatusAddress.errorMessage);
           return;
         }
       }
 
       // Validate all input fields
       if (_inputStatusFullName.status != InputStatusEnum.valid) {
-        errorOrderSummary(_inputStatusFullName.errorMessage);
+        formErrorToast(_inputStatusFullName.errorMessage);
         return;
       }
       if (_inputStatusEmail.status != InputStatusEnum.valid) {
-        errorOrderSummary(_inputStatusEmail.errorMessage);
+        formErrorToast(_inputStatusEmail.errorMessage);
         return;
       }
       if (_inputStatusPhoneNumber.status != InputStatusEnum.valid) {
-        errorOrderSummary(_inputStatusPhoneNumber.errorMessage);
+        formErrorToast(_inputStatusPhoneNumber.errorMessage);
         return;
       }
 
@@ -694,31 +695,16 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         _paymentType,
       );
 
-      try {
-        // Post the order
-        await _orderSummaryProvider.postOrder();
-      } catch (e) {
-        if (!context.mounted) return;
-        // If an error occurs, show a toast and set is submitting to false
-        serverErrorToast(e.toString());
-        return;
-      }
-      if (!context.mounted) return;
-
       // Save input data locally
       _orderSummaryProvider.storeUserData();
 
-      // If the order result has a payment URL, navigate to the PaymentPage
-      if (_orderSummaryProvider.orderResult != null) {
-        final PaymentResult orderResult = _orderSummaryProvider.orderResult!;
-        orderResult.store();
+      final bool success = await _orderSummaryProvider.postOrder();
 
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return PaymentPage(paymentData: orderResult.paymentData);
-          },
-        ));
-      }
+      if (!context.mounted) return;
+
+      if (!success) return;
+
+      navigatePayment(Navigator.of(context));
     }()
         .whenComplete(() {
       // Set is submitting to false when the async operation is complete
@@ -741,3 +727,4 @@ void _navigateBack(BuildContext context) {
     (route) => false,
   );
 }
+

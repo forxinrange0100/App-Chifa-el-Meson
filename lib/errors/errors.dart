@@ -1,8 +1,7 @@
 class FetchDeliveryZonesException implements Exception {
   final String message;
 
-  FetchDeliveryZonesException(
-      [this.message = 'Failed to fetch delivery zones']);
+  FetchDeliveryZonesException([this.message = 'Failed to fetch delivery zones']);
 
   @override
   String toString() {
@@ -35,8 +34,7 @@ class FetchDishesException implements Exception {
 class FetchDishCategoriesException implements Exception {
   final String message;
 
-  FetchDishCategoriesException(
-      [this.message = 'Failed to fetch dish categories']);
+  FetchDishCategoriesException([this.message = 'Failed to fetch dish categories']);
 
   @override
   String toString() {
@@ -47,8 +45,7 @@ class FetchDishCategoriesException implements Exception {
 class FetchRestaurantInfoException implements Exception {
   final String message;
 
-  FetchRestaurantInfoException(
-      [this.message = 'Failed to fetch restaurant info']);
+  FetchRestaurantInfoException([this.message = 'Failed to fetch restaurant info']);
 
   @override
   String toString() {
@@ -78,13 +75,31 @@ class FetchOrderFullException implements Exception {
   }
 }
 
-class ConnectionErrorException implements Exception {
-  final String message;
+class CustomException implements Exception {
+  String message;
+  String? details;
 
-  ConnectionErrorException([this.message = 'Error de conexión, verifique su conexión a internet']);
+  CustomException({this.message = '', this.details});
+
+  String _getDetails() {
+    if (details == null) return '';
+    return ' Detalles: $details';
+  }
 
   @override
   String toString() {
-    return 'ConnectionErrorException: $message';
+    return '$runtimeType: $message.${_getDetails()}';
   }
+}
+
+class ServerException extends CustomException {
+  ServerException({super.message = 'Error del servidor, intente más tarde', super.details});
+}
+
+class ConnectionErrorException extends CustomException {
+  ConnectionErrorException({super.message = 'Error de conexión, verifique su conexión a internet', super.details});
+}
+
+class ResponseParsingException extends CustomException {
+  ResponseParsingException({super.message = 'Error al parsear la respuesta del servidor', super.details});
 }
