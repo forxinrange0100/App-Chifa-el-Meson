@@ -1,5 +1,6 @@
 import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/input_status_enum.dart';
+import 'package:delivera/enum/payment_type_enum.dart' show PaymentTypeEnum, paymentTypesList;
 import 'package:delivera/model/input_status_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/user_box_model.dart' show UserBox;
@@ -16,10 +17,7 @@ import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hive/hive.dart' show Hive;
 import 'package:provider/provider.dart';
-
-import '../constants/payment_types_constant.dart' show PaymentType, paymentTypes;
 
 class OrderSummaryPage extends StatefulWidget {
   const OrderSummaryPage({super.key});
@@ -29,8 +27,8 @@ class OrderSummaryPage extends StatefulWidget {
 }
 
 class _OrderSummaryPageState extends State<OrderSummaryPage> {
-  final userBox = Hive.box(name: 'user');
-  late final UserBox lastInputs;
+  final UserBox? _lastInputs = UserBox.fromStorage();
+  late final bool _hasLastInputs;
 
   // Input status for address
   final InputStatus _inputStatusAddress =
@@ -62,7 +60,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   // Flag to indicate if the form is currently submitting
   bool _isSubmitting = false;
 
-  String _paymentType = paymentTypes.first.string; // Default payment type
+  // Tipo de pago seleccionado, por defecto es 'transbank'
+  PaymentTypeEnum _paymentType = PaymentTypeEnum.transbank;
 
   // Decorations
   final ButtonStyle selectedOptionButtonStyle = ButtonStyle(
@@ -98,12 +97,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     // Llama al método update() del provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _deliveryDetailsProvider.update();
-      // Si userBox no está vacio, inicializar los campos name, email y phone con los valores guardados
-      if (userBox.isNotEmpty) {
-        lastInputs = UserBox.fromBox(userBox);
-        _textEditingControllerFullName.text = lastInputs.name;
-        _textEditingControllerEmail.text = lastInputs.email;
-        _textEditingControllerPhoneNumber.text = lastInputs.phone;
+      // Si _lastInputs no está vacio, inicializar los campos name, email y phone con los valores guardados
+      _hasLastInputs = _lastInputs != null;
+      if (_hasLastInputs) {
+        _textEditingControllerFullName.text = _lastInputs!.name;
+        _textEditingControllerEmail.text = _lastInputs.email;
+        _textEditingControllerPhoneNumber.text = _lastInputs.phone;
         // Verificar validez de los inputs
         _inputStatusFullName.verify(_textEditingControllerFullName.text);
         _inputStatusEmail.verify(_textEditingControllerEmail.text);
@@ -354,7 +353,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [const Text("Descuentos"), PriceWidget(price: context.watch<ShoppingCartProvider>().discount)],
+                children: [const Text("Descuentos"), PriceWidget(price: context.watch<ShoppingCartProvider>().discounts)],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -370,11 +369,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("TOTAL"),
-                  PriceWidget(
-                    price: _orderSummaryProvider.deliveryDetails.cost +
-                        context.watch<ShoppingCartProvider>().subtotal -
-                        context.watch<ShoppingCartProvider>().discount,
-                  )
+                  PriceWidget(price: _orderSummaryProvider.deliveryDetails.cost + context.watch<ShoppingCartProvider>().total)
                 ],
               ),
               const Divider(),
@@ -486,7 +481,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               : SizedBox(
                   height: 150,
                   child: ListView(
-                    children: _deliveryDetailsProvider.deliveryZones.zones.map((zone) {
+                    children: _deliveryDetailsProvider.deliveryZones.map((zone) {
                       return ElevatedButton(
                         style: const ButtonStyle(
                             foregroundColor: WidgetStatePropertyAll<Color>(Colors.black),
@@ -497,8 +492,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         ),
                         onPressed: () {
                           _orderSummaryProvider.setDeliveryDetailsDispatch(Dispatch(address: "", zone: zone));
-                          if (userBox.isNotEmpty && lastInputs.deliveryZoneId == zone.id) {
-                            _textEditingControllerAddress.text = lastInputs.deliveryAddress!;
+                          if (_hasLastInputs && _lastInputs!.isSameZone(zone.id)) {
+                            _textEditingControllerAddress.text = _lastInputs.deliveryAddress!;
                             _inputStatusAddress.verify(_textEditingControllerAddress.text);
                           }
                         },
@@ -554,21 +549,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   }
 
   Column _selectPaymentMethod() {
-    ElevatedButton paymentMethodCard(PaymentType paymentType) {
-      final ButtonStyle getButtonStyle = (_paymentType == paymentType.string) ? selectedOptionButtonStyle : unselectedOptionButtonStyle;
-
-      return ElevatedButton(
-        style: getButtonStyle,
-        onPressed: () => setState(() {
-          _paymentType = paymentType.string;
-        }),
-        child: Image.asset(
-          height: 50,
-          width: 100,
-          fit: BoxFit.scaleDown,
-          paymentType.imgSrc,
-        ),
-      );
+    ButtonStyle getButtonStyle(PaymentTypeEnum paymentType) {
+      if (_paymentType == paymentType) return selectedOptionButtonStyle;
+      return unselectedOptionButtonStyle;
     }
 
     return Column(
@@ -577,8 +560,17 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         _showTitle("Medio de pago"),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: paymentTypes.map((paymentType) {
-            return paymentMethodCard(paymentType);
+          children: paymentTypesList.map((paymentType) {
+            return ElevatedButton(
+              style: getButtonStyle(paymentType),
+              onPressed: () => setState(() => _paymentType = paymentType),
+              child: Image.asset(
+                paymentType.imgSrc,
+                height: 50,
+                width: 100,
+                fit: BoxFit.scaleDown,
+              ),
+            );
           }).toList(),
         ),
       ],
@@ -725,4 +717,3 @@ void _navigateBack(BuildContext context) {
     (route) => false,
   );
 }
-

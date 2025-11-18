@@ -1,5 +1,6 @@
 import 'dart:developer' show log;
 
+import 'package:delivera/enum/payment_type_enum.dart' show PaymentTypeEnum;
 import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/user_details_model.dart';
@@ -23,7 +24,7 @@ class OrderSummaryProvider extends ChangeNotifier {
 
   OrderSummaryProvider(this._shoppingCartProvider) : _deliveryDetails = PickUp();
 
-  void setOrderSummary(String fullName, String email, String phoneNumber, String paymentType) {
+  void setOrderSummary(String fullName, String email, String phoneNumber, PaymentTypeEnum paymentType) {
     _orderSummary = OrderSummary(
         deliveryDetails: _deliveryDetails,
         userDetails: UserDetails(fullName: fullName, email: email, phoneNumber: phoneNumber),

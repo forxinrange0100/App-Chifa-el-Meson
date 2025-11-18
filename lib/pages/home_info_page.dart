@@ -105,7 +105,7 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
 
-    return showDialog<void>(
+    return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -123,7 +123,6 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
                 context.read<OrderSummaryProvider>().setOrderResult(_orderResult!);
                 navigatePayment(Navigator.of(context));
               },
-              // style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.amber)),
               style: buttonStyle.copyWith(backgroundColor: WidgetStatePropertyAll(Colors.amber)),
               child: const Text('Continuar pago', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -306,9 +305,9 @@ class _LastOrderWidget extends StatelessWidget {
       maximumSize: Size(double.infinity, 32),
     );
 
-    return showDialog<void>(
+    return showDialog(
       context: context,
-      builder: (context) {
+      builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
@@ -385,7 +384,7 @@ class _LastOrderWidget extends StatelessWidget {
                             onPressed: () {
                               final cartItems = _order.enabledProducts
                                   .map((op) => CartItem(
-                                        dish: op.product,
+                                        product: op.product,
                                         quantity: op.quantity,
                                         notes: '',
                                       ))
@@ -530,17 +529,17 @@ class ProductCardWidget extends StatelessWidget {
     required this.dish,
   });
 
+  void showDishDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => DishDialog(dish: dish),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return DishDialog(dish: dish);
-          },
-        );
-      },
+      onPressed: () => showDishDialog(context),
       style: const ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(Colors.white),
         foregroundColor: WidgetStatePropertyAll(Colors.black),
@@ -615,14 +614,7 @@ class ProductCardWidget extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           ElevatedButton(
-            onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return DishDialog(dish: dish);
-                },
-              );
-            },
+            onPressed: () => showDishDialog(context),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10,

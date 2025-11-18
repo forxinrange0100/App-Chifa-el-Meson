@@ -1,3 +1,4 @@
+import 'package:delivera/enum/payment_type_enum.dart';
 import 'package:delivera/model/delivery_zone_model.dart';
 import 'package:delivera/model/shopping_cart_model.dart';
 import 'package:delivera/model/user_details_model.dart';
@@ -6,11 +7,21 @@ class OrderSummary {
   DeliveryDetails deliveryDetails;
   UserDetails userDetails;
   ShoppingCart shoppingCart;
-  String paymentType;
-  OrderSummary({required this.deliveryDetails, required this.userDetails, required this.shoppingCart, required this.paymentType});
+  PaymentTypeEnum paymentType = PaymentTypeEnum.unknown;
+
+  OrderSummary({
+    required this.deliveryDetails,
+    required this.userDetails,
+    required this.shoppingCart,
+    required this.paymentType,
+  });
 
   factory OrderSummary.empty() => OrderSummary(
-      deliveryDetails: PickUp(), userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""), shoppingCart: ShoppingCart(), paymentType: "");
+        deliveryDetails: PickUp(),
+        userDetails: UserDetails(fullName: "", email: "", phoneNumber: ""),
+        shoppingCart: ShoppingCart(),
+        paymentType: PaymentTypeEnum.unknown,
+      );
 }
 
 abstract class DeliveryDetails {

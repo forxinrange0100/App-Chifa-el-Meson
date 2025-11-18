@@ -1,5 +1,5 @@
 import 'package:delivera/enum/delivery_type_enum.dart';
-import 'package:delivera/model/delivery_zones.dart';
+import 'package:delivera/model/delivery_zone_model.dart' show DeliveryZone;
 import 'package:delivera/utils/fech_dispatch_enabled.dart' show fetchDispatchEnabled;
 import 'package:delivera/utils/fetch_delivery_zones.dart' show fetchDeliveryZones;
 import 'package:flutter/material.dart';
@@ -11,9 +11,9 @@ class DeliveryDetailsProvider extends ChangeNotifier {
   DeliveryTypeEnum? _deliveryTypeEnum;
   DeliveryTypeEnum? get deliveryTypeEnum => _deliveryTypeEnum;
 
-  DeliveryZones _deliveryZones = DeliveryZones.example();
+  List<DeliveryZone> _deliveryZones = [];
   bool? _dispatchEnabled;
-  DeliveryZones get deliveryZones => _deliveryZones;
+  List<DeliveryZone> get deliveryZones => _deliveryZones;
   bool? get dispatchEnabled => _dispatchEnabled;
 
   /// Actualiza las zonas de envio disponibles y si el tipo de envio "Dispatch" está disponible

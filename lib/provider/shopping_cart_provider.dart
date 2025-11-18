@@ -15,12 +15,14 @@ class ShoppingCartProvider extends ChangeNotifier {
   /// List of all cart items
   List<CartItem> get cartItems => _shoppingCart.cartItems;
   /// Total price of the cart without discounts
-  int get subtotal => _shoppingCart.regularPrice;
+  int get subtotal => _shoppingCart.subtotal;
   /// Total price of the cart with discounts applied
-  int get discount => _shoppingCart.regularPrice - _shoppingCart.discountedPrice;
+  int get total => _shoppingCart.total;
+  /// Total discounts
+  int get discounts => _shoppingCart.discounts;
 
   void addCartItem(Dish dish, int quantity, String preferenceNote) {
-    _shoppingCart.cartItems.add(CartItem(dish: dish, quantity: quantity, notes: preferenceNote));
+    _shoppingCart.add(CartItem(product: dish, quantity: quantity, notes: preferenceNote));
     notifyListeners();
   }
 
@@ -30,9 +32,7 @@ class ShoppingCartProvider extends ChangeNotifier {
   }
 
   void removeCartItem(String id) {
-    _shoppingCart.cartItems = _shoppingCart.cartItems.where((cartItem) {
-      return cartItem.id != id;
-    }).toList();
+    _shoppingCart.remove(id);
     notifyListeners();
   }
 
@@ -47,13 +47,8 @@ class ShoppingCartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setPreference(String id, String preference) {
-    _shoppingCart.cartItems = _shoppingCart.cartItems.map((cartItem) {
-      if (cartItem.id == id) {
-        cartItem.notes = preference;
-      }
-      return cartItem;
-    }).toList();
+  void setNotes(String id, String notes) {
+    _shoppingCart.setNotes(id, notes);
     notifyListeners();
   }
 

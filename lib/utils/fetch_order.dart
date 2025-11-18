@@ -15,11 +15,11 @@ Future<PaymentResult?> fetchOrder(OrderSummary orderSummary) async {
   try {
     final body = jsonEncode({
       "delivery_type": orderSummary.deliveryDetails.name,
-      "payment_type": orderSummary.paymentType,
+      "payment_type": orderSummary.paymentType.name,
       "dispatch_zone_id": orderSummary.deliveryDetails.zone?.id,
       "order_products": orderSummary.shoppingCart.cartItems.map((cartItem) {
         return {
-          "product_id": cartItem.dish.id,
+          "product_id": cartItem.product.id,
           "quantity": cartItem.quantity,
           "product_note": cartItem.notes,
         };

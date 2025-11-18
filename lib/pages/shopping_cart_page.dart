@@ -98,7 +98,7 @@ class ShoppingCartPage extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
                         ),
                         PriceWidget(
-                          price: shoppingCartProvider.shoppingCart.discountedPrice,
+                          price: shoppingCartProvider.total,
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
                         )

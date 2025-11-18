@@ -16,9 +16,7 @@ class _NoteDialogState extends State<NoteDialog> {
 
   @override
   Widget build(BuildContext context) {
-    _notesController.text = widget.cartItem.notes.isEmpty
-        ? ""
-        : widget.cartItem.notes;
+    _notesController.text = widget.cartItem.notes.isEmpty ? "" : widget.cartItem.notes;
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: EdgeInsets.zero,
@@ -30,8 +28,7 @@ class _NoteDialogState extends State<NoteDialog> {
           decoration: InputDecoration(
             hintText: "Escribe tus notas aquí...",
             border: OutlineInputBorder(
-              borderSide: const BorderSide(
-                  color: Colors.black, style: BorderStyle.solid),
+              borderSide: const BorderSide(color: Colors.black, style: BorderStyle.solid),
               borderRadius: BorderRadius.circular(8),
             ),
             focusedBorder: OutlineInputBorder(
@@ -58,9 +55,7 @@ class _NoteDialogState extends State<NoteDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            context
-                .read<ShoppingCartProvider>()
-                .setPreference(widget.cartItem.id, _notesController.text);
+            context.read<ShoppingCartProvider>().setNotes(widget.cartItem.id, _notesController.text);
             Navigator.of(context).pop();
           },
           child: const Text(

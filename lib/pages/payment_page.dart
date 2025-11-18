@@ -51,7 +51,7 @@ class PaymentPageState extends State<PaymentPage> {
       return;
     }
 
-    openBrowser(paymentProvider, paymentData);
+    await openBrowser(paymentProvider, paymentData);
   }
 
   Future<void> listenForAppLinks() async {
@@ -159,7 +159,7 @@ class _BrowserOpenedWidget extends StatelessWidget {
 
     final paymentData = orderSummaryProvider.orderResult!.paymentData;
 
-    void caseTransbank() async {
+    Future<void> caseTransbank() async {
       bool success = await orderSummaryProvider.postOrder();
       if (!success) {
         paymentProvider.setHasError(true);
@@ -216,18 +216,18 @@ Future<void> openBrowserTransbank(
 Future<void> openBrowser(
   PaymentProvider paymentProvider,
   PaymentData paymentData, {
-  void Function()? caseGetnet,
-  void Function()? caseTransbank,
+  Future<void> Function()? caseGetnet,
+  Future<void> Function()? caseTransbank,
 }) async {
   try {
     switch (paymentData.paymentType) {
       case 'getnet':
-        caseGetnet?.call();
-        openBrowserGetnet(paymentData.paymentUrl);
+        await caseGetnet?.call();
+        await openBrowserGetnet(paymentData.paymentUrl);
         break;
       case 'transbank':
-        caseTransbank?.call();
-        openBrowserTransbank(paymentData.paymentUrl, paymentData.token!);
+        await caseTransbank?.call();
+        await openBrowserTransbank(paymentData.paymentUrl, paymentData.token!);
         break;
     }
     paymentProvider.onOpened();

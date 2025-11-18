@@ -31,7 +31,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
     return Consumer<ShoppingCartProvider>(
       builder: (context, shoppingCartProvider, child) {
         final String discountPercentage =
-            (((1 - (widget.cartItem.dish.discountedPrice / widget.cartItem.dish.regularPrice))) * 100).toStringAsFixed(0);
+            (((1 - (widget.cartItem.product.discountedPrice / widget.cartItem.product.regularPrice))) * 100).toStringAsFixed(0);
 
         final double imageWidth = MediaQuery.of(context).size.width / 3;
 
@@ -66,7 +66,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    widget.cartItem.dish.name.toUpperCase(),
+                    widget.cartItem.product.name.toUpperCase(),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: CachedNetworkImage(
-                            imageUrl: widget.cartItem.dish.imageUrl,
+                            imageUrl: widget.cartItem.product.imageUrl,
                             width: imageWidth,
                             fit: BoxFit.cover,
                           ),
@@ -102,13 +102,13 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: ExpandableText(
-                                    widget.cartItem.dish.description,
+                                    widget.cartItem.product.description,
                                     maxLines: 3,
                                     enabled: false,
                                   ),
                                 ),
                               ),
-                              widget.cartItem.dish.discountedPrice != 0
+                              widget.cartItem.product.discountedPrice != 0
                                   ? Container(
                                       color: Colors.green,
                                       child: Text(
@@ -118,17 +118,17 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                                       ),
                                     )
                                   : const SizedBox(),
-                              widget.cartItem.dish.discountedPrice != 0
+                              widget.cartItem.product.discountedPrice != 0
                                   ? Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         PriceWidget(
-                                          price: widget.cartItem.dish.regularPrice * widget.cartItem.quantity,
+                                          price: widget.cartItem.product.regularPrice * widget.cartItem.quantity,
                                           textDecoration: TextDecoration.lineThrough,
                                         ),
                                         PriceWidget(
-                                          price: widget.cartItem.dish.discountedPrice * widget.cartItem.quantity,
+                                          price: widget.cartItem.product.discountedPrice * widget.cartItem.quantity,
                                           fontSize: 25,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -138,7 +138,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         PriceWidget(
-                                          price: widget.cartItem.dish.regularPrice * widget.cartItem.quantity,
+                                          price: widget.cartItem.product.regularPrice * widget.cartItem.quantity,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 25,
                                         ),

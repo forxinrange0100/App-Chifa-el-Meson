@@ -1,5 +1,5 @@
 import 'dart:developer' show log;
-import 'package:hive/hive.dart' show Box, Hive;
+import 'package:hive/hive.dart' show Hive;
 
 /// Guarda los ultimos inputs del usuario utilizados en una orden
 class UserBox {
@@ -8,20 +8,10 @@ class UserBox {
   String phone;
   int? deliveryZoneId;
   String? deliveryAddress;
+
   // static const List<String> keys = ['name', 'email', 'phone', 'deliveryZoneId', 'deliveryAddress'];
 
   UserBox(this.name, this.email, this.phone, this.deliveryZoneId, this.deliveryAddress);
-
-  /// Instancia un UserBox a partir de una Box(name:'user')
-  factory UserBox.fromBox(Box userBox) {
-    return UserBox(
-      userBox.get('name'),
-      userBox.get('email'),
-      userBox.get('phone'),
-      userBox.get('deliveryZoneId'),
-      userBox.get('deliveryAddress'),
-    );
-  }
 
   void store() {
     try {
@@ -42,7 +32,45 @@ class UserBox {
       log(e.toString(), stackTrace: stackTrace);
     }
   }
-  
+
+  static UserBox? fromStorage() {
+    final box = Hive.box(name: 'user');
+    if (box.isEmpty) {
+      box.close();
+      return null;
+    }
+
+    UserBox? userBox;
+    try {
+      userBox = UserBox(
+        box.get('name'),
+        box.get('email'),
+        box.get('phone'),
+        box.get('deliveryZoneId'),
+        box.get('deliveryAddress'),
+      );
+    } catch (e, stackTrace) {
+      log("Error al obtener UserBox del almacenamiento: $e", stackTrace: stackTrace);
+      userBox = null;
+      box.clear();
+    } finally {
+      box.close();
+    }
+
+    return userBox;
+  }
+
+  bool isSameZone(int zoneId) {
+    if (deliveryZoneId == null) return false;
+    return deliveryZoneId == zoneId;
+  }
+
+  static void clearStorage() {
+    final box = Hive.box(name: 'user');
+    box.clear();
+    box.close();
+  }
+
   factory UserBox.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
     return UserBox(
