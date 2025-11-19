@@ -1,4 +1,6 @@
 import 'dart:developer' show log;
+import 'package:delivera/model/order_summary_model.dart';
+import 'package:delivera/model/user_details_model.dart';
 import 'package:hive/hive.dart' show Hive;
 
 /// Guarda los ultimos inputs del usuario utilizados en una orden
@@ -13,6 +15,24 @@ class UserBox {
 
   UserBox(this.name, this.email, this.phone, this.deliveryZoneId, this.deliveryAddress);
 
+  /// Crea un UserBox a partir de los inputs de un OrderSummary
+  factory UserBox.fromSummary(UserDetails userDetails, DeliveryDetails deliveryDetails) {
+    int? deliveryZoneId;
+    String? deliveryAddress;
+    if (deliveryDetails is Dispatch) {
+      deliveryZoneId = deliveryDetails.zone.id;
+      deliveryAddress = deliveryDetails.address;
+    }
+    return UserBox(
+      userDetails.fullName,
+      userDetails.email,
+      userDetails.phoneNumber,
+      deliveryZoneId,
+      deliveryAddress,
+    );
+  }
+
+  /// Guarda los ultimos inputs del usuario utilizados en una orden, en el almacenamiento local
   void store() {
     try {
       final userBox = Hive.box(name: 'user');

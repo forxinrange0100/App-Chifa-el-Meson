@@ -600,17 +600,15 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     });
 
     () async {
+      bool success;
+      
       // Update the shift status before proceeding
-      try {
-        await context.read<ShiftProvider>().updateIsOpen();
-      } catch (e) {
-        if (!context.mounted) return;
-        serverErrorToast("Error al verificar el estado del turno. Por favor, intente más tarde.");
-        return;
-      }
+      success = await context.read<ShiftProvider>().updateIsOpen();
 
       // Check if the context is still mounted before navigating (the user might have navigated away)
       if (!context.mounted) return;
+
+      if (!success) return;
 
       // Verify if the shift is open
       if (!context.read<ShiftProvider>().isOpen) {
@@ -685,10 +683,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         _paymentType,
       );
 
-      // Save input data locally
-      _orderSummaryProvider.storeUserData();
+      // Guarda los datos del usuario y el carrito en el almacenamiento local
+      _orderSummaryProvider.orderSummary.store();
 
-      final bool success = await _orderSummaryProvider.postOrder();
+      success = await _orderSummaryProvider.postOrder();
 
       if (!context.mounted) return;
 

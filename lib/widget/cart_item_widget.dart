@@ -30,8 +30,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Consumer<ShoppingCartProvider>(
       builder: (context, shoppingCartProvider, child) {
-        final String discountPercentage =
-            (((1 - (widget.cartItem.product.discountedPrice / widget.cartItem.product.regularPrice))) * 100).toStringAsFixed(0);
+        final String discountPercentage = widget.cartItem.product.discountPercentage;
 
         final double imageWidth = MediaQuery.of(context).size.width / 3;
 
@@ -108,7 +107,7 @@ class _CartItemWidgetState extends State<CartItemWidget> with SingleTickerProvid
                                   ),
                                 ),
                               ),
-                              widget.cartItem.product.discountedPrice != 0
+                              discountPercentage.isNotEmpty
                                   ? Container(
                                       color: Colors.green,
                                       child: Text(

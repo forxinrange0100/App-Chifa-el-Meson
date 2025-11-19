@@ -25,7 +25,6 @@ class InvoiceProvider extends ChangeNotifier {
       rethrow;
     }
     publicId = null;
-    PaymentResult.clearStorage();
     notifyListeners();
   }
 

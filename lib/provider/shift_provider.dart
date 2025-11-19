@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:developer' show log;
 
+import 'package:delivera/toast/toast.dart' show serverErrorToast;
 import 'package:delivera/utils/fetch_shift.dart';
 import 'package:delivera/utils/fetch_shift_is_paused.dart';
 import 'package:flutter/material.dart';
@@ -17,24 +19,37 @@ class ShiftProvider extends ChangeNotifier {
     startTimer();
   }
 
-  void _toggleIsFetching() {
-    _isFetching = !_isFetching;
+  /// Cambia el valor de [_isFetching] y notifica a los listeners.
+  void _setIsFetching(bool value) {
+    _isFetching = value;
     notifyListeners();
   }
 
   /// Updates the [_isOpen] variable by fetching the current shift status.
   /// This method checks if there is a shift opened and not paused, then notifies listeners.
-  Future<void> updateIsOpen([bool shouldToggleIsFetching = true]) async {
-    if (shouldToggleIsFetching) _toggleIsFetching();
+  Future<bool> updateIsOpen([bool shouldToggleIsFetching = true]) async {
+    if (shouldToggleIsFetching) _setIsFetching(true);
+
+    bool success = false;
     try {
       _isOpen = await fetchShift() && !await fetchShiftIsPaused();
-    } catch (e) {
+      success = true;
+    } catch (e, s) {
       _isOpen = false;
-      rethrow;
-    } finally {
-      if (shouldToggleIsFetching) _toggleIsFetching();
+      log("Error al verificar el estado del turno: $e", stackTrace: s);
     }
-    notifyListeners();
+
+    if (!shouldToggleIsFetching) {
+      notifyListeners();
+      return success;
+    }
+
+    _setIsFetching(false);
+    if (!success) {
+      serverErrorToast("Error al verificar el estado del turno. Por favor, intente más tarde.");
+    }
+
+    return success;
   }
 
   /// Starts a timer that updates the shift status every minute.

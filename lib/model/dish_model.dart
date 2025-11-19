@@ -24,6 +24,8 @@ class Dish {
 
   String get formattedRegularPrice => formatPrice(regularPrice);
 
+  String get discountPercentage => discountedPrice == 0 ? '' : ((regularPrice - discountedPrice) / regularPrice * 100).toStringAsFixed(0);
+
   String get imageUrl => image == null || image!.endsWith('null') ? 'https://chifaelmeson.cl/img/default.webp' : "${Urls.apiUrl}/storage/$image";
 
   Dish(

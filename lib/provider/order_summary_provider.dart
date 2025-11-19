@@ -13,6 +13,7 @@ import 'package:hive/hive.dart' show Hive;
 class OrderSummaryProvider extends ChangeNotifier {
   // TODO: hacer _details nullable
   OrderSummary _orderSummary = OrderSummary.empty();
+  OrderSummary get orderSummary => _orderSummary;
   final ShoppingCartProvider _shoppingCartProvider;
   PaymentResult? _orderResult;
 

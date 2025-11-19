@@ -3,6 +3,7 @@ import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/shift_provider.dart' show ShiftProvider;
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart' show cleanCartToast, serverErrorToast, shiftClosedToast;
+import 'package:delivera/utils/navigation.dart' show navigateCheckout;
 import 'package:delivera/widget/cart_item_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +109,7 @@ class ShoppingCartPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: ElevatedButton.icon(
-                      onPressed: () => _proceedToCheckout(context),
+                      onPressed: () => navigateCheckout(context),
                       iconAlignment: IconAlignment.end,
                       icon: context.watch<ShiftProvider>().isFetching
                           ? const CircularProgressIndicator(color: Colors.white, constraints: BoxConstraints.tightFor(width: 24, height: 24))
@@ -128,29 +129,6 @@ class ShoppingCartPage extends StatelessWidget {
           );
         }
       },
-    );
-  }
-
-  void _proceedToCheckout(BuildContext context) async {
-    // Check if the shift is open before navigating to the order summary page
-    try {
-      await context.read<ShiftProvider>().updateIsOpen();
-    } catch (e) {
-      if (!context.mounted) return;
-      serverErrorToast();
-      return;
-    }
-
-    if (!context.mounted) return;
-    if (!context.read<ShiftProvider>().isOpen) {
-      shiftClosedToast();
-      return;
-    }
-    
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const OrderSummaryPage()),
-      (route) => false,
     );
   }
 

@@ -2,9 +2,11 @@ import 'dart:developer' show log;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivera/enum/order_status_enum.dart';
+import 'package:delivera/enum/payment_type_enum.dart';
 import 'package:delivera/model/cart_item_model.dart' show CartItem;
 import 'package:delivera/model/dish_model.dart' show Dish;
 import 'package:delivera/model/payment_result_model.dart' show PaymentResult;
+import 'package:delivera/model/shopping_cart_model.dart' show ShoppingCart;
 import 'package:delivera/provider/dish_categories_provider.dart';
 import 'package:delivera/provider/dishes_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
@@ -13,7 +15,7 @@ import 'package:delivera/provider/scroll_controller_provider.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:delivera/toast/toast.dart' show addingCartItemsToast;
-import 'package:delivera/utils/navigation.dart' show navigatePayment;
+import 'package:delivera/utils/navigation.dart' show navigatePayment, navigateCheckout;
 import 'package:delivera/widget/dish_dialog_widget.dart';
 import 'package:delivera/widget/expandable_text_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
@@ -64,9 +66,7 @@ class HomeInfoPage extends StatelessWidget {
 }
 
 class _ContinuePayment extends StatefulWidget {
-  const _ContinuePayment({
-    super.key,
-  });
+  const _ContinuePayment({super.key});
 
   @override
   State<_ContinuePayment> createState() => _ContinuePaymentState();
@@ -97,6 +97,25 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
     });
   }
 
+  void _handleContinuePayment() {
+    final paymentTypeEnum = PaymentTypeEnum.fromName(_orderResult!.paymentData.paymentType);
+
+    switch (paymentTypeEnum) {
+      case PaymentTypeEnum.transbank:
+        final cart = ShoppingCart.fromStorage();
+        if (cart == null) return;
+        context.read<ShoppingCartProvider>().setCart(cart);
+        navigateCheckout(context);
+        break;
+      case PaymentTypeEnum.getnet:
+        context.read<OrderSummaryProvider>().setOrderResult(_orderResult!);
+        navigatePayment(Navigator.of(context));
+        break;
+      default:
+        break;
+    }
+  }
+
   Future<void> _continuePaymentModal() {
     setState(() => _modalShowing = true);
 
@@ -119,10 +138,7 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
               child: const Text('Cerrar'),
             ),
             ElevatedButton(
-              onPressed: () {
-                context.read<OrderSummaryProvider>().setOrderResult(_orderResult!);
-                navigatePayment(Navigator.of(context));
-              },
+              onPressed: () => _handleContinuePayment(),
               style: buttonStyle.copyWith(backgroundColor: WidgetStatePropertyAll(Colors.amber)),
               child: const Text('Continuar pago', style: TextStyle(fontWeight: FontWeight.bold)),
             ),

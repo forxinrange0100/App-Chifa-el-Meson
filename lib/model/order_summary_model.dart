@@ -1,6 +1,7 @@
 import 'package:delivera/enum/payment_type_enum.dart';
 import 'package:delivera/model/delivery_zone_model.dart';
 import 'package:delivera/model/shopping_cart_model.dart';
+import 'package:delivera/model/user_box_model.dart' show UserBox;
 import 'package:delivera/model/user_details_model.dart';
 
 class OrderSummary {
@@ -22,6 +23,13 @@ class OrderSummary {
         shoppingCart: ShoppingCart(),
         paymentType: PaymentTypeEnum.unknown,
       );
+
+  /// Guarda los datos del usuario y el carrito en el almacenamiento local
+  void store() {
+    final userBox = UserBox.fromSummary(userDetails, deliveryDetails);
+    userBox.store();
+    shoppingCart.store();
+  }
 }
 
 abstract class DeliveryDetails {

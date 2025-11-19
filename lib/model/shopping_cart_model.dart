@@ -1,3 +1,5 @@
+import 'dart:developer' show log;
+
 import 'package:delivera/model/cart_item_model.dart';
 import 'package:hive/hive.dart' show Hive;
 
@@ -33,15 +35,37 @@ class ShoppingCart {
   }
 
   void store() {
-    final box = Hive.box(name: 'cart');
-    box.put('cart', this);
-    box.close();
+    try {
+      final box = Hive.box(name: 'cart');
+      box.put('cart', this);
+      box.close();
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
+    }
   }
 
   static ShoppingCart? fromStorage() {
+    try {
+
     final box = Hive.box(name: 'cart');
     if (box.isEmpty) return null;
     return box.get('cart');
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
+      return null;
+    }
+  }
+
+  /// Borra el carrito del almacenamiento local
+  /// Debe ejecutarse después de que se haya terminado la compra (al ver la boleta)
+  static void clearStorage() {
+    try {
+      final box = Hive.box(name: 'cart');
+      box.clear();
+      box.close();
+    } catch (e, stackTrace) {
+      log(e.toString(), stackTrace: stackTrace);
+    }
   }
 
   factory ShoppingCart.fromJson(dynamic json) {
