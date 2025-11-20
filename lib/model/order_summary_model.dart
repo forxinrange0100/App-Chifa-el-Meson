@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:delivera/enum/payment_type_enum.dart';
 import 'package:delivera/model/delivery_zone_model.dart';
 import 'package:delivera/model/shopping_cart_model.dart';
@@ -33,39 +35,29 @@ class OrderSummary {
 }
 
 abstract class DeliveryDetails {
-  int get cost;
-  String? address;
-  DeliveryZone? zone;
-
   String get name;
+  int get cost => 0;
+  String? get address => null; 
+  DeliveryZone? get zone => null;
 }
 
 class PickUp extends DeliveryDetails {
-  @override
-  int get cost => 0;
-
   @override
   String get name => 'pickup';
 }
 
 class Dispatch extends DeliveryDetails {
-  final String _address;
-
-  @override
-  String get address => _address;
-
-  final DeliveryZone _zone;
-
-  @override
-  DeliveryZone get zone => _zone;
-
-  @override
-  int get cost => _zone.price;
-
-  Dispatch({required String address, required DeliveryZone zone})
-      : _address = address,
-        _zone = zone;
-
   @override
   String get name => 'dispatch';
+
+  @override
+  String address;
+
+  @override
+  DeliveryZone zone;
+
+  @override
+  int get cost => zone.price;
+
+  Dispatch({this.address = '', required this.zone});
 }
