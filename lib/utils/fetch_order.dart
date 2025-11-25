@@ -34,12 +34,14 @@ Future<PaymentResult?> fetchOrder(OrderSummary orderSummary) async {
     });
 
     log("fetchOrder iniciado");
+    //TODO: Obtener el nombre de la app y usarlo en X-Platform, cambiar otras referencias a "chifaelmeson"
     final response = await http.post(
       Uri.parse(
         "${Urls.apiUrl}/api/orders/${Urls.companyId}",
       ),
       headers: {
         "Content-Type": "application/json",
+        "X-Platform": "chifaelmeson",
       },
       body: body,
     );

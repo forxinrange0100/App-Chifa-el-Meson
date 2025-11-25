@@ -103,7 +103,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleAppLink(Uri uri) {
-    if (uri.scheme != 'delivera') return;
+    if (uri.scheme != 'chifaelmeson') return;
 
     FlutterNativeSplash.remove();
     setState(() {});
