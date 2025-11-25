@@ -5,7 +5,6 @@ import 'package:delivera/enum/bottom_navigation_bar_enum.dart' show BottomNaviga
 import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/model/order_tracking_model.dart' show OrderTracking;
-import 'package:delivera/pages/history_page.dart' show HistoryPage;
 import 'package:delivera/pages/home_page.dart' show HomePage;
 import 'package:delivera/pages/invoice_page.dart' show InvoicePage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;

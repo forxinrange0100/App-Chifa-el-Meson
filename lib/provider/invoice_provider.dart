@@ -1,5 +1,4 @@
 import 'package:delivera/model/order_model.dart';
-import 'package:delivera/model/payment_result_model.dart' show PaymentResult;
 import 'package:delivera/utils/fetch_order_full.dart';
 import 'package:flutter/material.dart';
 

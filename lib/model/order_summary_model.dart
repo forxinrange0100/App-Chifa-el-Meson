@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:delivera/enum/payment_type_enum.dart';
 import 'package:delivera/model/delivery_zone_model.dart';
 import 'package:delivera/model/shopping_cart_model.dart';

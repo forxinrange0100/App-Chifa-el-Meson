@@ -1,7 +1,6 @@
 import 'dart:developer' show log;
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/enum/payment_type_enum.dart';
 import 'package:delivera/model/cart_item_model.dart' show CartItem;
 import 'package:delivera/model/dish_model.dart' show Dish;

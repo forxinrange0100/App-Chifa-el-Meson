@@ -1,8 +1,7 @@
-import 'package:delivera/pages/order_summary_page.dart';
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart';
 import 'package:delivera/provider/shift_provider.dart' show ShiftProvider;
 import 'package:delivera/provider/shopping_cart_provider.dart';
-import 'package:delivera/toast/toast.dart' show cleanCartToast, serverErrorToast, shiftClosedToast;
+import 'package:delivera/toast/toast.dart' show cleanCartToast;
 import 'package:delivera/utils/navigation.dart' show navigateCheckout;
 import 'package:delivera/widget/cart_item_widget.dart';
 import 'package:delivera/widget/price_widget.dart';

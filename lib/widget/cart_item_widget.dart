@@ -1,4 +1,3 @@
-import 'dart:ui' show ViewConstraints;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivera/model/cart_item_model.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';

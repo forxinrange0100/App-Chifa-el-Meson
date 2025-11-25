@@ -110,8 +110,6 @@ class FirebaseMessagingService {
     //     {},
     //   );
     // }
-
-    // TODO: Add navigation or specific handling based on message data
   }
 }
 
