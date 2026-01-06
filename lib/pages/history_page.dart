@@ -1,5 +1,4 @@
 
-import 'dart:developer';
 import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/model/order_model.dart' show Order;

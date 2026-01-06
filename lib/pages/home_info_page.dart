@@ -65,7 +65,7 @@ class HomeInfoPage extends StatelessWidget {
 }
 
 class _ContinuePayment extends StatefulWidget {
-  const _ContinuePayment({super.key});
+  const _ContinuePayment();
 
   @override
   State<_ContinuePayment> createState() => _ContinuePaymentState();

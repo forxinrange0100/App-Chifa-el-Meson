@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '264968005767',
     projectId: 'chifaelmeson-ae40a',
     storageBucket: 'chifaelmeson-ae40a.firebasestorage.app',
-    iosBundleId: 'com.example.chifaElMeson',
+    iosBundleId: 'com.delivera.chifaElMeson',
   );
 }

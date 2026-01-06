@@ -21,9 +21,9 @@ dependencies {
 }
 
 android {
-    namespace = "com.example.delivera"
-    compileSdk = globalProperties['flutter.compileSdkVersion']?.toInteger() ?: flutter.compileSdkVersion
-    ndkVersion = globalProperties['flutter.ndkVersion'] ?: flutter.ndkVersion
+    namespace = globalProperties['applicationId'] ?: "com.example.delivera"
+    compileSdk = globalProperties['compileSdkVersion']?.toInteger() ?: flutter.compileSdkVersion
+    ndkVersion = globalProperties['ndkVersion'] ?: flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -37,13 +37,13 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.delivera.delivera"
+        applicationId = globalProperties['applicationId'] ?: "com.delivera.delivera"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = globalProperties['flutter.minSdkVersion']?.toInteger() ?: flutter.minSdkVersion
-        targetSdk = globalProperties['flutter.targetSdkVersion']?.toInteger() ?: flutter.targetSdkVersion
-        versionCode = globalProperties['flutter.versionCode']?.toInteger() ?: flutter.versionCode
-        versionName = globalProperties['flutter.versionName'] ?: flutter.versionName
+        minSdk = globalProperties['minSdkVersion']?.toInteger() ?: flutter.minSdkVersion
+        targetSdk = globalProperties['targetSdkVersion']?.toInteger() ?: flutter.targetSdkVersion
+        versionCode = globalProperties['versionCode']?.toInteger() ?: flutter.versionCode
+        versionName = globalProperties['versionName'] ?: flutter.versionName
     }
 
     signingConfigs {

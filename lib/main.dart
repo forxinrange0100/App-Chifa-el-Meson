@@ -36,6 +36,9 @@ import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
+import 'package:upgrader/upgrader.dart';
+import 'package:url_launcher/url_launcher.dart' show launchUrl;
+import 'package:url_launcher/url_launcher_string.dart' show LaunchMode;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -72,6 +75,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _appLinks = AppLinks();
   StreamSubscription? _sub;
+  final upgrader = Upgrader(
+    // TODO: cambiar a false en producción
+    debugDisplayAlways: true,
+    languageCode: 'es',
+    countryCode: "CL",
+    durationUntilAlertAgain: const Duration(seconds: 0),
+  );
 
   @override
   void initState() {
@@ -194,7 +204,21 @@ class _MyAppState extends State<MyApp> {
             ),
             useMaterial3: false,
           ),
-          home: const HomePage(),
+          home: UpgradeAlert(
+            upgrader: upgrader,
+            onUpdate: () {
+              final url = upgrader.currentAppStoreListingURL;
+              if (url == null) return false;
+              if (!kDebugMode) return true;
+              // En debug: abre Safari/navegador con el mismo URL
+              launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              return false;
+            },
+            showPrompt: false,
+            showIgnore: false,
+            showLater: false,
+            child: const HomePage(),
+          ),
         ),
       ),
     );
