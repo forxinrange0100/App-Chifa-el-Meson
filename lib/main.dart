@@ -10,6 +10,7 @@ import 'package:delivera/pages/order_summary_page.dart' show OrderSummaryPage;
 import 'package:delivera/pages/order_tracking_page.dart' show OrderTrackingPage;
 import 'package:delivera/pages/payment_page.dart' show PaymentPage;
 import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
+import 'package:delivera/utils/custom_upgrader_spanish.dart' show CustomUpgraderSpanish;
 import 'package:delivera/utils/initialize_hive.dart' show initializeHive;
 import 'package:flutter/services.dart' show SystemNavigator;
 import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
@@ -82,6 +83,7 @@ class _MyAppState extends State<MyApp> {
     languageCode: 'es',
     countryCode: "CL",
     durationUntilAlertAgain: const Duration(seconds: 0),
+    messages: CustomUpgraderSpanish(),
   );
 
   @override
