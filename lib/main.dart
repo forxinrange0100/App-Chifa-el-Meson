@@ -11,6 +11,7 @@ import 'package:delivera/pages/order_tracking_page.dart' show OrderTrackingPage;
 import 'package:delivera/pages/payment_page.dart' show PaymentPage;
 import 'package:delivera/pages/shopping_cart_page.dart' show ShoppingCartPage;
 import 'package:delivera/utils/initialize_hive.dart' show initializeHive;
+import 'package:flutter/services.dart' show SystemNavigator;
 import 'package:flutter_native_splash/flutter_native_splash.dart' show FlutterNativeSplash;
 import 'package:delivera/services/firebase_messaging_service.dart';
 import 'package:delivera/services/local_notifications_service.dart';
@@ -214,9 +215,14 @@ class _MyAppState extends State<MyApp> {
               launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
               return false;
             },
+            onLater: () {
+              SystemNavigator.pop();
+              return false;
+            },
             showPrompt: false,
             showIgnore: false,
-            showLater: false,
+            showLater: true,
+            dialogStyle: UpgradeDialogStyle.cupertino,
             child: const HomePage(),
           ),
         ),
