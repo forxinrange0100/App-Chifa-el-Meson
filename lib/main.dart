@@ -79,7 +79,7 @@ class _MyAppState extends State<MyApp> {
   StreamSubscription? _sub;
   final upgrader = Upgrader(
     // TODO: cambiar a false en producción
-    debugDisplayAlways: true,
+    debugDisplayAlways: false,
     languageCode: 'es',
     countryCode: "CL",
     durationUntilAlertAgain: const Duration(seconds: 0),
