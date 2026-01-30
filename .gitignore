@@ -70,3 +70,4 @@ ios/Runner/Assets.xcassets/AppIcon.appiconset/*.png
 ios/Runner/Assets.xcassets/LaunchImage.imageset/*.png
 ios/Runner/Assets.xcassets/BrandingImage.imageset/*.png
 .vscode/settings.json
+key.properties
