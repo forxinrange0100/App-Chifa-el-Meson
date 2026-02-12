@@ -1,7 +1,7 @@
 import 'dart:developer' show log;
 
 import 'package:delivera/model/cart_item_model.dart';
-import 'package:hive/hive.dart' show Hive;
+import 'package:hive_ce/hive_ce.dart' show Hive;
 
 class ShoppingCart {
   List<CartItem> _cartItems;
@@ -36,9 +36,8 @@ class ShoppingCart {
 
   void store() {
     try {
-      final box = Hive.box(name: 'cart');
+      final box = Hive.box('cart');
       box.put('cart', this);
-      box.close();
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
     }
@@ -46,10 +45,9 @@ class ShoppingCart {
 
   static ShoppingCart? fromStorage() {
     try {
-
-    final box = Hive.box(name: 'cart');
-    if (box.isEmpty) return null;
-    return box.get('cart');
+      final box = Hive.box('cart');
+      if (box.isEmpty) return null;
+      return box.get('cart');
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
       return null;
@@ -60,9 +58,8 @@ class ShoppingCart {
   /// Debe ejecutarse después de que se haya terminado la compra (al ver la boleta)
   static void clearStorage() {
     try {
-      final box = Hive.box(name: 'cart');
+      final box = Hive.box('cart');
       box.clear();
-      box.close();
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
     }

@@ -1,7 +1,7 @@
 import 'dart:developer' show log;
 import 'package:delivera/model/order_summary_model.dart';
 import 'package:delivera/model/user_details_model.dart';
-import 'package:hive/hive.dart' show Hive;
+import 'package:hive_ce/hive_ce.dart' show Hive;
 
 /// Guarda los ultimos inputs del usuario utilizados en una orden
 class UserBox {
@@ -35,7 +35,7 @@ class UserBox {
   /// Guarda los ultimos inputs del usuario utilizados en una orden, en el almacenamiento local
   void store() {
     try {
-      final userBox = Hive.box(name: 'user');
+      final userBox = Hive.box('user');
       userBox.putAll({
         'name': name,
         'email': email,
@@ -47,16 +47,14 @@ class UserBox {
           'deliveryAddress': deliveryAddress,
         });
       }
-      userBox.close();
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
     }
   }
 
   static UserBox? fromStorage() {
-    final box = Hive.box(name: 'user');
+    final box = Hive.box('user');
     if (box.isEmpty) {
-      box.close();
       return null;
     }
 
@@ -73,8 +71,6 @@ class UserBox {
       log("Error al obtener UserBox del almacenamiento: $e", stackTrace: stackTrace);
       userBox = null;
       box.clear();
-    } finally {
-      box.close();
     }
 
     return userBox;
@@ -86,9 +82,8 @@ class UserBox {
   }
 
   static void clearStorage() {
-    final box = Hive.box(name: 'user');
+    final box = Hive.box('user');
     box.clear();
-    box.close();
   }
 
   factory UserBox.fromJson(dynamic json) {

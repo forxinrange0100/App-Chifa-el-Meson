@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:delivera/environment.dart';
 import 'package:delivera/errors/errors.dart';
-import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/product_model.dart';
 import 'package:delivera/model/dishes_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,9 +21,9 @@ Future<Dishes> fetchDishes() async {
       // log("Fetch Dishes length: ${response.body.length}");
       final result = json.decode(response.body);
       final products = result['products'];
-      List<Dish> dishes = [];
+      List<Product> dishes = [];
       for (var product in products) {
-        dishes.add(Dish.fromJson(product));
+        dishes.add(Product.fromJson(product));
       }
       return Dishes(dishes: dishes);
     } else {

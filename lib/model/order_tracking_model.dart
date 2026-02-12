@@ -1,7 +1,7 @@
 import 'package:delivera/enum/delivery_type_enum.dart';
 import 'package:delivera/enum/order_status_enum.dart';
 import 'package:delivera/model/order_model.dart';
-import 'package:hive/hive.dart' show Hive;
+import 'package:hive_ce/hive_Ce.dart' show Hive;
 
 class OrderTracking {
   final int orderPublicId;
@@ -48,12 +48,11 @@ class OrderTracking {
   /// Si ya existe, lo actualiza anadiendo el nuevo timestamp.
   /// Debe usarse con el OrderTracking obtenido de fromOrder.
   void store(DeliveryTypeEnum deliveryType) {
-    final hiveBox = Hive.box<OrderTracking>(name: 'ordersTracking');
+    final hiveBox = Hive.box<OrderTracking>('ordersTracking');
     // Si ya existe, lo actualiza añadiendo el nuevo timestamp
     final orderTracking = hiveBox.get(orderPublicId.toString());
     if (orderTracking == null) {
       hiveBox.put(orderPublicId.toString(), this);
-      hiveBox.close();
       return;
     }
 
@@ -67,13 +66,11 @@ class OrderTracking {
 
     orderTracking.timestamps.addAll(timestamps);
     hiveBox.put(orderPublicId.toString(), orderTracking);
-    hiveBox.close();
   }
 
   static OrderTracking? fromStorage(int orderPublicId) {
-    final hiveBox = Hive.box<OrderTracking>(name: 'ordersTracking');
+    final hiveBox = Hive.box<OrderTracking>('ordersTracking');
     final orderTracking = hiveBox.get(orderPublicId.toString());
-    hiveBox.close();
     return orderTracking;
   }
 

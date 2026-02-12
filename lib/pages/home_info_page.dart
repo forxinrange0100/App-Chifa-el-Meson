@@ -3,7 +3,7 @@ import 'dart:developer' show log;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:delivera/enum/payment_type_enum.dart';
 import 'package:delivera/model/cart_item_model.dart' show CartItem;
-import 'package:delivera/model/dish_model.dart' show Dish;
+import 'package:delivera/model/product_model.dart' show Product;
 import 'package:delivera/model/payment_result_model.dart' show PaymentResult;
 import 'package:delivera/model/shopping_cart_model.dart' show ShoppingCart;
 import 'package:delivera/provider/dish_categories_provider.dart';
@@ -35,13 +35,8 @@ class HomeInfoPage extends StatelessWidget {
       body: CustomScrollView(
         controller: context.watch<ScrollControllerProvider>().scrollController,
         slivers: [
-          SliverToBoxAdapter(
-            child: HeaderWidget(),
-          ),
-          if (lastOrder != null)
-            SliverToBoxAdapter(
-              child: _LastOrderWidget(lastOrder),
-            ),
+          SliverToBoxAdapter(child: HeaderWidget()),
+          if (lastOrder != null) SliverToBoxAdapter(child: _LastOrderWidget(lastOrder)),
           SliverAppBar(
             pinned: true,
             floating: false,
@@ -50,11 +45,7 @@ class HomeInfoPage extends StatelessWidget {
             collapsedHeight: 70,
             backgroundColor: Colors.white,
             shadowColor: Colors.black,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: true,
-              title: CategoriesScrollerWidget(),
-              titlePadding: EdgeInsets.zero,
-            ),
+            flexibleSpace: FlexibleSpaceBar(centerTitle: true, title: CategoriesScrollerWidget(), titlePadding: EdgeInsets.zero),
           ),
           StoreProductsWidget(),
         ],
@@ -118,10 +109,7 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
   Future<void> _continuePaymentModal() {
     setState(() => _modalShowing = true);
 
-    final buttonStyle = TextButton.styleFrom(
-      padding: const EdgeInsets.all(12),
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    );
+    final buttonStyle = TextButton.styleFrom(padding: const EdgeInsets.all(12), tapTargetSize: MaterialTapTargetSize.shrinkWrap);
 
     return showDialog(
       context: context,
@@ -131,11 +119,7 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
           content: const Text('Tiene un pago sin terminar.\n¿Desea continuar con el pago?'),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              style: buttonStyle,
-              child: const Text('Cerrar'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(context), style: buttonStyle, child: const Text('Cerrar')),
             ElevatedButton(
               onPressed: () => _handleContinuePayment(),
               style: buttonStyle.copyWith(backgroundColor: WidgetStatePropertyAll(Colors.amber)),
@@ -165,9 +149,7 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
 }
 
 class HeaderWidget extends StatelessWidget {
-  const HeaderWidget({
-    super.key,
-  });
+  const HeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -199,94 +181,77 @@ class HeaderWidget extends StatelessWidget {
 
     return Column(
       children: [
-        Stack(children: [
-          CachedNetworkImage(
-            imageUrl: imageUrl,
-            width: double.infinity,
-            height: 250,
-            fit: BoxFit.cover,
-            progressIndicatorBuilder: (context, url, downloadProgress) {
-              return Container(
-                width: double.infinity,
-                height: 250,
-                color: Colors.redAccent.shade700,
-              );
-            },
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          ),
-          Container(
-            width: double.infinity,
-            height: 250,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withValues(alpha: 0.8),
+        Stack(
+          children: [
+            CachedNetworkImage(
+              imageUrl: imageUrl,
+              width: double.infinity,
+              height: 250,
+              fit: BoxFit.cover,
+              progressIndicatorBuilder: (context, url, downloadProgress) {
+                return Container(width: double.infinity, height: 250, color: Colors.redAccent.shade700);
+              },
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
+            Container(
+              width: double.infinity,
+              height: 250,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 10,
+              left: 10,
+              right: 10,
+              child: Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                columnWidths: const {0: FlexColumnWidth(2), 1: FlexColumnWidth(1)},
+                children: [
+                  TableRow(
+                    children: [
+                      DefaultTextStyle(
+                        style: const TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis),
+                        maxLines: 2,
+                        softWrap: true,
+                        overflow: TextOverflow.fade,
+                        child: Column(
+                          spacing: 5,
+                          children: [
+                            buildIconInfo(icon: FontAwesomeIcons.locationDot, text: address),
+                            buildIconInfo(icon: FontAwesomeIcons.phone, text: phone),
+                            buildIconInfo(icon: FontAwesomeIcons.solidClock, text: schedule),
+                            context.watch<ShiftProvider>().isOpen
+                                ? buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Abierto", color: Colors.green)
+                                : buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Cerrado", color: Colors.red),
+                          ],
+                        ),
+                      ),
+                      ClipOval(
+                        child: CachedNetworkImage(imageUrl: logoUrl, fit: BoxFit.scaleDown),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-          ),
-          Positioned(
-            bottom: 10,
-            left: 10,
-            right: 10,
-            child: Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              columnWidths: const {
-                0: FlexColumnWidth(2),
-                1: FlexColumnWidth(1),
-              },
-              children: [
-                TableRow(
-                  children: [
-                    DefaultTextStyle(
-                      style: const TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis),
-                      maxLines: 2,
-                      softWrap: true,
-                      overflow: TextOverflow.fade,
-                      child: Column(
-                        spacing: 5,
-                        children: [
-                          buildIconInfo(icon: FontAwesomeIcons.locationDot, text: address),
-                          buildIconInfo(icon: FontAwesomeIcons.phone, text: phone),
-                          buildIconInfo(icon: FontAwesomeIcons.solidClock, text: schedule),
-                          context.watch<ShiftProvider>().isOpen
-                              ? buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Abierto", color: Colors.green)
-                              : buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Cerrado", color: Colors.red),
-                        ],
-                      ),
-                    ),
-                    ClipOval(
-                      child: CachedNetworkImage(
-                        imageUrl: logoUrl,
-                        fit: BoxFit.scaleDown,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ]),
+          ],
+        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                name.toUpperCase(),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-              ),
-              const Text(
-                "Descripción:",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              ExpandableText(description)
+              Text(name.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+              const Text("Descripción:", style: TextStyle(fontWeight: FontWeight.w600)),
+              ExpandableText(description),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -310,7 +275,7 @@ class _LastOrderWidget extends StatelessWidget {
   }
 
   Future<void> _lastOrderModal(BuildContext context) {
-    final List<Dish> newProducts = context.read<DishesProvider>().dishes.dishes.toList();
+    final List<Product> newProducts = context.read<DishesProvider>().dishes.dishes.toList();
     _order.updateProducts(newProducts, clearNotes: true);
     _order.updateTotals();
     final textButtonStyle = TextButton.styleFrom(
@@ -358,13 +323,7 @@ class _LastOrderWidget extends StatelessWidget {
                                   placeholder: (_, __) => CircularProgressIndicator(),
                                   errorWidget: (_, __, ___) => Icon(Icons.error),
                                 ),
-                                Expanded(
-                                  child: ExpandableText(
-                                    orderProduct.product.name,
-                                    enabled: false,
-                                    maxLines: 3,
-                                  ),
-                                ),
+                                Expanded(child: ExpandableText(orderProduct.product.name, enabled: false, maxLines: 3)),
                                 Text('x${orderProduct.quantity}'),
                                 Text(orderProduct.formattedTotalPrice),
                               ],
@@ -378,31 +337,18 @@ class _LastOrderWidget extends StatelessWidget {
                         alignment: Alignment.centerRight,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 4, bottom: 8.0),
-                          child: Text(
-                            'Subtotal: ${_order.formattedSubtotal}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                          child: Text('Subtotal: ${_order.formattedSubtotal}', style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         spacing: 8,
                         children: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: textButtonStyle,
-                            child: Text(
-                              'Cerrar',
-                            ),
-                          ),
+                          TextButton(onPressed: () => Navigator.pop(context), style: textButtonStyle, child: Text('Cerrar')),
                           ElevatedButton(
                             onPressed: () {
                               final cartItems = _order.enabledProducts
-                                  .map((op) => CartItem(
-                                        product: op.product,
-                                        quantity: op.quantity,
-                                        notes: '',
-                                      ))
+                                  .map((op) => CartItem(product: op.product, quantity: op.quantity, notes: ''))
                                   .toList();
                               context.read<ShoppingCartProvider>().cleanShoppingCart();
                               context.read<ShoppingCartProvider>().addCartItems(cartItems);
@@ -427,9 +373,7 @@ class _LastOrderWidget extends StatelessWidget {
 }
 
 class CategoriesScrollerWidget extends StatelessWidget {
-  const CategoriesScrollerWidget({
-    super.key,
-  });
+  const CategoriesScrollerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -447,18 +391,10 @@ class CategoriesScrollerWidget extends StatelessWidget {
                 onPressed: () {
                   final context = category.categoryKey.currentContext;
                   if (context != null) {
-                    Scrollable.ensureVisible(
-                      context,
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.ease,
-                      alignment: 0.0,
-                    );
+                    Scrollable.ensureVisible(context, duration: const Duration(seconds: 1), curve: Curves.ease, alignment: 0.0);
                   }
                 },
-                child: Text(
-                  category.name,
-                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
-                ),
+                child: Text(category.name, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20)),
               );
             },
           ),
@@ -469,46 +405,42 @@ class CategoriesScrollerWidget extends StatelessWidget {
 }
 
 class StoreProductsWidget extends StatelessWidget {
-  const StoreProductsWidget({
-    super.key,
-  });
+  const StoreProductsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SliverList(
-      delegate: SliverChildListDelegate(
-        [
-          Consumer<DishCategoriesProvider>(
-            builder: (context, dishCategoriesProvider, child) {
-              return Container(
-                color: Colors.grey.shade200,
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  children: dishCategoriesProvider.dishCategories.categories.map((category) {
-                    return Column(
-                      key: category.categoryKey,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          margin: const EdgeInsets.symmetric(vertical: 16),
-                          color: Colors.white,
-                          child: Text(
-                            category.name,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                          ),
+      delegate: SliverChildListDelegate([
+        Consumer<DishCategoriesProvider>(
+          builder: (context, dishCategoriesProvider, child) {
+            return Container(
+              color: Colors.grey.shade200,
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Column(
+                children: dishCategoriesProvider.dishCategories.categories.map((category) {
+                  return Column(
+                    key: category.categoryKey,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        color: Colors.white,
+                        child: Text(
+                          category.name,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                         ),
-                        CategoryProductsWidget(categoryId: category.id)
-                      ],
-                    );
-                  }).toList(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+                      ),
+                      CategoryProductsWidget(categoryId: category.id),
+                    ],
+                  );
+                }).toList(),
+              ),
+            );
+          },
+        ),
+      ]),
     );
   }
 }
@@ -516,10 +448,7 @@ class StoreProductsWidget extends StatelessWidget {
 class CategoryProductsWidget extends StatelessWidget {
   final int categoryId;
 
-  const CategoryProductsWidget({
-    super.key,
-    required this.categoryId,
-  });
+  const CategoryProductsWidget({super.key, required this.categoryId});
 
   @override
   Widget build(BuildContext context) {
@@ -537,12 +466,9 @@ class CategoryProductsWidget extends StatelessWidget {
 }
 
 class ProductCardWidget extends StatelessWidget {
-  final Dish dish;
+  final Product dish;
 
-  const ProductCardWidget({
-    super.key,
-    required this.dish,
-  });
+  const ProductCardWidget({super.key, required this.dish});
 
   void showDishDialog(BuildContext context) {
     showDialog(
@@ -558,9 +484,7 @@ class ProductCardWidget extends StatelessWidget {
       style: const ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(Colors.white),
         foregroundColor: WidgetStatePropertyAll(Colors.black),
-        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        )),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
       ),
       child: Column(
         children: [
@@ -579,38 +503,17 @@ class ProductCardWidget extends StatelessWidget {
                       Text(
                         dish.name,
                         maxLines: 3,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          overflow: TextOverflow.ellipsis,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontSize: 20, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
                       ),
-                      ExpandableText(
-                        dish.description,
-                        maxLines: 3,
-                        enabled: false,
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                      ExpandableText(dish.description, maxLines: 3, enabled: false, style: TextStyle(color: Colors.grey)),
                       Center(
                         child: (dish.discountedPrice == 0)
-                            ? PriceWidget(
-                                price: dish.regularPrice,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                              )
+                            ? PriceWidget(price: dish.regularPrice, fontWeight: FontWeight.bold, fontSize: 25)
                             : Row(
                                 children: [
-                                  PriceWidget(
-                                    price: dish.discountedPrice,
-                                    color: Colors.green,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  PriceWidget(price: dish.discountedPrice, color: Colors.green, fontSize: 22, fontWeight: FontWeight.bold),
                                   const SizedBox(width: 10),
-                                  PriceWidget(
-                                    price: dish.regularPrice,
-                                    textDecoration: TextDecoration.lineThrough,
-                                  ),
+                                  PriceWidget(price: dish.regularPrice, textDecoration: TextDecoration.lineThrough),
                                 ],
                               ),
                       ),
@@ -623,7 +526,7 @@ class ProductCardWidget extends StatelessWidget {
                   fit: BoxFit.cover,
                   placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
-                )
+                ),
               ],
             ),
           ),
@@ -633,12 +536,9 @@ class ProductCardWidget extends StatelessWidget {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10,
-              children: [
-                Icon(FontAwesomeIcons.cartShopping),
-                Text("AGREGAR AL CARRITO"),
-              ],
+              children: [Icon(FontAwesomeIcons.cartShopping), Text("AGREGAR AL CARRITO")],
             ),
-          )
+          ),
         ],
       ),
     );

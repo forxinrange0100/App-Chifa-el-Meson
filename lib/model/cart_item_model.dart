@@ -1,9 +1,9 @@
-import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/product_model.dart';
 import 'package:flutter/foundation.dart' show UniqueKey;
 
 class CartItem {
   final String id;
-  final Dish product;
+  final Product product;
   int quantity;
   String notes;
 
@@ -26,7 +26,7 @@ class CartItem {
   factory CartItem.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
     return CartItem(
-      product: Dish.fromJson(map['product']),
+      product: Product.fromJson(map['product']),
       quantity: map['quantity'],
       notes: map['notes'],
     );

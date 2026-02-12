@@ -1,11 +1,11 @@
 import 'dart:developer' show log;
 
-import 'package:delivera/model/dish_model.dart' show Dish;
+import 'package:delivera/model/product_model.dart' show Product;
 import 'package:delivera/model/order_product_model.dart';
 import 'package:delivera/model/payment_status_style_model.dart';
 import 'package:delivera/utils/date_time_chile.dart';
 import 'package:delivera/utils/format_price.dart';
-import 'package:hive/hive.dart' show Hive;
+import 'package:hive_ce/hive_ce.dart';
 
 /// Represents an order that's retrieved from the server
 class Order {
@@ -26,8 +26,9 @@ class Order {
   final String clientEmail;
   final String clientName;
   List<OrderProduct> orderProducts;
-  DateTime get timestampChile => dateTimeChile(timestamp);
 
+  int get id => _id;
+  DateTime get timestampChile => dateTimeChile(timestamp);
   String get formattedSubtotal => formatPrice(subtotal);
   List<OrderProduct> get enabledProducts => orderProducts.where((orderProduct) => orderProduct.enabled).toList();
 
@@ -146,7 +147,7 @@ class Order {
 
   /// Remplaza los datos de los productos existentes en orderProducts con otros orderProducts (segun su id).
   /// Añade los que no estaban antes, y desactiva los que no se encuentren ahora
-  void updateProducts(List<Dish> updatedProducts, {bool clearNotes = false}) {
+  void updateProducts(List<Product> updatedProducts, {bool clearNotes = false}) {
     // Busca los productos a actualizar
     final List<OrderProduct> updatedOrderProducts = orderProducts.map((orderProduct) {
       // Obtiene el indice del producto en la lista
@@ -185,17 +186,16 @@ class Order {
   /// Si ya existe, lo actualiza
   void storeOrder() {
     try {
-      final ordersBox = Hive.box<Order>(name: 'orders');
+      final ordersBox = Hive.box<Order>('orders');
       ordersBox.put(publicId.toString(), this);
-      ordersBox.close();
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
     }
   }
 
   static Order? getLastOrder() {
-    final ordersBox = Hive.box<Order>(name: 'orders');
-    final List<String> ordersBoxKeys = ordersBox.keys;
+    final ordersBox = Hive.box<Order>('orders');
+    final List<dynamic> ordersBoxKeys = ordersBox.keys.toList();
     return ordersBoxKeys.isEmpty ? null : ordersBox.get(ordersBoxKeys.last);
   }
 

@@ -8,9 +8,10 @@ import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show Bott
 import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
 import 'package:delivera/utils/format_date_time.dart';
 import 'package:delivera/utils/format_price.dart';
+import 'package:delivera/utils/initialize_hive.dart' show HiveBoxExtension;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart' show FontAwesomeIcons, FaIcon;
-import 'package:hive/hive.dart' show Hive;
+import 'package:hive_ce/hive_ce.dart' show Hive;
 import 'package:provider/provider.dart';
 
 class HistoryPage extends StatelessWidget {
@@ -18,10 +19,9 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ordersBox = Hive.box<Order>(name: 'orders');
-    final List<Order?> orders = ordersBox.getAll(ordersBox.keys).reversed.toList();
+    final ordersBox = Hive.box<Order>('orders');
+    final List<Order?> orders = ordersBox.getAll<Order?>(ordersBox.keys.toList()).reversed.toList();
     // final List<Order?> orders = generateFakeOrders();
-    ordersBox.close();
     // addFakeOrders();
     // for (var order in orders) {
     //   if (order == null) continue;
@@ -216,7 +216,7 @@ class HistoryPage extends StatelessWidget {
   }
 
   void addFakeOrders() {
-    final ordersBox = Hive.box<Order>(name: 'orders');
+    final ordersBox = Hive.box<Order>('orders');
     const from = 1001;
     const to = 1010;
     final status = OrderStatusEnum.pending.name;

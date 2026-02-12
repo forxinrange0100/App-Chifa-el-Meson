@@ -9,12 +9,15 @@ import 'package:delivera/model/order_tracking_model.dart' show OrderTracking;
 import 'package:delivera/pages/order_tracking_page.dart';
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart' show Hive;
-import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
+import 'package:hive_ce/hive_ce.dart' show Hive;
+// import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
 import 'package:provider/provider.dart';
 
 abstract class NotificationHandler {
   int? notificationId;
+
+  NotificationHandler({this.notificationId});
+
   factory NotificationHandler.fromType(NotificationTypeEnum typeEnum) {
     switch (typeEnum) {
       case NotificationTypeEnum.orderTracking:
@@ -38,14 +41,13 @@ abstract class NotificationHandler {
   
   /// Guarda el tipo de notification handler y el payload en el storage local.
   /// Para poder instanciar el mismo tipo de notification handler cuando se abre la app.
-  static void store(NotificationHandler notificationHandler, dynamic payload) async {
-    Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
+  static void store(NotificationHandler notificationHandler, dynamic payload) {
+    // Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
 
     try {
-      final notificationBox = Hive.box(name: 'notification');
+      final notificationBox = Hive.box('notification');
       if (notificationBox.isNotEmpty) notificationBox.clear();
       notificationBox.put(notificationHandler.runtimeType.toString(), payload);
-      notificationBox.close();
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
     }
@@ -55,7 +57,7 @@ abstract class NotificationHandler {
   /// Instancia el [NotificationHandler] correspondiente y ejecuta su metodo [NotificationHandler.handleTapped].
   static void handleStoredNotification() {
     try {
-      final notificationBox = Hive.box(name: 'notification');
+      final notificationBox = Hive.box('notification');
       log('notificationBox empty: ${notificationBox.isEmpty}');
       if (notificationBox.isEmpty) return;
       final String notificationHandlerType = notificationBox.keys.first;
@@ -63,7 +65,6 @@ abstract class NotificationHandler {
       final notificationHandler = NotificationHandler.fromRuntimeType(notificationHandlerType);
       notificationHandler.handleTapped(payload);
       notificationBox.clear();
-      notificationBox.close();
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
     }

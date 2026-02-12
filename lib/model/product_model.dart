@@ -2,7 +2,7 @@ import 'package:delivera/environment.dart' show Urls;
 import 'package:delivera/utils/conversions.dart';
 import '../utils/format_price.dart' show formatPrice;
 
-class Dish {
+class Product {
   final int id;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -28,7 +28,7 @@ class Dish {
 
   String get imageUrl => image == null || image!.endsWith('null') ? 'https://chifaelmeson.cl/img/default.webp' : "${Urls.apiUrl}/storage/$image";
 
-  Dish(
+  Product(
       {required this.id,
       required this.createdAt,
       required this.updatedAt,
@@ -45,7 +45,7 @@ class Dish {
         categoryId = categoryId ?? 0,
         units = units ?? 0;
 
-  Dish copyWith({
+  Product copyWith({
     int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -59,7 +59,7 @@ class Dish {
     int? displayOrder,
     int? units,
   }) {
-    return Dish(
+    return Product(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -75,12 +75,12 @@ class Dish {
     );
   }
 
-  factory Dish.fromJson(dynamic json) {
+  factory Product.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
     map['created_at'] = map['createdAt'] ?? DateTime.now().toString();
     map['updated_at'] = map['updatedAt'] ?? DateTime.now().toString();
 
-    return Dish(
+    return Product(
         id: map['id'],
         createdAt: DateTime.parse(map['created_at']),
         updatedAt: DateTime.parse(map['updated_at']),

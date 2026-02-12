@@ -1,5 +1,5 @@
 import 'package:delivera/model/cart_item_model.dart';
-import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/product_model.dart';
 import 'package:delivera/model/shopping_cart_model.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +26,7 @@ class ShoppingCartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addCartItem(Dish dish, int quantity, String preferenceNote) {
+  void addCartItem(Product dish, int quantity, String preferenceNote) {
     _shoppingCart.add(CartItem(product: dish, quantity: quantity, notes: preferenceNote));
     notifyListeners();
   }

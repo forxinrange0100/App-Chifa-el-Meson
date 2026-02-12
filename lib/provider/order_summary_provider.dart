@@ -8,7 +8,7 @@ import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart' show serverErrorToast;
 import 'package:delivera/utils/fetch_order.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart' show Hive;
+import 'package:hive_ce/hive_ce.dart' show Hive;
 
 class OrderSummaryProvider extends ChangeNotifier {
   // TODO: hacer _details nullable
@@ -88,9 +88,9 @@ class OrderSummaryProvider extends ChangeNotifier {
   }
 
   /// Guarda los datos del usuario y los datos de envio de forma local
-  void storeUserData() {
+  void storeUserData() async {
     try {
-      final userBox = Hive.box(name: 'user');
+      final userBox = Hive.box('user');
       userBox.putAll({
         'name': _orderSummary.userDetails.fullName,
         'email': _orderSummary.userDetails.email,
@@ -108,7 +108,6 @@ class OrderSummaryProvider extends ChangeNotifier {
           'deliveryAddress': null,
         });
       }
-      userBox.close();
     } catch (e, stackTrace) {
       log(e.toString(), stackTrace: stackTrace);
     }

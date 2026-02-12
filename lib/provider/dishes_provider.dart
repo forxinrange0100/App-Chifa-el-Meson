@@ -1,4 +1,4 @@
-import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/product_model.dart';
 import 'package:delivera/model/dishes_model.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +12,7 @@ class DishesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Dish> getDishesByCategory(int categoryId) {
+  List<Product> getDishesByCategory(int categoryId) {
     return _dishes.dishes
         .where((dish) => dish.categoryId == categoryId)
         .toList();

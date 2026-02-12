@@ -72,7 +72,7 @@ class LocalNotificationsService {
 
     // Initialize plugin with settings and callback for notification taps
     await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: _notificationTapped,
       onDidReceiveBackgroundNotificationResponse: _notificationTapped,
     );
@@ -107,7 +107,7 @@ class LocalNotificationsService {
         log('Deleting existing channel: ${channel.id}');
         await _flutterLocalNotificationsPlugin
             .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-            ?.deleteNotificationChannel(channel.id);
+            ?.deleteNotificationChannel(channelId: channel.id);
       }
     }
   }
@@ -167,10 +167,10 @@ class LocalNotificationsService {
 
       // Display the notification
       await _flutterLocalNotificationsPlugin.show(
-        notificationId,
-        title,
-        body,
-        notificationDetails,
+        id: notificationId,
+        title: title,
+        body: body,
+        notificationDetails: notificationDetails,
         payload: jsonEncode(payload),
       );
 

@@ -1,8 +1,8 @@
-import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/product_model.dart';
 import 'package:delivera/utils/format_price.dart' show formatPrice;
 
 class OrderProduct {
-  final Dish product;
+  final Product product;
   final int quantity;
   final String note;
 
@@ -18,7 +18,7 @@ class OrderProduct {
   }) : note = note ?? '';
 
   OrderProduct copyWith({
-    Dish? product,
+    Product? product,
     int? quantity,
     String? note,
   }) {
@@ -32,7 +32,7 @@ class OrderProduct {
   factory OrderProduct.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
     return OrderProduct(
-      product: Dish.fromJson(map['product']),
+      product: Product.fromJson(map['product']),
       quantity: map['quantity'],
       note: map['note'],
     );

@@ -1,14 +1,15 @@
 import 'dart:developer';
 import 'package:delivera/model/order_model.dart' show Order;
+import 'package:delivera/utils/initialize_hive.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
-import 'package:hive/hive.dart' show Hive;
-import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
+import 'package:hive_ce/hive_ce.dart' show Hive;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
+  // Hive.defaultDirectory = (await getApplicationDocumentsDirectory()).path;
   // readAll();
   // delete(100001);
+  await initializeHive();
   deleteAll();
   log("Finished.");
 }
@@ -28,6 +29,6 @@ void main() async {
 // }
 
 void deleteAll() {
-  final userBox = Hive.box<Order>(name: 'user');
+  final userBox = Hive.box<Order>('user');
   userBox.clear();
 }

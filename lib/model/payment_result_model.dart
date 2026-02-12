@@ -1,6 +1,6 @@
 import 'dart:developer' show log;
 
-import 'package:hive/hive.dart' show Hive;
+import 'package:hive_ce/hive_ce.dart' show Hive;
 
 class PaymentData {
   final String paymentType;
@@ -28,20 +28,18 @@ class PaymentResult {
   // Guarda el resultado de la order en el almacenamiento local
   // Solo si es tipo getnet
   void store() {
-    final paymentBox = Hive.box(name: 'payment');
+    final paymentBox = Hive.box('payment');
     paymentBox.putAll({
       'paymentType': paymentData.paymentType,
       'paymentUrl': paymentData.paymentUrl,
       'token': paymentData.token,
       'publicId': publicId,
     });
-    paymentBox.close();
   }
 
   static PaymentResult? fromStorage() {
-    final box = Hive.box(name: 'payment');
+    final box = Hive.box('payment');
     if (box.isEmpty) {
-      box.close();
       return null;
     }
     PaymentResult? orderResult;
@@ -57,15 +55,12 @@ class PaymentResult {
       );
     } catch (e, stackTrace) {
       log("Error retrieving PaymentResult from storage: $e", stackTrace: stackTrace);
-    } finally {
-      box.close();
     }
     return orderResult;
   }
 
   static void clearStorage() {
-    final box = Hive.box(name: 'payment');
+    final box = Hive.box('payment');
     box.clear();
-    box.close();
   }
 }

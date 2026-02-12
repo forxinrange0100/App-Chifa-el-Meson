@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:delivera/model/dish_model.dart';
+import 'package:delivera/model/product_model.dart';
 import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
 import 'package:delivera/toast/toast.dart';
@@ -10,7 +10,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class DishDialog extends StatefulWidget {
-  final Dish dish;
+  final Product dish;
   const DishDialog({super.key, required this.dish});
 
   @override
