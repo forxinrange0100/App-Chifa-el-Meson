@@ -21,7 +21,7 @@ import 'package:delivera/firebase_options.dart' show DefaultFirebaseOptions;
 import 'package:delivera/services/local_notifications_service.dart' show LocalNotificationsService;
 import 'package:delivera/services/firebase_messaging_service.dart' show FirebaseMessagingService;
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'dart:io' show HttpClient;
+import 'dart:io' show HttpClient, HttpOverrides, SecurityContext, X509Certificate;
 import 'package:delivera/pages/home_page.dart' show HomePage;
 import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show BottomNavigationBarProvider;
 import 'package:delivera/provider/data_provider.dart' show DataProvider;
@@ -44,6 +44,13 @@ import 'package:url_launcher/url_launcher_string.dart' show LaunchMode;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
@@ -57,9 +64,12 @@ void main() async {
   final firebaseMessagingService = FirebaseMessagingService.instance();
   await firebaseMessagingService.init(localNotificationsService: localNotificationsService);
 
-  // Para evitar un error en la herramienta Network mientras se debuggea
+  // Configuraciones para modo debug (local)
   if (kDebugMode) {
+    // Para evitar un error en la herramienta Network mientras se debuggea
     HttpClient.enableTimelineLogging = true;
+    // Ignora errores de certificado en debug (útil para localhost con HTTPS)
+    HttpOverrides.global = MyHttpOverrides();
   }
 
   await initializeHive();
