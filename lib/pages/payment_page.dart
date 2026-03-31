@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:delivera/environment.dart' show Urls;
 import 'package:delivera/provider/payment_provider.dart' show PaymentProvider;
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:app_links/app_links.dart';
 import 'package:provider/provider.dart';
 import 'package:delivera/model/payment_result_model.dart';
@@ -169,43 +169,49 @@ class _BrowserOpenedWidget extends StatelessWidget {
   }
 }
 
+/// Abre una URL en una custom tab con tema consistente
+/// Configurado para Getnet y Transbank
+Future<void> _launchPaymentCustomTab(Uri uri) async {
+  try {
+    await launchUrl(
+      uri,
+      customTabsOptions: CustomTabsOptions(
+        colorSchemes: CustomTabsColorSchemes.defaults(
+          toolbarColor: const Color(0xFF2196F3),
+        ),
+        shareState: CustomTabsShareState.on,
+        urlBarHidingEnabled: true,
+        showTitle: true,
+        closeButton: CustomTabsCloseButton(
+          icon: CustomTabsCloseButtonIcons.back,
+        ),
+      ),
+      safariVCOptions: const SafariViewControllerOptions(
+        preferredBarTintColor: Color(0xFF2196F3),
+        preferredControlTintColor: Colors.white,
+        barCollapsingEnabled: true,
+        dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,
+      ),
+    );
+  } catch (e) {
+    log('Error opening payment URL: $e');
+    rethrow;
+  }
+}
+
 Future<void> openBrowserGetnet(String paymentUrl) async {
   final uri = Uri.parse(paymentUrl);
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
+  await _launchPaymentCustomTab(uri);
 }
 
 Future<void> openBrowserTransbank(
   String paymentUrl,
   String token,
 ) async {
-  // Transbank POST con formulario HTML temporal
-  // final htmlContent = '''
-  //     <html>
-  //       <body onload="document.forms[0].submit()">
-  //         <form action="$paymentUrl" method="POST">
-  //           <input type="hidden" name="token_ws" value="$token" />
-  //           <input type="submit" value="Pagar" />
-  //         </form>
-  //       </body>
-  //     </html>
-  //   ''';
-
-  // final dir = await getTemporaryDirectory();
-  // final file = File('${dir.path}/payment_form.html');
-  // await file.writeAsString(htmlContent);
-
-  // if (Platform.isAndroid) {
-  //   await OpenFilex.open(file.path, type: "text/html");
-  // } else if (Platform.isIOS) {
-  //   final uri = Uri.parse(paymentUrl);
-  //   await launchUrl(uri, mode: LaunchMode.externalApplication);
-  // }
-
   final uri = Uri.parse(
     '${Urls.apiUrl}/api/transbank/form?payment_url=$paymentUrl&token_ws=$token',
   );
-
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
+  await _launchPaymentCustomTab(uri);
 }
 
 /// Abre el navegador para completar el pago, dependiendo del tipo de pago.

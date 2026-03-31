@@ -310,7 +310,7 @@ class _LastOrderWidget extends StatelessWidget {
                         child: ListView.separated(
                           shrinkWrap: true,
                           itemCount: itemCount,
-                          separatorBuilder: (_, __) => Divider(height: 5),
+                          separatorBuilder: (_, _) => Divider(height: 5),
                           itemBuilder: (context, index) {
                             final orderProduct = _order.enabledProducts[index];
                             return Row(
@@ -320,8 +320,8 @@ class _LastOrderWidget extends StatelessWidget {
                                   imageUrl: orderProduct.product.imageUrl,
                                   width: 50,
                                   height: 50,
-                                  placeholder: (_, __) => CircularProgressIndicator(),
-                                  errorWidget: (_, __, ___) => Icon(Icons.error),
+                                  placeholder: (_, _) => CircularProgressIndicator(),
+                                  errorWidget: (_, _, _) => Icon(Icons.error),
                                 ),
                                 Expanded(child: ExpandableText(orderProduct.product.name, enabled: false, maxLines: 3)),
                                 Text('x${orderProduct.quantity}'),

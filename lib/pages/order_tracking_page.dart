@@ -204,7 +204,7 @@ class OrderTrackingPage extends StatelessWidget {
                     child: ListView.separated(
                       shrinkWrap: true,
                       itemCount: order.orderProducts.length,
-                      separatorBuilder: (_, __) => Divider(height: 5),
+                      separatorBuilder: (_, _) => Divider(height: 5),
                       itemBuilder: (context, index) {
                         final orderProduct = order.orderProducts[index];
                         return Row(
@@ -214,8 +214,8 @@ class OrderTrackingPage extends StatelessWidget {
                               imageUrl: orderProduct.product.imageUrl,
                               width: 75,
                               height: 75,
-                              placeholder: (_, __) => CircularProgressIndicator(),
-                              errorWidget: (_, __, ___) => Icon(Icons.error),
+                              placeholder: (_, _) => CircularProgressIndicator(),
+                              errorWidget: (_, _, _) => Icon(Icons.error),
                             ),
                             Expanded(
                               child: ExpandableText(
