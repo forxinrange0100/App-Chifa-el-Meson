@@ -177,7 +177,7 @@ Future<void> _launchPaymentCustomTab(Uri uri) async {
       uri,
       customTabsOptions: CustomTabsOptions(
         colorSchemes: CustomTabsColorSchemes.defaults(
-          toolbarColor: const Color(0xFF2196F3),
+          toolbarColor: const Color(0xFF557819),
         ),
         shareState: CustomTabsShareState.on,
         urlBarHidingEnabled: true,
@@ -187,7 +187,7 @@ Future<void> _launchPaymentCustomTab(Uri uri) async {
         ),
       ),
       safariVCOptions: const SafariViewControllerOptions(
-        preferredBarTintColor: Color(0xFF2196F3),
+        preferredBarTintColor: Color(0xFF557819),
         preferredControlTintColor: Colors.white,
         barCollapsingEnabled: true,
         dismissButtonStyle: SafariViewControllerDismissButtonStyle.close,

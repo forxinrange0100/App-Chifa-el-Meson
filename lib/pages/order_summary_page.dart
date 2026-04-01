@@ -96,6 +96,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     super.initState();
     // Llama al método update() del provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _orderSummaryProvider.clearDeliveryDetails();
       _deliveryDetailsProvider.update();
       // Si _lastInputs no está vacio, inicializar los campos name, email y phone con los valores guardados
       _hasLastInputs = _lastInputs != null;
