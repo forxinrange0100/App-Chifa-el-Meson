@@ -1,8 +1,8 @@
 import 'package:delivera/provider/delivery_details_provider.dart';
-import 'package:delivera/provider/dish_categories_provider.dart';
+import 'package:delivera/provider/categories_provider.dart';
 import 'package:delivera/provider/products_provider.dart';
 import 'package:delivera/provider/restaurant_info_provider.dart';
-import 'package:delivera/utils/fetch_dish_categories.dart';
+import 'package:delivera/utils/fetch_categories.dart';
 import 'package:delivera/utils/fetch_products.dart';
 import 'package:delivera/utils/fetch_restaurant_info.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 class DataProvider extends ChangeNotifier {
   final RestaurantInfoProvider _restaurantInfoProvider;
   final ProductsProvider _productsProvider;
-  final DishCategoriesProvider _dishCategoriesProvider;
+  final CategoriesProvider _categoriesProvider;
   final DeliveryDetailsProvider _deliveryDetailsProvider;
 
   String _errorMessage = '';
@@ -20,14 +20,14 @@ class DataProvider extends ChangeNotifier {
   bool get done => _done;
 
   DataProvider(this._restaurantInfoProvider, this._productsProvider,
-      this._dishCategoriesProvider, this._deliveryDetailsProvider);
+      this._categoriesProvider, this._deliveryDetailsProvider);
 
   Future<void> getData() async {
     reset();
     try {
       await getRestaurant();
       await getProducts();
-      await getDishCategories();
+      await getCategories();
       await getDeliveryDetails();
     } catch (e) {
       _errorMessage = e.toString();
@@ -45,8 +45,8 @@ class DataProvider extends ChangeNotifier {
     _productsProvider.init(await fetchProducts());
   }
 
-  Future<void> getDishCategories() async {
-    _dishCategoriesProvider.init(await fetchDishCategories());
+  Future<void> getCategories() async {
+    _categoriesProvider.init(await fetchCategories());
   }
 
   Future<void> getDeliveryDetails() async {

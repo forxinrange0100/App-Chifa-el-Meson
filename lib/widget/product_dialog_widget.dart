@@ -9,15 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-class DishDialog extends StatefulWidget {
-  final Product dish;
-  const DishDialog({super.key, required this.dish});
+class ProductDialog extends StatefulWidget {
+  final Product product;
+  const ProductDialog({super.key, required this.product});
 
   @override
-  State<DishDialog> createState() => _DishDialogState();
+  State<ProductDialog> createState() => _ProductDialogState();
 }
 
-class _DishDialogState extends State<DishDialog> {
+class _ProductDialogState extends State<ProductDialog> {
   int _counter = 1;
   final TextEditingController _notesController = TextEditingController();
 
@@ -37,7 +37,7 @@ class _DishDialogState extends State<DishDialog> {
               child: ListView(
                 children: [
                   CachedNetworkImage(
-                    imageUrl: widget.dish.imageUrl,
+                    imageUrl: widget.product.imageUrl,
                     height: 300,
                     fit: BoxFit.cover,
                   ),
@@ -46,13 +46,13 @@ class _DishDialogState extends State<DishDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        widget.dish.discountedPrice != 0
+                        widget.product.discountedPrice != 0
                             ? Container(
                                 color: Colors.green,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    "Ahorras un ${((1 - (widget.dish.discountedPrice / widget.dish.regularPrice)) * 100).toStringAsFixed(0)}%",
+                                    "Ahorras un ${((1 - (widget.product.discountedPrice / widget.product.regularPrice)) * 100).toStringAsFixed(0)}%",
                                     style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -61,28 +61,28 @@ class _DishDialogState extends State<DishDialog> {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
-                            widget.dish.name,
+                            widget.product.name,
                             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ),
                         ExpandableText(
-                          widget.dish.description,
+                          widget.product.description,
                           message: "Ver más",
                         ),
                         Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: widget.dish.discountedPrice != 0
+                            child: widget.product.discountedPrice != 0
                                 ? Row(
                                     children: [
-                                      PriceWidget(price: widget.dish.discountedPrice, fontSize: 25, fontWeight: FontWeight.bold),
+                                      PriceWidget(price: widget.product.discountedPrice, fontSize: 25, fontWeight: FontWeight.bold),
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      PriceWidget(price: widget.dish.regularPrice, textDecoration: TextDecoration.lineThrough)
+                                      PriceWidget(price: widget.product.regularPrice, textDecoration: TextDecoration.lineThrough)
                                     ],
                                   )
                                 : PriceWidget(
-                                    price: widget.dish.regularPrice,
+                                    price: widget.product.regularPrice,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 25,
                                   )),
@@ -184,7 +184,7 @@ class _DishDialogState extends State<DishDialog> {
               shiftClosedToast();
               return;
             }
-            context.read<ShoppingCartProvider>().addCartItem(widget.dish, _counter, _notesController.text);
+            context.read<ShoppingCartProvider>().addCartItem(widget.product, _counter, _notesController.text);
             addingCartItemToast();
             Navigator.of(context).pop();
           },
@@ -192,7 +192,7 @@ class _DishDialogState extends State<DishDialog> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               PriceWidget(
-                price: widget.dish.price * _counter,
+                price: widget.product.price * _counter,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,

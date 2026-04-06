@@ -26,8 +26,8 @@ class ShoppingCartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addCartItem(Product dish, int quantity, String preferenceNote) {
-    _shoppingCart.add(CartItem(product: dish, quantity: quantity, notes: preferenceNote));
+  void addCartItem(Product product, int quantity, String preferenceNote) {
+    _shoppingCart.add(CartItem(product: product, quantity: quantity, notes: preferenceNote));
     notifyListeners();
   }
 

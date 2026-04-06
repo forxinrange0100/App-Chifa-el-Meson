@@ -14,10 +14,10 @@ void main() async {
   // TestWidgetsFlutterBinding.ensureInitialized();
   // final directory = await onDocumentsDirectory();
   // print('Directory: ${directory.path}');
-  // final file = File('${directory.path}/test2_fetch_dishes.txt');
+  // final file = File('${directory.path}/test2_fetch_products.txt');
   // this gives an (OS Error: Read-only file system, errno = 30)
   // file.writeAsStringSync('123', mode: FileMode.append);
-  log("Fetching dishes 1000 times.");
+  log("Fetching products 1000 times.");
   for (int i = 0; i < 1000; i++) {
     try {
       final response = await http.get(Uri.parse("${Urls.apiUrl}/api/products/${Urls.companyId}"));
@@ -25,13 +25,13 @@ void main() async {
         if (response.body.length < 7675) {
           // save all important information in the file
           // file.writeAsStringSync(response.body, mode: FileMode.append);
-          log("Fetch Dishes: ${response.body}");
-          log("Fetch Dishes headers: ${response.headers}");
+          log("Fetch Products: ${response.body}");
+          log("Fetch Products headers: ${response.headers}");
         }
       }
     } catch (e) {
-      log('Error fetching dishes: $e');
+      log('Error fetching products: $e');
     }
   }
-  log("Finished fetching dishes 1000 times.");
+  log("Finished fetching products 1000 times.");
 }

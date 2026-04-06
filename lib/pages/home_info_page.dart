@@ -6,7 +6,7 @@ import 'package:delivera/model/cart_item_model.dart' show CartItem;
 import 'package:delivera/model/product_model.dart' show Product;
 import 'package:delivera/model/payment_result_model.dart' show PaymentResult;
 import 'package:delivera/model/shopping_cart_model.dart' show ShoppingCart;
-import 'package:delivera/provider/dish_categories_provider.dart';
+import 'package:delivera/provider/categories_provider.dart';
 import 'package:delivera/provider/products_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
 import 'package:delivera/provider/restaurant_info_provider.dart';
@@ -15,7 +15,7 @@ import 'package:delivera/provider/shift_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart' show ShoppingCartProvider;
 import 'package:delivera/toast/toast.dart' show addingCartItemsToast;
 import 'package:delivera/utils/navigation.dart' show navigatePayment, navigateCheckout;
-import 'package:delivera/widget/dish_dialog_widget.dart';
+import 'package:delivera/widget/product_dialog_widget.dart';
 import 'package:delivera/widget/expandable_text_widget.dart';
 import 'package:delivera/widget/price_widget.dart';
 import 'package:flutter/material.dart';
@@ -387,15 +387,15 @@ class CategoriesScrollerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DishCategoriesProvider>(
-      builder: (context, dishCategoriesProvider, child) {
+    return Consumer<CategoriesProvider>(
+      builder: (context, categoriesProvider, child) {
         return SizedBox(
           height: 50,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: dishCategoriesProvider.dishCategories.categories.length,
+            itemCount: categoriesProvider.categories.length,
             itemBuilder: (context, index) {
-              final category = dishCategoriesProvider.dishCategories.categories[index];
+              final category = categoriesProvider.categories[index];
 
               return TextButton(
                 onPressed: () {
@@ -421,13 +421,13 @@ class StoreProductsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildListDelegate([
-        Consumer<DishCategoriesProvider>(
-          builder: (context, dishCategoriesProvider, child) {
+        Consumer<CategoriesProvider>(
+          builder: (context, categoriesProvider, child) {
             return Container(
               color: Colors.grey.shade200,
               padding: const EdgeInsets.only(bottom: 20.0),
               child: Column(
-                children: dishCategoriesProvider.dishCategories.categories.map((category) {
+                children: categoriesProvider.categories.map((category) {
                   return Column(
                     key: category.categoryKey,
                     children: [
@@ -463,11 +463,11 @@ class CategoryProductsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ProductsProvider>(
-      builder: (context, dishProvider, child) {
+      builder: (context, productProvider, child) {
         return Column(
           spacing: 16,
-          children: dishProvider.getProductsByCategory(categoryId).map((dish) {
-            return ProductCardWidget(dish: dish);
+          children: productProvider.getProductsByCategory(categoryId).map((product) {
+            return ProductCardWidget(product: product);
           }).toList(),
         );
       },
@@ -476,21 +476,21 @@ class CategoryProductsWidget extends StatelessWidget {
 }
 
 class ProductCardWidget extends StatelessWidget {
-  final Product dish;
+  final Product product;
 
-  const ProductCardWidget({super.key, required this.dish});
+  const ProductCardWidget({super.key, required this.product});
 
-  void showDishDialog(BuildContext context) {
+  void showProductDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => DishDialog(dish: dish),
+      builder: (_) => ProductDialog(product: product),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => showDishDialog(context),
+      onPressed: () => showProductDialog(context),
       style: const ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(Colors.white),
         foregroundColor: WidgetStatePropertyAll(Colors.black),
@@ -511,19 +511,19 @@ class ProductCardWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        dish.name,
+                        product.name,
                         maxLines: 3,
                         style: const TextStyle(fontSize: 20, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
                       ),
-                      ExpandableText(dish.description, maxLines: 3, enabled: false, style: TextStyle(color: Colors.grey)),
+                      ExpandableText(product.description, maxLines: 3, enabled: false, style: TextStyle(color: Colors.grey)),
                       Center(
-                        child: (dish.discountedPrice == 0)
-                            ? PriceWidget(price: dish.regularPrice, fontWeight: FontWeight.bold, fontSize: 25)
+                        child: (product.discountedPrice == 0)
+                            ? PriceWidget(price: product.regularPrice, fontWeight: FontWeight.bold, fontSize: 25)
                             : Row(
                                 children: [
-                                  PriceWidget(price: dish.discountedPrice, color: Colors.green, fontSize: 22, fontWeight: FontWeight.bold),
+                                  PriceWidget(price: product.discountedPrice, color: Colors.green, fontSize: 22, fontWeight: FontWeight.bold),
                                   const SizedBox(width: 10),
-                                  PriceWidget(price: dish.regularPrice, textDecoration: TextDecoration.lineThrough),
+                                  PriceWidget(price: product.regularPrice, textDecoration: TextDecoration.lineThrough),
                                 ],
                               ),
                       ),
@@ -531,7 +531,7 @@ class ProductCardWidget extends StatelessWidget {
                   ),
                 ),
                 CachedNetworkImage(
-                  imageUrl: dish.imageUrl,
+                  imageUrl: product.imageUrl,
                   width: 170,
                   fit: BoxFit.cover,
                   memCacheWidth: 170,
@@ -544,7 +544,7 @@ class ProductCardWidget extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           ElevatedButton(
-            onPressed: () => showDishDialog(context),
+            onPressed: () => showProductDialog(context),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10,

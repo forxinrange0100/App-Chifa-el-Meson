@@ -31,14 +31,14 @@ class FetchProductsException implements Exception {
   }
 }
 
-class FetchDishCategoriesException implements Exception {
+class FetchCategoriesException implements Exception {
   final String message;
 
-  FetchDishCategoriesException([this.message = 'Failed to fetch dish categories']);
+  FetchCategoriesException([this.message = 'Failed to fetch categories']);
 
   @override
   String toString() {
-    return 'FetchDishCategoriesException: $message';
+    return 'FetchCategoriesException: $message';
   }
 }
 

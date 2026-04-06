@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class DishCategory {
+class Category {
   final int id;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -9,7 +9,7 @@ class DishCategory {
   final int displayOrder;
   GlobalKey categoryKey;
 
-  DishCategory(
+  Category(
       {required this.id,
       required this.createdAt,
       required this.updatedAt,
