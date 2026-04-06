@@ -29,8 +29,9 @@ void navigateCheckout(BuildContext context) async {
 /// Navega a la pantalla de pago.
 /// Siempre antes de navegar se debe asignar [OrderSummaryProvider.orderResult], 
 /// ya sea manualmente o mediante [OrderSummaryProvider.postOrder].
+/// Usa [pushReplacement] para liberar memoria de OrderSummaryPage antes de abrir el CustomTab.
 void navigatePayment(NavigatorState navigator) {
-  navigator.push(
+  navigator.pushReplacement(
     MaterialPageRoute(builder: (context) => PaymentPage()),
   );
 }

@@ -36,6 +36,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   late final FocusNode _focusNodeEmail;
   late final FocusNode _focusNodePhone;
 
+  // Cache provider for dispose (only for cleanup, not context.read)
+  late final DeliveryDetailsProvider _deliveryDetailsProviderForDispose;
+
   // Input status for address
   final InputStatus _inputStatusAddress = InputStatus(
     errorMessage: "Dirección debería tener al menos 5 caracteres",
@@ -115,6 +118,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   @override
   void initState() {
     super.initState();
+    // Cache provider for dispose (safe to do in initState before context is deactivated)
+    _deliveryDetailsProviderForDispose = context.read<DeliveryDetailsProvider>();
+
     // Initialize focus nodes
     _focusNodeAddress = FocusNode();
     _focusNodeFullName = FocusNode();
@@ -141,8 +147,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
 
   @override
   void dispose() {
-    // Usa la referencia guardada, no el context.read directamente
-    _deliveryDetailsProvider.clearDeliveryTypeEnum();
+    // Use cached provider for cleanup, NOT context.read()
+    _deliveryDetailsProviderForDispose.clearDeliveryTypeEnum();
     // Limpia los controladores y focus nodes
     _textEditingControllerAddress.dispose();
     _textEditingControllerFullName.dispose();

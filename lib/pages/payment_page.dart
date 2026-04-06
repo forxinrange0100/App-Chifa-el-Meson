@@ -7,6 +7,7 @@ import 'package:app_links/app_links.dart';
 import 'package:provider/provider.dart';
 import 'package:delivera/model/payment_result_model.dart';
 import 'package:delivera/pages/invoice_page.dart';
+import 'package:delivera/pages/order_summary_page.dart' show OrderSummaryPage;
 import 'package:delivera/provider/invoice_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart';
 import 'package:delivera/provider/shopping_cart_provider.dart';
@@ -39,26 +40,33 @@ class PaymentPageState extends State<PaymentPage> {
     super.dispose();
   }
 
+  // ============ Provider Getters ============
+  OrderSummaryProvider get _orderSummaryProvider => context.read<OrderSummaryProvider>();
+
+  PaymentProvider get _paymentProvider => context.read<PaymentProvider>();
+
   Future<void> initializePayment() async {
-    final paymentData = context.read<OrderSummaryProvider>().orderResult?.paymentData;
-    final paymentProvider = context.read<PaymentProvider>();
+    final paymentData = _orderSummaryProvider.orderResult?.paymentData;
 
     if (paymentData == null) {
-      paymentProvider.onError();
+      _paymentProvider.onError();
       return;
     }
 
-    await openBrowser(paymentProvider, paymentData);
+    await openBrowser(_paymentProvider, paymentData);
   }
 
   Future<void> listenForAppLinks() async {
     // Caso cuando la app ya está abierta
-    _sub = _appLinks.uriLinkStream.listen((uri) {
-      log('cambios');
-      _handleAppLink(uri);
-    }, onError: (err) {
-      log("Error en app link stream: $err");
-    });
+    _sub = _appLinks.uriLinkStream.listen(
+      (uri) {
+        log('cambios');
+        _handleAppLink(uri);
+      },
+      onError: (err) {
+        log("Error en app link stream: $err");
+      },
+    );
   }
 
   void _handleAppLink(Uri uri) {
@@ -80,16 +88,30 @@ class PaymentPageState extends State<PaymentPage> {
 
   void _navigateInvoice(int publicId) {
     context.read<ShoppingCartProvider>().cleanShoppingCart();
-    final orderSummaryProvider = context.read<OrderSummaryProvider>();
-    orderSummaryProvider.clearOrderSummary();
-    orderSummaryProvider.clearPaymentData();
+    _orderSummaryProvider.clearOrderSummary();
+    _orderSummaryProvider.clearPaymentData();
     context.read<InvoiceProvider>().publicId = publicId;
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const InvoicePage()),
-      (route) => false,
-    );
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const InvoicePage()), (route) => false);
+  }
+
+  Future<void> _retryPayment(BuildContext context) async {
+    if (_orderSummaryProvider.orderResult == null) return;
+
+    _paymentProvider.onLoading();
+
+    final paymentData = _orderSummaryProvider.orderResult!.paymentData;
+
+    Future<void> caseTransbank() async {
+      bool success = await _orderSummaryProvider.postOrder();
+      if (!success) {
+        _paymentProvider.setHasError(true);
+        _paymentProvider.setIsLoading(false);
+        return;
+      }
+    }
+
+    await openBrowser(_paymentProvider, paymentData, caseTransbank: caseTransbank);
   }
 
   @override
@@ -111,8 +133,10 @@ class PaymentPageState extends State<PaymentPage> {
           bottomNavigationBar: paymentProvider.isLoading
               ? null
               : ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Volver atrás'),
+                  onPressed: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const OrderSummaryPage()),
+                  ),
+                  child: const Text('Volver atrás'),
                 ),
         );
       },
@@ -125,47 +149,33 @@ class _BrowserOpenedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Padding(
         padding: EdgeInsets.all(30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           spacing: 10,
           children: [
-            Text(
-              "Se ha abierto un navegador para completar el pago.",
-              textAlign: TextAlign.center,
-            ),
-            ElevatedButton(
-              onPressed: () => _retryPayment(context),
-              child: Text('Reintentar pago'),
-            ),
+            Text("Se ha abierto un navegador para completar el pago.", textAlign: TextAlign.center),
+            _RetryPaymentButton(),
           ],
         ),
       ),
     );
   }
+}
 
-  void _retryPayment(BuildContext context) async {
-    final orderSummaryProvider = context.read<OrderSummaryProvider>();
-    final paymentProvider = context.read<PaymentProvider>();
+class _RetryPaymentButton extends StatelessWidget {
+  const _RetryPaymentButton();
 
-    if (orderSummaryProvider.orderResult == null) return;
-
-    paymentProvider.onLoading();
-
-    final paymentData = orderSummaryProvider.orderResult!.paymentData;
-
-    Future<void> caseTransbank() async {
-      bool success = await orderSummaryProvider.postOrder();
-      if (!success) {
-        paymentProvider.setHasError(true);
-        paymentProvider.setIsLoading(false);
-        return;
-      }
-    }
-
-    await openBrowser(paymentProvider, paymentData, caseTransbank: caseTransbank);
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        (context.findAncestorStateOfType<PaymentPageState>())?._retryPayment(context);
+      },
+      child: const Text('Reintentar pago'),
+    );
   }
 }
 
@@ -176,15 +186,11 @@ Future<void> _launchPaymentCustomTab(Uri uri) async {
     await launchUrl(
       uri,
       customTabsOptions: CustomTabsOptions(
-        colorSchemes: CustomTabsColorSchemes.defaults(
-          toolbarColor: const Color(0xFF557819),
-        ),
+        colorSchemes: CustomTabsColorSchemes.defaults(toolbarColor: const Color(0xFF557819)),
         shareState: CustomTabsShareState.on,
         urlBarHidingEnabled: true,
         showTitle: true,
-        closeButton: CustomTabsCloseButton(
-          icon: CustomTabsCloseButtonIcons.back,
-        ),
+        closeButton: CustomTabsCloseButton(icon: CustomTabsCloseButtonIcons.back),
       ),
       safariVCOptions: const SafariViewControllerOptions(
         preferredBarTintColor: Color(0xFF557819),
@@ -204,13 +210,8 @@ Future<void> openBrowserGetnet(String paymentUrl) async {
   await _launchPaymentCustomTab(uri);
 }
 
-Future<void> openBrowserTransbank(
-  String paymentUrl,
-  String token,
-) async {
-  final uri = Uri.parse(
-    '${Urls.apiUrl}/api/transbank/form?payment_url=$paymentUrl&token_ws=$token',
-  );
+Future<void> openBrowserTransbank(String paymentUrl, String token) async {
+  final uri = Uri.parse('${Urls.apiUrl}/api/transbank/form?payment_url=$paymentUrl&token_ws=$token');
   await _launchPaymentCustomTab(uri);
 }
 
@@ -254,7 +255,7 @@ class RedirectingWidget extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(20.0),
             child: Text("Estamos redirigiéndote al portal de pago...", textAlign: TextAlign.center),
-          )
+          ),
         ],
       ),
     );
