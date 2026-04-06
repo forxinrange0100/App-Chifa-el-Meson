@@ -27,7 +27,7 @@ import 'package:delivera/provider/bottom_navigation_bar_provider.dart' show Bott
 import 'package:delivera/provider/data_provider.dart' show DataProvider;
 import 'package:delivera/provider/delivery_details_provider.dart' show DeliveryDetailsProvider;
 import 'package:delivera/provider/dish_categories_provider.dart' show DishCategoriesProvider;
-import 'package:delivera/provider/dishes_provider.dart' show DishesProvider;
+import 'package:delivera/provider/products_provider.dart' show ProductsProvider;
 import 'package:delivera/provider/invoice_provider.dart' show InvoiceProvider;
 import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
 import 'package:delivera/provider/payment_provider.dart' show PaymentProvider;
@@ -164,7 +164,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => BottomNavigationBarProvider()),
         ChangeNotifierProvider(create: (_) => RestaurantInfoProvider()),
-        ChangeNotifierProvider(create: (_) => DishesProvider()),
+        ChangeNotifierProvider(create: (_) => ProductsProvider()),
         ChangeNotifierProvider(create: (_) => DishCategoriesProvider()),
         ChangeNotifierProvider(create: (_) => ScrollControllerProvider()),
         ChangeNotifierProvider(create: (_) => ShoppingCartProvider()),
@@ -182,7 +182,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
           create: (context) => DataProvider(
             context.read<RestaurantInfoProvider>(),
-            context.read<DishesProvider>(),
+            context.read<ProductsProvider>(),
             context.read<DishCategoriesProvider>(),
             context.read<DeliveryDetailsProvider>(),
           ),

@@ -3,10 +3,9 @@ import 'dart:convert';
 import 'package:delivera/environment.dart';
 import 'package:delivera/errors/errors.dart';
 import 'package:delivera/model/product_model.dart';
-import 'package:delivera/model/dishes_model.dart';
 import 'package:http/http.dart' as http;
 
-Future<Dishes> fetchDishes() async {
+Future<List<Product>> fetchProducts() async {
   try {
     final response = await http.get(Uri.parse("${Urls.apiUrl}/api/products/${Urls.companyId}"));
     if (response.statusCode == 200) {
@@ -20,16 +19,16 @@ Future<Dishes> fetchDishes() async {
       // log("Response body decode: ${json.decode(response.body)}");
       // log("Fetch Dishes length: ${response.body.length}");
       final result = json.decode(response.body);
-      final products = result['products'];
-      List<Product> dishes = [];
-      for (var product in products) {
-        dishes.add(Product.fromJson(product));
+      final productsJson = result['products'];
+      List<Product> products = [];
+      for (var product in productsJson) {
+        products.add(Product.fromJson(product));
       }
-      return Dishes(dishes: dishes);
+      return products;
     } else {
-      throw FetchDishesException(response.body.toString());
+      throw FetchProductsException(response.body.toString());
     }
   } catch (e) {
-    throw FetchDishesException(e.toString());
+    throw FetchProductsException(e.toString());
   }
 }

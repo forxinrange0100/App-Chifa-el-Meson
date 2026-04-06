@@ -7,7 +7,7 @@ import 'package:delivera/model/product_model.dart' show Product;
 import 'package:delivera/model/payment_result_model.dart' show PaymentResult;
 import 'package:delivera/model/shopping_cart_model.dart' show ShoppingCart;
 import 'package:delivera/provider/dish_categories_provider.dart';
-import 'package:delivera/provider/dishes_provider.dart';
+import 'package:delivera/provider/products_provider.dart';
 import 'package:delivera/provider/order_summary_provider.dart' show OrderSummaryProvider;
 import 'package:delivera/provider/restaurant_info_provider.dart';
 import 'package:delivera/provider/scroll_controller_provider.dart';
@@ -281,7 +281,7 @@ class _LastOrderWidget extends StatelessWidget {
   }
 
   Future<void> _lastOrderModal(BuildContext context) {
-    final List<Product> newProducts = context.read<DishesProvider>().dishes.dishes.toList();
+    final List<Product> newProducts = context.read<ProductsProvider>().products;
     _order.updateProducts(newProducts, clearNotes: true);
     _order.updateTotals();
     final textButtonStyle = TextButton.styleFrom(
@@ -462,11 +462,11 @@ class CategoryProductsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DishesProvider>(
+    return Consumer<ProductsProvider>(
       builder: (context, dishProvider, child) {
         return Column(
           spacing: 16,
-          children: dishProvider.getDishesByCategory(categoryId).map((dish) {
+          children: dishProvider.getProductsByCategory(categoryId).map((dish) {
             return ProductCardWidget(dish: dish);
           }).toList(),
         );

@@ -20,14 +20,14 @@ class FetchDispatchEnabledException implements Exception {
   }
 }
 
-class FetchDishesException implements Exception {
+class FetchProductsException implements Exception {
   final String message;
 
-  FetchDishesException([this.message = 'Failed to fetch dishes']);
+  FetchProductsException([this.message = 'Failed to fetch products']);
 
   @override
   String toString() {
-    return 'FetchDishesException: $message';
+    return 'FetchProductsException: $message';
   }
 }
 
