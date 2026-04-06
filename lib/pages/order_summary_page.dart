@@ -30,6 +30,12 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   final UserBox? _lastInputs = UserBox.fromStorage();
   late final bool _hasLastInputs;
 
+  // Focus nodes for form navigation
+  late final FocusNode _focusNodeAddress;
+  late final FocusNode _focusNodeFullName;
+  late final FocusNode _focusNodeEmail;
+  late final FocusNode _focusNodePhone;
+
   // Input status for address
   final InputStatus _inputStatusAddress =
       InputStatus(errorMessage: "Dirección debería tener al menos 5 caracteres", isValid: (String value) => (value.length > 4));
@@ -88,12 +94,32 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   static const _titleStyle = TextStyle(fontWeight: FontWeight.bold);
   static const _textInvalidStyle = TextStyle(color: Colors.red);
 
+  static final InputBorder _defaultInputBorder = const OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+    borderSide: BorderSide(width: 2, color: Colors.grey),
+  );
+  
+  // Default input decoration
+  static final InputDecoration _defaultInputDecoration = InputDecoration(
+    filled: true,
+    fillColor: Colors.grey.shade200,
+    enabledBorder: _defaultInputBorder,
+    focusedBorder: _defaultInputBorder,
+    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+  );
+
   late DeliveryDetailsProvider _deliveryDetailsProvider;
   late OrderSummaryProvider _orderSummaryProvider;
 
   @override
   void initState() {
     super.initState();
+    // Initialize focus nodes
+    _focusNodeAddress = FocusNode();
+    _focusNodeFullName = FocusNode();
+    _focusNodeEmail = FocusNode();
+    _focusNodePhone = FocusNode();
+
     // Llama al método update() del provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _orderSummaryProvider.clearDeliveryDetails();
@@ -116,11 +142,15 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   void dispose() {
     // Usa la referencia guardada, no el context.read directamente
     _deliveryDetailsProvider.clearDeliveryTypeEnum();
-    // Limpia los controladores
+    // Limpia los controladores y focus nodes
     _textEditingControllerAddress.dispose();
     _textEditingControllerFullName.dispose();
     _textEditingControllerEmail.dispose();
     _textEditingControllerPhoneNumber.dispose();
+    _focusNodeAddress.dispose();
+    _focusNodeFullName.dispose();
+    _focusNodeEmail.dispose();
+    _focusNodePhone.dispose();
     super.dispose();
   }
 
@@ -244,25 +274,22 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
+                  focusNode: _focusNodeFullName,
+                  textInputAction: TextInputAction.next,
+                  onEditingComplete: () {
+                    if (_inputStatusFullName.status == InputStatusEnum.valid) {
+                      FocusScope.of(context).requestFocus(_focusNodeEmail);
+                    }
+                  },
                   onChanged: (value) {
                     setState(() {
                       _inputStatusFullName.verify(value);
                     });
                   },
                   controller: _textEditingControllerFullName,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey.shade200,
+                  decoration: _buildInputDecoration(
                     hintText: 'Ingrese su nombre',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(width: 2, color: _inputStatusFullName.getStatusColor()),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                    borderColor: _inputStatusFullName.getStatusColor(),
                   ),
                 ),
               ),
@@ -276,6 +303,13 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
+                  focusNode: _focusNodeEmail,
+                  textInputAction: TextInputAction.next,
+                  onEditingComplete: () {
+                    if (_inputStatusEmail.status == InputStatusEnum.valid) {
+                      FocusScope.of(context).requestFocus(_focusNodePhone);
+                    }
+                  },
                   onChanged: (value) {
                     setState(() {
                       _inputStatusEmail.verify(value);
@@ -285,19 +319,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
                   ],
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey.shade200,
+                  decoration: _buildInputDecoration(
                     hintText: 'Ingrese su correo',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(width: 2, color: _inputStatusEmail.getStatusColor()),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                    borderColor: _inputStatusEmail.getStatusColor(),
                   ),
                 ),
               ),
@@ -311,6 +335,8 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
+                  focusNode: _focusNodePhone,
+                  textInputAction: TextInputAction.none,
                   onChanged: (value) {
                     setState(() {
                       _inputStatusPhoneNumber.verify(value);
@@ -321,19 +347,9 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                     FilteringTextInputFormatter.digitsOnly, // Allow only digits
                     FilteringTextInputFormatter.deny(RegExp(r'\s')), // Remove spaces from input
                   ],
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey.shade200,
+                  decoration: _buildInputDecoration(
                     hintText: 'Ingrese su celular. Ejemplo: 912345678',
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(width: 2, color: _inputStatusPhoneNumber.getStatusColor()),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                    borderColor: _inputStatusPhoneNumber.getStatusColor(),
                   ),
                 ),
               ),
@@ -513,25 +529,22 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                         style: _titleStyle,
                       ),
                       TextFormField(
+                        focusNode: _focusNodeAddress,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () {
+                          if (_inputStatusAddress.status == InputStatusEnum.valid) {
+                            FocusScope.of(context).requestFocus(_focusNodeFullName);
+                          }
+                        },
                         controller: _textEditingControllerAddress,
                         onChanged: (value) {
                           setState(() {
                             _inputStatusAddress.verify(value);
                           });
                         },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey.shade200,
+                        decoration: _buildInputDecoration(
                           hintText: 'Ingrese su dirección...',
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide(width: 2, color: _inputStatusAddress.getStatusColor()),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                          borderColor: _inputStatusAddress.getStatusColor(),
                         ),
                       ),
                       (_inputStatusAddress.status == InputStatusEnum.invalid)
@@ -585,6 +598,21 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
         title,
         style: _titleStyle,
       ),
+    );
+  }
+
+  InputDecoration _buildInputDecoration({
+    required String hintText,
+    required Color borderColor,
+  }) {
+    final inputBorder = _defaultInputBorder.copyWith(
+      borderSide: _defaultInputBorder.borderSide.copyWith(color: borderColor),
+    );
+
+    return _defaultInputDecoration.copyWith(
+      hintText: hintText,
+      enabledBorder: inputBorder,
+      focusedBorder: inputBorder,
     );
   }
 
