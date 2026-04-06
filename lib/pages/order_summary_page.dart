@@ -36,8 +36,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   late final FocusNode _focusNodeEmail;
   late final FocusNode _focusNodePhone;
 
-  // Cache provider for dispose (only for cleanup, not context.read)
-  late final DeliveryDetailsProvider _deliveryDetailsProviderForDispose;
+  // Cached provider references (initialized in initState)
+  late final DeliveryDetailsProvider _deliveryDetailsProvider;
+  late final OrderSummaryProvider _orderSummaryProvider;
+  late final ShiftProvider _shiftProvider;
 
   // Input status for address
   final InputStatus _inputStatusAddress = InputStatus(
@@ -118,8 +120,10 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   @override
   void initState() {
     super.initState();
-    // Cache provider for dispose (safe to do in initState before context is deactivated)
-    _deliveryDetailsProviderForDispose = context.read<DeliveryDetailsProvider>();
+    // Cache provider references (safe to do in initState before context is deactivated)
+    _deliveryDetailsProvider = context.read<DeliveryDetailsProvider>();
+    _orderSummaryProvider = context.read<OrderSummaryProvider>();
+    _shiftProvider = context.read<ShiftProvider>();
 
     // Initialize focus nodes
     _focusNodeAddress = FocusNode();
@@ -148,7 +152,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
   @override
   void dispose() {
     // Use cached provider for cleanup, NOT context.read()
-    _deliveryDetailsProviderForDispose.clearDeliveryTypeEnum();
+    _deliveryDetailsProvider.clearDeliveryTypeEnum();
     // Limpia los controladores y focus nodes
     _textEditingControllerAddress.dispose();
     _textEditingControllerFullName.dispose();
@@ -160,13 +164,6 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
     _focusNodePhone.dispose();
     super.dispose();
   }
-
-  // ============ Provider Getters ============
-  DeliveryDetailsProvider get _deliveryDetailsProvider => context.read<DeliveryDetailsProvider>();
-
-  OrderSummaryProvider get _orderSummaryProvider => context.read<OrderSummaryProvider>();
-
-  ShiftProvider get _shiftProvider => context.read<ShiftProvider>();
 
   @override
   Widget build(BuildContext context) {
@@ -312,7 +309,7 @@ class _OrderSummaryPageState extends State<OrderSummaryPage> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
                   focusNode: _focusNodePhone,
-                  textInputAction: TextInputAction.none,
+                  textInputAction: TextInputAction.done,
                   onChanged: (value) {
                     setState(() {
                       _inputStatusPhoneNumber.verify(value);

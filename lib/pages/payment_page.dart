@@ -24,9 +24,17 @@ class PaymentPageState extends State<PaymentPage> {
   late final AppLinks _appLinks;
   StreamSubscription? _sub;
 
+  // Cached provider references (initialized in initState)
+  late final OrderSummaryProvider _orderSummaryProvider;
+  late final PaymentProvider _paymentProvider;
+
   @override
   void initState() {
     super.initState();
+    // Cache provider references (safe to do in initState before context is deactivated)
+    _orderSummaryProvider = context.read<OrderSummaryProvider>();
+    _paymentProvider = context.read<PaymentProvider>();
+
     _appLinks = AppLinks();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initializePayment();
@@ -39,11 +47,6 @@ class PaymentPageState extends State<PaymentPage> {
     _sub?.cancel();
     super.dispose();
   }
-
-  // ============ Provider Getters ============
-  OrderSummaryProvider get _orderSummaryProvider => context.read<OrderSummaryProvider>();
-
-  PaymentProvider get _paymentProvider => context.read<PaymentProvider>();
 
   Future<void> initializePayment() async {
     final paymentData = _orderSummaryProvider.orderResult?.paymentData;

@@ -33,7 +33,7 @@ class HomeInfoPage extends StatelessWidget {
 
     return Scaffold(
       body: CustomScrollView(
-        controller: context.watch<ScrollControllerProvider>().scrollController,
+        controller: context.select((ScrollControllerProvider p) => p.scrollController),
         slivers: [
           SliverToBoxAdapter(child: HeaderWidget()),
           if (lastOrder != null) SliverToBoxAdapter(child: _LastOrderWidget(lastOrder)),
@@ -143,7 +143,7 @@ class _ContinuePaymentState extends State<_ContinuePayment> {
       mini: true,
       splashColor: Colors.white70,
       backgroundColor: Colors.amber.withValues(alpha: .9),
-      child: Icon(Icons.attach_money, size: 24),
+      child: const Icon(Icons.attach_money, size: 24),
     );
   }
 }
@@ -153,15 +153,14 @@ class HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Using Consumer to listen to changes in RestaurantInfoProvider
-    var restaurantInfoProvider = context.watch<RestaurantInfoProvider>();
-    var imageUrl = restaurantInfoProvider.restaurantInfo.heroImage;
-    var address = restaurantInfoProvider.restaurantInfo.address;
-    var phone = restaurantInfoProvider.restaurantInfo.phone;
-    var schedule = restaurantInfoProvider.restaurantInfo.schedule;
-    var logoUrl = restaurantInfoProvider.restaurantInfo.logo;
-    var name = restaurantInfoProvider.restaurantInfo.name;
-    var description = restaurantInfoProvider.restaurantInfo.description;
+    // Selective subscriptions to specific properties
+    var imageUrl = context.select((RestaurantInfoProvider p) => p.restaurantInfo.heroImage);
+    var address = context.select((RestaurantInfoProvider p) => p.restaurantInfo.address);
+    var phone = context.select((RestaurantInfoProvider p) => p.restaurantInfo.phone);
+    var schedule = context.select((RestaurantInfoProvider p) => p.restaurantInfo.schedule);
+    var logoUrl = context.select((RestaurantInfoProvider p) => p.restaurantInfo.logo);
+    var name = context.select((RestaurantInfoProvider p) => p.restaurantInfo.name);
+    var description = context.select((RestaurantInfoProvider p) => p.restaurantInfo.description);
 
     Row buildIconInfo({required IconData icon, required String text, Color? color}) {
       return Row(
@@ -187,6 +186,8 @@ class HeaderWidget extends StatelessWidget {
               imageUrl: imageUrl,
               width: double.infinity,
               height: 250,
+              memCacheHeight: 250,
+              memCacheWidth: (MediaQuery.of(context).size.width).toInt(),
               fit: BoxFit.cover,
               progressIndicatorBuilder: (context, url, downloadProgress) {
                 return Container(width: double.infinity, height: 250, color: Colors.redAccent.shade700);
@@ -225,14 +226,19 @@ class HeaderWidget extends StatelessWidget {
                             buildIconInfo(icon: FontAwesomeIcons.locationDot, text: address),
                             buildIconInfo(icon: FontAwesomeIcons.phone, text: phone),
                             buildIconInfo(icon: FontAwesomeIcons.solidClock, text: schedule),
-                            context.watch<ShiftProvider>().isOpen
+                            context.select((ShiftProvider p) => p.isOpen)
                                 ? buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Abierto", color: Colors.green)
                                 : buildIconInfo(icon: FontAwesomeIcons.solidCircle, text: "Turno Cerrado", color: Colors.red),
                           ],
                         ),
                       ),
                       ClipOval(
-                        child: CachedNetworkImage(imageUrl: logoUrl, fit: BoxFit.scaleDown),
+                        child: CachedNetworkImage(
+                          imageUrl: logoUrl,
+                          fit: BoxFit.scaleDown,
+                          memCacheHeight: 100,
+                          memCacheWidth: 100,
+                        ),
                       ),
                     ],
                   ),
@@ -320,8 +326,10 @@ class _LastOrderWidget extends StatelessWidget {
                                   imageUrl: orderProduct.product.imageUrl,
                                   width: 50,
                                   height: 50,
-                                  placeholder: (_, _) => CircularProgressIndicator(),
-                                  errorWidget: (_, _, _) => Icon(Icons.error),
+                                  memCacheHeight: 50,
+                                  memCacheWidth: 50,
+                                  placeholder: (_, _) => const CircularProgressIndicator(),
+                                  errorWidget: (_, _, _) => const Icon(Icons.error),
                                 ),
                                 Expanded(child: ExpandableText(orderProduct.product.name, enabled: false, maxLines: 3)),
                                 Text('x${orderProduct.quantity}'),
@@ -375,6 +383,8 @@ class _LastOrderWidget extends StatelessWidget {
 class CategoriesScrollerWidget extends StatelessWidget {
   const CategoriesScrollerWidget({super.key});
 
+  static const _categoryTextStyle = TextStyle(fontWeight: FontWeight.w500, fontSize: 20);
+
   @override
   Widget build(BuildContext context) {
     return Consumer<DishCategoriesProvider>(
@@ -394,7 +404,7 @@ class CategoriesScrollerWidget extends StatelessWidget {
                     Scrollable.ensureVisible(context, duration: const Duration(seconds: 1), curve: Curves.ease, alignment: 0.0);
                   }
                 },
-                child: Text(category.name, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 20)),
+                child: Text(category.name, style: _categoryTextStyle),
               );
             },
           ),
@@ -524,6 +534,8 @@ class ProductCardWidget extends StatelessWidget {
                   imageUrl: dish.imageUrl,
                   width: 170,
                   fit: BoxFit.cover,
+                  memCacheWidth: 170,
+                  memCacheHeight: 160,
                   placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
