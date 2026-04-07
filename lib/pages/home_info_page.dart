@@ -186,7 +186,7 @@ class HeaderWidget extends StatelessWidget {
               imageUrl: imageUrl,
               width: double.infinity,
               height: 250,
-              memCacheHeight: 250,
+              memCacheHeight: 500,
               memCacheWidth: (MediaQuery.of(context).size.width).toInt(),
               fit: BoxFit.cover,
               progressIndicatorBuilder: (context, url, downloadProgress) {
@@ -236,8 +236,8 @@ class HeaderWidget extends StatelessWidget {
                         child: CachedNetworkImage(
                           imageUrl: logoUrl,
                           fit: BoxFit.scaleDown,
-                          memCacheHeight: 100,
-                          memCacheWidth: 100,
+                          memCacheHeight: 200,
+                          memCacheWidth: 200,
                         ),
                       ),
                     ],
@@ -326,8 +326,8 @@ class _LastOrderWidget extends StatelessWidget {
                                   imageUrl: orderProduct.product.imageUrl,
                                   width: 50,
                                   height: 50,
-                                  memCacheHeight: 50,
-                                  memCacheWidth: 50,
+                                  memCacheHeight: 100,
+                                  memCacheWidth: 100,
                                   placeholder: (_, _) => const CircularProgressIndicator(),
                                   errorWidget: (_, _, _) => const Icon(Icons.error),
                                 ),
@@ -425,7 +425,7 @@ class StoreProductsWidget extends StatelessWidget {
           builder: (context, categoriesProvider, child) {
             return Container(
               color: Colors.grey.shade200,
-              padding: const EdgeInsets.only(bottom: 20.0),
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: Column(
                 children: categoriesProvider.categories.map((category) {
                   return Column(
@@ -434,7 +434,7 @@ class StoreProductsWidget extends StatelessWidget {
                       Container(
                         width: double.infinity,
                         alignment: Alignment.center,
-                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        margin: const EdgeInsets.only(top: 0),
                         color: Colors.white,
                         child: Text(
                           category.name,
@@ -464,11 +464,18 @@ class CategoryProductsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ProductsProvider>(
       builder: (context, productProvider, child) {
-        return Column(
-          spacing: 16,
-          children: productProvider.getProductsByCategory(categoryId).map((product) {
-            return ProductCardWidget(product: product);
-          }).toList(),
+        final products = productProvider.getProductsByCategory(categoryId);
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: products.length,
+          padding: const EdgeInsets.only(bottom: 32.0),
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: ProductCardWidget(product: products[index]),
+            );
+          },
         );
       },
     );
@@ -534,8 +541,8 @@ class ProductCardWidget extends StatelessWidget {
                   imageUrl: product.imageUrl,
                   width: 170,
                   fit: BoxFit.cover,
-                  memCacheWidth: 170,
-                  memCacheHeight: 160,
+                  memCacheWidth: 340,
+                  memCacheHeight: 320,
                   placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
